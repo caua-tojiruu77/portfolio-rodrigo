@@ -1,7 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
-};
+  reactStrictMode: true,
+  i18n: {
+    locales: ['en', 'it', 'de'], // idiomas suportados
+    defaultLocale: 'en',         // idioma padrão
+  },
+}
 
-export default nextConfig;
+export default nextConfig
