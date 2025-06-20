@@ -4,17 +4,16 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { usePathname } from "next/navigation";
+import { createPolyglot } from "@/utils/polyglot";
+import { useLanguage } from "@/context/languageContext";
 
 export default function Header() {
   const [navbar, setNavbar] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
 
-  // Captura a rota atual (ex: /en/about)
-  const currentLang = pathname.split("/")[1] || "en";
-
-  const languages = ["en", "it", "de"];
+  const { language, setLanguage } = useLanguage();
+  const polyglot = createPolyglot(language);
+  const languages = ["it", "de", "en"];
 
   useEffect(() => {
     const changeBackground = () => {
@@ -25,18 +24,10 @@ export default function Header() {
   }, []);
 
   const navigation = [
-    { name: "Home", href: "/#" },
-    { name: "About Me", href: "/about" },
-    { name: "Experiência", href: "/" },
-    { name: "Formação", href: "/" },
-    { name: "Galeria", href: "/" },
+    { name: polyglot.t("header.home"), href: "/#" },
+    { name: polyglot.t("header.about"), href: "/about" },
+    { name: polyglot.t("header.experience"), href: "/experience" },
   ];
-
-  const switchLang = (lang: string) => {
-    const segments = pathname.split("/");
-    segments[1] = lang;
-    return segments.join("/") || "/";
-  };
 
   return (
     <header>
@@ -62,7 +53,7 @@ export default function Header() {
             {navigation.map((item, index) => (
               <Link
                 key={index}
-                href={`/${currentLang}${item.href}`}
+                href={item.href}
                 className="text-brand-100 font-semibold hover:underline"
               >
                 {item.name}
@@ -73,17 +64,17 @@ export default function Header() {
           {/* Seletor de Idiomas */}
           <div className="hidden lg:flex gap-2">
             {languages.map((lang) => (
-              <Link
+              <button
                 key={lang}
-                href={switchLang(lang)}
+                onClick={() => setLanguage(lang as "it" | "de")}
                 className={`px-3 py-1 rounded-full text-sm font-bold ${
-                  currentLang === lang
-                    ? "bg-white text-brand-500"
-                    : "bg-brand-100 text-white hover:bg-white hover:text-brand-500"
+                  language === lang
+                    ? "bg-brand-200 text-brand-500"
+                    : "bg-brand-100 text-white hover:bg-blue-400 hover:text-brand-500"
                 } transition-all duration-200`}
               >
                 {lang.toUpperCase()}
-              </Link>
+              </button>
             ))}
           </div>
 
@@ -141,7 +132,7 @@ export default function Header() {
               {navigation.map((item, index) => (
                 <Link
                   key={index}
-                  href={`/${currentLang}${item.href}`}
+                  href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
                   className="text-white text-lg font-medium hover:underline"
                 >
@@ -151,18 +142,20 @@ export default function Header() {
 
               <div className="flex gap-3">
                 {languages.map((lang) => (
-                  <Link
+                  <button
                     key={lang}
-                    href={switchLang(lang)}
+                    onClick={() => {
+                      setLanguage(lang as "it" | "de");
+                      setMobileMenuOpen(false);
+                    }}
                     className={`px-3 py-1 rounded-full text-sm font-bold ${
-                      currentLang === lang
-                        ? "bg-white text-brand-500"
-                        : "bg-brand-500 text-white"
+                      language === lang
+                        ? "bg-brand-200 text-brand-500"
+                        : "bg-brand-100 text-white hover:bg-blue-400 hover:text-brand-500"
                     }`}
-                    onClick={() => setMobileMenuOpen(false)}
                   >
                     {lang.toUpperCase()}
-                  </Link>
+                  </button>
                 ))}
               </div>
             </div>

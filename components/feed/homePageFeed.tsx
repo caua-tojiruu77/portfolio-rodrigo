@@ -7,9 +7,33 @@ import FadeInSection from "../animations/fadeAnimation";
 import EntryAnimation from "../animations/entryAnimation";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import Polyglot from "node-polyglot";
+import { useLanguage } from "@/context/languageContext";
 
 export default function HomePageSection() {
   const [showContent, setShowContent] = useState(false);
+
+  const { language } = useLanguage();
+
+  const phrases = {
+    de: {
+      "page.welcome":
+        "Willkommen in meinem Universum. Hier erfährst du mehr über den Weg, den ich gegangen bin, um der Tänzer zu werden, der ich heute bin ein Weg voller Hingabe, Mut und Liebe zur Kunst.\nFühle dich frei, zu erkunden, dich inspirieren zu lassen und dich mit jeder Bewegung dieser Geschichte zu verbinden.",
+    },
+    it: {
+      "page.welcome":
+        "Benvenuto nel mio universo. Qui scoprirai di più sul percorso che ho intrapreso per diventare il danzatore che sono oggi un cammino fatto di dedizione, coraggio e amore per l’arte.\nSentiti libero di esplorare, lasciarti ispirare e connetterti con ogni movimento di questa storia.",
+    },
+    en: {
+      "page.welcome":
+        "Welcome to my universe. Here you will learn more about the path I have taken to become the dancer I am today a journey shaped by dedication, courage, and love for the art.\nFeel free to explore, be inspired, and connect with every movement of this story.",
+    },
+  };
+
+  const polyglot = new Polyglot({
+    phrases: phrases[language],
+    locale: language,
+  });
 
   useEffect(() => {
     const timer = setTimeout(() => setShowContent(true), 2000); // mesmo tempo do EntryAnimation
@@ -39,11 +63,7 @@ export default function HomePageSection() {
               </FadeInSection>
             </div>
             <p className="text-sm md:text-base text-gray-300 mb-2 text-start">
-              Seja bem-vindo ao meu universo. Aqui você vai conhecer mais sobre
-              o caminho que percorri para me tornar o dançarino que sou hoje —
-              uma trajetória feita de dedicação, coragem e amor pela arte.
-              Sinta-se à vontade para explorar, inspirar-se e conectar-se com
-              cada movimento dessa história.
+              <h1>{polyglot.t("page.welcome")}</h1>
             </p>
             <div className="mt-4 flex items-center text-center gap-2 text-brand-200 animate-bounce w-full">
               <Mouse size={30} />

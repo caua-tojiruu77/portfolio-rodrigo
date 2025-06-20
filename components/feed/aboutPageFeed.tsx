@@ -1,25 +1,112 @@
 "use client";
 
 import Image from "next/image";
-import { Mail, ArrowBigDown, Mouse } from "lucide-react";
-import Link from "next/link";
-import FadeInSection from "../animations/fadeAnimation";
-import EntryAnimation from "../animations/entryAnimation";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useTranslation } from 'react-i18next'
+import { useLanguage } from "@/context/languageContext";
+import Polyglot from "node-polyglot";
+import FadeInSection from "../animations/fadeAnimation";
+import EntryAnimation from "../animations/entryAnimation";
 
 export default function AboutSection() {
   const [showContent, setShowContent] = useState(false);
+  const { language } = useLanguage();
 
-  interface Props {
-    texts: {
-      description: string
-    }
-  }
+  const polyglot = new Polyglot({
+    phrases: {
+      en: {
+        "about.title": "About Me",
+        "about.intro":
+          "My name is Rodrigo Willian Tavella, I am a Brazilian artist with Italian citizenship, currently living in Dortmund, Germany. My artistic journey is marked by the fusion of dance, acrobatics, and stage expression, with a dedication that goes beyond technical movement to reach pure emotion. I hold a degree in dance and have extensive experience as a dancer, acrobat, and performer, working with companies, theaters, shows, schools, and major international productions.",
+        "about.specialties.title": "My specialties include:",
+        "about.specialties.dance":
+          "Dance: classical ballet, jazz, contemporary and modern dance.",
+        "about.specialties.acrobatics":
+          "Acrobatics: solo, group, duo, aerial hoop, handbalance, pole dance.",
+        "about.specialties.stage": "Stage performance and musical theater.",
+        "about.statement.1":
+          "My art is visceral, physical, and symbolic, driven by a constant search for transformation and connection. I believe the body is a living language, and the stage is the place where soul and technique meet.",
+        "about.statement.2":
+          "Today, in addition to performing, I also work as a dance teacher, sharing my experience with new artists and exploring the pedagogy of movement.",
+        "about.mission":
+          "Whether on European stages, in a rehearsal room, or suspended in an aerial hoop, my mission is the same: ",
+        "about.mission.highlight": "to move with authenticity.",
+        "about.tech.title": "Technical sheet",
+        "about.tech.nationality":
+          "Nationality: Brazilian, with Italian citizenship (European Union)",
+        "about.tech.age": "Age: 32 years old",
+        "about.tech.birth": "Date of birth: September 17, 1992",
+        "about.tech.height": "Height: 1.74 m (or 5'8\")",
+        "about.tech.weight": "Weight: 70 kg",
+        "about.tech.shoe": "Shoe size: 41 (BR)",
+        "about.tech.skin": "Skin color: White",
+        "about.tech.eyes": "Eye color: Medium brown",
+        "about.tech.status": "Marital status: Single",
+      },
+      it: {
+        "about.title": "Chi sono",
+        "about.intro":
+          "Mi chiamo Rodrigo Willian Tavella, sono un artista brasiliano con cittadinanza italiana e attualmente vivo a Dortmund, in Germania. Il mio percorso artistico è caratterizzato dalla fusione tra danza, acrobazia ed espressione scenica, con una dedizione che va oltre il movimento tecnico per raggiungere l’emozione pura. Sono laureato in danza e ho una vasta esperienza come ballerino, acrobata e performer, collaborando con compagnie, teatri, spettacoli, scuole e grandi produzioni internazionali.",
+        "about.specialties.title": "Le mie specialità includono:",
+        "about.specialties.dance":
+          "Danza: balletto classico, jazz, danza contemporanea e moderna.",
+        "about.specialties.acrobatics":
+          "Acrobazie: da solo, in gruppo, in coppia, cerchio aereo, handbalance, pole dance.",
+        "about.specialties.stage": "Performance teatrale e musical.",
+        "about.statement.1":
+          "La mia arte è viscerale, fisica e simbolica, guidata da una costante ricerca di trasformazione e connessione. Credo che il corpo sia un linguaggio vivente e che il palco sia il luogo dove anima e tecnica si incontrano.",
+        "about.statement.2":
+          "Oggi, oltre a esibirmi, lavoro anche come insegnante di danza, condividendo la mia esperienza con nuovi artisti ed esplorando la pedagogia del movimento.",
+        "about.mission":
+          "Che sia su un palco europeo, in sala prove o sospeso in un cerchio aereo, la mia missione è la stessa: ",
+        "about.mission.highlight": "muovermi con autenticità.",
+        "about.tech.title": "Scheda tecnica",
+        "about.tech.nationality":
+          "Nazionalità: Brasiliano, con cittadinanza italiana (Unione Europea)",
+        "about.tech.age": "Età: 32 anni",
+        "about.tech.birth": "Data di nascita: 17 settembre 1992",
+        "about.tech.height": "Altezza: 1,74 m",
+        "about.tech.weight": "Peso: 70 kg",
+        "about.tech.shoe": "Numero di scarpe: 41 (BR)",
+        "about.tech.skin": "Colore della pelle: Chiara",
+        "about.tech.eyes": "Colore degli occhi: Marrone medio",
+        "about.tech.status": "Stato civile: Celibe",
+      },
+      de: {
+        "about.title": "Über mich",
+        "about.intro":
+          "Mein Name ist Rodrigo Willian Tavella. Ich bin ein brasilianischer Künstler mit italienischer Staatsbürgerschaft und lebe derzeit in Dortmund, Deutschland. Mein künstlerischer Weg ist geprägt von der Verschmelzung von Tanz, Akrobatik und Bühnenausdruck – mit einer Hingabe, die über technische Bewegung hinausgeht, um reine Emotion zu erreichen. Ich habe einen Abschluss in Tanz und umfassende Erfahrung als Tänzer, Akrobat und Performer in Zusammenarbeit mit Kompanien, Theatern, Shows, Schulen und großen internationalen Produktionen.",
+        "about.specialties.title": "Meine Spezialgebiete sind:",
+        "about.specialties.dance":
+          "Tanz: klassisches Ballett, Jazz, zeitgenössischer und moderner Tanz.",
+        "about.specialties.acrobatics":
+          "Akrobatik: solo, Gruppe, Duo, Luftring, Handbalance, Pole Dance.",
+        "about.specialties.stage": "Bühnenperformance und Musicaltheater.",
+        "about.statement.1":
+          "Meine Kunst ist visceral, körperlich und symbolisch – angetrieben von einem ständigen Streben nach Transformation und Verbindung. Ich glaube, der Körper ist eine lebendige Sprache, und die Bühne ist der Ort, an dem sich Seele und Technik begegnen.",
+        "about.statement.2":
+          "Heute bin ich neben meinen Auftritten auch als Tanzlehrer tätig, teile meine Erfahrungen mit neuen Künstlern und erkunde die Pädagogik der Bewegung.",
+        "about.mission":
+          "Ob auf europäischen Bühnen, im Proberaum oder im Luftring – meine Mission bleibt dieselbe: ",
+        "about.mission.highlight": "mit Authentizität zu bewegen.",
+        "about.tech.title": "Technisches Datenblatt",
+        "about.tech.nationality":
+          "Nationalität: Brasilianer mit italienischer Staatsbürgerschaft (Europäische Union)",
+        "about.tech.age": "Alter: 32 Jahre",
+        "about.tech.birth": "Geburtsdatum: 17. September 1992",
+        "about.tech.height": "Größe: 1,74 m",
+        "about.tech.weight": "Gewicht: 70 kg",
+        "about.tech.shoe": "Schuhgröße: 41 (BR)",
+        "about.tech.skin": "Hautfarbe: Weiß",
+        "about.tech.eyes": "Augenfarbe: Mittelbraun",
+        "about.tech.status": "Familienstand: Ledig",
+      },
+    }[language],
+    locale: language,
+  });
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowContent(true), 2000); // mesmo tempo do EntryAnimation
+    const timer = setTimeout(() => setShowContent(true), 2000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -27,8 +114,9 @@ export default function AboutSection() {
     <>
       <section className="flex flex-col items-center justify-center text-white relative">
         <h1 className="mainTitle md:pb-12">
-          <span className="text-brand-200">About</span> Me
+          <span className="text-white">{polyglot.t("about.title")}</span>
         </h1>
+
         {!showContent && <EntryAnimation />}
         {showContent && (
           <motion.div
@@ -37,66 +125,29 @@ export default function AboutSection() {
             transition={{ duration: 1 }}
             className="row flex flex-col-reverse lg:flex-row-reverse items-center md:justify-center w-full lg:gap-12"
           >
-            {/* Text Content */}
             <div className="container text-start lg:text-left flex items-start flex-col">
               <div className="mb-6 mt-6">
                 <FadeInSection>
-                  <p className="text-sm md:text-base text-start">
-                    Meu nome é Rodrigo Willian Tavella, sou artista brasileiro
-                    com cidadania italiana e atualmente vivo em Dortmund,
-                    Alemanha. Minha trajetória artística é marcada pela união
-                    entre dança, acrobacia e expressão cênica, com uma entrega
-                    que ultrapassa o movimento técnico para alcançar a emoção
-                    pura. Sou formado em dança e possuo ampla experiência como
-                    bailarino, acrobata e performer, atuando em companhias,
-                    teatros, shows, escolas e grandes produções internacionais.
-                  </p>
-
+                  <p className="text-sm md:text-base">{polyglot.t("about.intro")}</p>
                   <br />
-
-                  <h2 className="text-xl font-bold">
-                    Minhas especialidades incluem:
-                  </h2>
+                  <h2 className="text-xl font-bold">{polyglot.t("about.specialties.title")}</h2>
                   <ul className="list-disc pl-5">
-                    <li>
-                      <b>Dança:</b> balé clássico, jazz, dança contemporânea e
-                      moderna.
-                    </li>
-                    <li>
-                      <b>Acrobacias:</b> solo, em grupo, em dupla, aerial hoop,
-                      handbalance, pole dance.
-                    </li>
-                    <li>Performance de palco e teatro musical.</li>
+                    <li>{polyglot.t("about.specialties.dance")}</li>
+                    <li>{polyglot.t("about.specialties.acrobatics")}</li>
+                    <li>{polyglot.t("about.specialties.stage")}</li>
                   </ul>
-
                   <br />
-
-                  <p>
-                    Minha arte é visceral, física e simbólica movida por uma
-                    busca constante por transformação e conexão. Acredito que o
-                    corpo é uma linguagem viva e que o palco é o lugar onde alma
-                    e técnica se encontram.
-                  </p>
-                  <p>
-                    Hoje, além de performer, também atuo como professor de
-                    dança, dividindo minha experiência com novos artistas e
-                    explorando a pedagogia do movimento.
-                  </p>
-
+                  <p>{polyglot.t("about.statement.1")}</p>
+                  <p>{polyglot.t("about.statement.2")}</p>
                   <br />
-
                   <p>
-                    Seja nos palcos da Europa, em uma sala de ensaio ou nas
-                    alturas de um aro aéreo, minha missão é a mesma:{" "}
-                    <span className="text-brand-200">
-                      emocionar com autenticidade.
-                    </span>
+                    {polyglot.t("about.mission")}
+                    <span className="text-brand-200">{polyglot.t("about.mission.highlight")}</span>
                   </p>
                 </FadeInSection>
               </div>
             </div>
 
-            {/* Image */}
             <div className="lg:w-1/2 mt-10 md:mt-0 flex justify-center md:justify-start container">
               <motion.div
                 initial={{ opacity: 0, scale: 0 }}
@@ -112,8 +163,8 @@ export default function AboutSection() {
               >
                 <Image
                   src="/img/about-images.png"
-                  alt=""
-                  title=""
+                  alt="About"
+                  title="About"
                   width={500}
                   height={500}
                   className="rounded-2xl object-cover w-full h-full"
@@ -123,7 +174,9 @@ export default function AboutSection() {
           </motion.div>
         )}
       </section>
-      <section className=" flex items-center justify-center text-white relative">
+
+      {/* Tech Sheet Section */}
+      <section className="flex items-center justify-center text-white relative">
         {!showContent && <EntryAnimation />}
         {showContent && (
           <motion.div
@@ -132,50 +185,27 @@ export default function AboutSection() {
             transition={{ duration: 1 }}
             className="row flex flex-col-reverse lg:flex-row items-center md:justify-center w-full lg:gap-12"
           >
-            {/* Text Content */}
             <div className="container text-start lg:text-left flex items-start flex-col">
               <div className="mb-6 mt-6">
                 <FadeInSection>
                   <p className="text-3xl font-bold text-start">
-                    <span className="text-brand-200">Technical</span> sheet
+                    <span className="text-brand-200">{polyglot.t("about.tech.title")}</span>
                   </p>
                   <ul>
-                    <li>
-                      <span className="font-bold">Nationality:</span> Brazilian,
-                      with Italian citizenship (European Union)
-                    </li>
-                    <li>
-                      <span className="font-bold">Age:</span> 32 years old
-                    </li>
-                    <li>
-                      <span className="font-bold">Date of birth:</span>{" "}
-                      September 17, 1992
-                    </li>
-                    <li>
-                      <span className="font-bold">Height:</span> 1.74 m (or
-                      5'8")
-                    </li>
-                    <li>
-                      <span className="font-bold">Weight:</span> 70 kg
-                    </li>
-                    <li>
-                      <span className="font-bold">Shoe size:</span> 41 (BR)
-                    </li>
-                    <li>
-                      <span className="font-bold">Skin color:</span> White
-                    </li>
-                    <li>
-                      <span className="font-bold">Eye color:</span> Medium brown
-                    </li>
-                    <li>
-                      <span className="font-bold">Marital status:</span> Single
-                    </li>
+                    <li>{polyglot.t("about.tech.nationality")}</li>
+                    <li>{polyglot.t("about.tech.age")}</li>
+                    <li>{polyglot.t("about.tech.birth")}</li>
+                    <li>{polyglot.t("about.tech.height")}</li>
+                    <li>{polyglot.t("about.tech.weight")}</li>
+                    <li>{polyglot.t("about.tech.shoe")}</li>
+                    <li>{polyglot.t("about.tech.skin")}</li>
+                    <li>{polyglot.t("about.tech.eyes")}</li>
+                    <li>{polyglot.t("about.tech.status")}</li>
                   </ul>
                 </FadeInSection>
               </div>
             </div>
 
-            {/* Image */}
             <div className="lg:w-1/2 mt-10 md:mt-0 flex justify-center md:justify-start container">
               <motion.div
                 initial={{ opacity: 0, scale: 0 }}
@@ -191,8 +221,8 @@ export default function AboutSection() {
               >
                 <Image
                   src="/img/about-image-2.png"
-                  alt="Caua Tavella - Desenvolvedor Web"
-                  title="Desenvolvedor Web apaixonado pelo que faz, com uma imaginação fora dos padrões"
+                  alt="Rodrigo Tavella"
+                  title="Dance and Performance Artist"
                   width={500}
                   height={500}
                   className="rounded-2xl object-cover w-full h-full"

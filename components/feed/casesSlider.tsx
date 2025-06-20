@@ -21,6 +21,8 @@ interface CasesSliderProps {
   }[];
 }
 
+
+
 const CasesSlider = ({ cases }: CasesSliderProps) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
