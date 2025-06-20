@@ -1,8 +1,12 @@
+"use client"
+
 import Link from "next/link";
 import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import CasesSlider from "./casesSlider";
 import Polyglot from "node-polyglot";
 import { useLanguage } from "@/context/languageContext";
+import { createPolyglot } from "@/utils/polyglot";
+
 
 const CasesFeed = () => {
   const { language } = useLanguage();
@@ -29,30 +33,34 @@ export default CasesFeed;
 const cases = [
   {
     name: "Pinturas planejadas",
-    img: "500x500.svg",
+    img: "/img/gallery/22.webp",
   },
   {
     name: "Pinturas planejadas",
-    img: "500x500.svg",
+    img: "/img/gallery/2.webp",
   },
   {
     name: "Pinturas planejadas",
-    img: "500x500.svg",
+    img: "/img/gallery/4.webp",
   },
   {
     name: "Pinturas planejadas",
-    img: "500x500.svg",
+    img: "/img/gallery/5.webp",
   },
   {
     name: "Pinturas planejadas",
-    img: "500x500.svg",
+    img: "/img/gallery/6.webp",
   },
   {
     name: "Pinturas planejadas",
-    img: "500x500.svg",
+    img: "/img/gallery/7.webp",
   },
   {
     name: "Pinturas planejadas",
-    img: "500x500.svg",
+    img: "/img/gallery/24.webp",
+  },
+  {
+    name: "Pinturas planejadas",
+    img: "/img/gallery/25.webp",
   },
 ];

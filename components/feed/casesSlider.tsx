@@ -13,6 +13,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import GalleryButton from "../buttons/galleryButton";
 
 interface CasesSliderProps {
   cases: {
@@ -20,8 +21,6 @@ interface CasesSliderProps {
     name: string;
   }[];
 }
-
-
 
 const CasesSlider = ({ cases }: CasesSliderProps) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -62,22 +61,28 @@ const CasesSlider = ({ cases }: CasesSliderProps) => {
           760: {
             slidesPerView: 4,
           },
+          320: {
+            slidesPerView: 2,
+          },
         }}
       >
         {cases.map(({ img, name }, i) => (
           <SwiperSlide key={i}>
             <Image
-              src={`/img/${img}`}
-              width={800}
-              height={600}
+              src={`${img}`}
+              width={500}
+              height={500}
               title=""
-              alt={`${name} | Primecor Pinturas | Sempre priorizando o melhor acabamento e qualidade da pintura.`}
+              alt={`${name} Rodrigo Tavella professional dancer`}
               className="cursor-pointer rounded-2xl"
-              onClick={() => setSelectedImage(`/img/${img}`)}
+              onClick={() => setSelectedImage(`${img}`)}
             />
           </SwiperSlide>
         ))}
       </Swiper>
+      <div className="py-12">
+        <GalleryButton />
+      </div>
       {selectedImage && (
         <div
           className="fixed inset-0 bg-black/80 bg-opacity-70 flex items-center justify-center z-50 transition-all duration-500"
@@ -86,9 +91,9 @@ const CasesSlider = ({ cases }: CasesSliderProps) => {
           <div className="relative max-w-4xl w-full p-4">
             <Image
               src={selectedImage}
-              alt="Imagem ampliada"
-              width={1200}
-              height={800}
+              alt="An enlarged view of the selected case"
+              width={500}
+              height={500}
               className="w-full h-auto object-contain rounded-2xl"
             />
             <button

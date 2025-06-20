@@ -27,6 +27,9 @@ export default function Header() {
     { name: polyglot.t("header.home"), href: "/#" },
     { name: polyglot.t("header.about"), href: "/about" },
     { name: polyglot.t("header.experience"), href: "/experience" },
+    { name: polyglot.t("header.danceexp"), href: "/danceExperience" },
+    { name: polyglot.t("header.academicFormation"), href: "/academicFormation" },
+    { name: polyglot.t("header.gallery"), href: "/gallery" },
   ];
 
   return (
@@ -41,10 +44,9 @@ export default function Header() {
           <Link href="/" className="pr-20">
             <Image
               src="/img/logo-header.png"
-              width={50}
-              height={50}
+              width={30}
+              height={30}
               alt="Logo"
-              className="rounded-full"
             />
           </Link>
 
@@ -54,7 +56,9 @@ export default function Header() {
               <Link
                 key={index}
                 href={item.href}
-                className="text-brand-100 font-semibold hover:underline"
+                className="relative text-brand-100 font-semibold transition-colors duration-200
+                after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5
+                after:bg-brand-200 after:transition-all after:duration-300 hover:after:w-full hover:text-brand-200"
               >
                 {item.name}
               </Link>
@@ -126,15 +130,15 @@ export default function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden fixed top-0 left-0 w-full h-screen bg-brand-100 z-40 px-6 pt-28"
+            className="lg:hidden fixed top-0 left-0 w-full h-screen bg-brand-500 z-40 px-6 pt-28"
           >
-            <div className="flex flex-col gap-20 items-center">
+            <div className="flex flex-col gap-12 items-center">
               {navigation.map((item, index) => (
                 <Link
                   key={index}
                   href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-white text-lg font-medium hover:underline"
+                  className="text-brand-100 text-lg font-medium hover:underline"
                 >
                   {item.name}
                 </Link>

@@ -77,4 +77,8 @@ main {
   display: none !important;
 }
 
+.custom-swiper-button-prev,
+.custom-swiper-button-next {
+  @apply absolute transform z-10 top-[36%] lg:block hidden;
+}
 

@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
 import FadeInSection from "../animations/fadeAnimation";
-import EntryAnimation from "../animations/entryAnimation";
 
 export default function AboutSection() {
   const [showContent, setShowContent] = useState(false);
@@ -113,124 +112,140 @@ export default function AboutSection() {
   return (
     <>
       <section className="flex flex-col items-center justify-center text-white relative">
-        <h1 className="mainTitle md:pb-12">
-          <span className="text-white">{polyglot.t("about.title")}</span>
-        </h1>
-
-        {!showContent && <EntryAnimation />}
-        {showContent && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            className="row flex flex-col-reverse lg:flex-row-reverse items-center md:justify-center w-full lg:gap-12"
+        <div className="relative lg:py-16 mb-6">
+          {/* Texto grande de fundo */}
+          <h1
+            className="hidden lg:flex absolute inset-0 justify-center items-center md:text-[5rem] xl:text-[7rem] font-extrabold text-gray-300 opacity-10 select-none pointer-events-none -z-10 whitespace-nowrap uppercase"
+            aria-hidden="true"
           >
-            <div className="container text-start lg:text-left flex items-start flex-col">
-              <div className="mb-6 mt-6">
-                <FadeInSection>
-                  <p className="text-sm md:text-base">{polyglot.t("about.intro")}</p>
-                  <br />
-                  <h2 className="text-xl font-bold">{polyglot.t("about.specialties.title")}</h2>
-                  <ul className="list-disc pl-5">
-                    <li>{polyglot.t("about.specialties.dance")}</li>
-                    <li>{polyglot.t("about.specialties.acrobatics")}</li>
-                    <li>{polyglot.t("about.specialties.stage")}</li>
-                  </ul>
-                  <br />
-                  <p>{polyglot.t("about.statement.1")}</p>
-                  <p>{polyglot.t("about.statement.2")}</p>
-                  <br />
-                  <p>
-                    {polyglot.t("about.mission")}
-                    <span className="text-brand-200">{polyglot.t("about.mission.highlight")}</span>
-                  </p>
-                </FadeInSection>
-              </div>
-            </div>
+            {polyglot.t("about.title")}
+          </h1>
 
-            <div className="lg:w-1/2 mt-10 md:mt-0 flex justify-center md:justify-start container">
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{
-                  duration: 0.4,
-                  scale: {
-                    type: "spring",
-                    bounce: 0.5,
-                  },
-                }}
-                className="w-full h-auto rounded-2xl overflow-hidden"
-              >
-                <Image
-                  src="/img/about-images.png"
-                  alt="About"
-                  title="About"
-                  width={500}
-                  height={500}
-                  className="rounded-2xl object-cover w-full h-full"
-                />
-              </motion.div>
+          {/* Texto principal */}
+          <FadeInSection>
+            <h2 className="relative text-4xl font-bold text-center">
+              <span className="text-white">{polyglot.t("about.title")}</span>
+            </h2>
+          </FadeInSection>
+        </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="row flex flex-col-reverse lg:flex-row-reverse items-center md:justify-center w-full lg:gap-12"
+        >
+          <div className="container text-start lg:text-left flex items-start flex-col">
+            <div className="mb-6 mt-6">
+              <FadeInSection>
+                <p>
+                  {polyglot.t("about.intro")}
+                </p>
+                <br />
+                <h2 className="text-xl font-bold">
+                  {polyglot.t("about.specialties.title")}
+                </h2>
+                <ul className="list-disc pl-5">
+                  <li>{polyglot.t("about.specialties.dance")}</li>
+                  <li>{polyglot.t("about.specialties.acrobatics")}</li>
+                  <li>{polyglot.t("about.specialties.stage")}</li>
+                </ul>
+                <br />
+                <p>{polyglot.t("about.statement.1")}</p>
+                <p>{polyglot.t("about.statement.2")}</p>
+                <br />
+                <p>
+                  {polyglot.t("about.mission")}
+                  <span className="text-brand-200">
+                    {polyglot.t("about.mission.highlight")}
+                  </span>
+                </p>
+              </FadeInSection>
             </div>
-          </motion.div>
-        )}
+          </div>
+
+          <div className="lg:w-1/2 mt-10 md:mt-0 flex justify-center md:justify-start container">
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: 0.4,
+                scale: {
+                  type: "spring",
+                  bounce: 0.5,
+                },
+              }}
+              className="w-full h-auto rounded-2xl overflow-hidden"
+            >
+              <Image
+                src="/img/about-images.png"
+                alt="About Rodrigo Tavella"
+                title="About for Rodrigo Tavella"
+                width={500}
+                height={500}
+                className="rounded-2xl object-cover w-full h-full"
+                priority
+              />
+            </motion.div>
+          </div>
+        </motion.div>
       </section>
 
       {/* Tech Sheet Section */}
       <section className="flex items-center justify-center text-white relative">
-        {!showContent && <EntryAnimation />}
-        {showContent && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1 }}
-            className="row flex flex-col-reverse lg:flex-row items-center md:justify-center w-full lg:gap-12"
-          >
-            <div className="container text-start lg:text-left flex items-start flex-col">
-              <div className="mb-6 mt-6">
-                <FadeInSection>
-                  <p className="text-3xl font-bold text-start">
-                    <span className="text-brand-200">{polyglot.t("about.tech.title")}</span>
-                  </p>
-                  <ul>
-                    <li>{polyglot.t("about.tech.nationality")}</li>
-                    <li>{polyglot.t("about.tech.age")}</li>
-                    <li>{polyglot.t("about.tech.birth")}</li>
-                    <li>{polyglot.t("about.tech.height")}</li>
-                    <li>{polyglot.t("about.tech.weight")}</li>
-                    <li>{polyglot.t("about.tech.shoe")}</li>
-                    <li>{polyglot.t("about.tech.skin")}</li>
-                    <li>{polyglot.t("about.tech.eyes")}</li>
-                    <li>{polyglot.t("about.tech.status")}</li>
-                  </ul>
-                </FadeInSection>
-              </div>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+          className="row flex flex-col-reverse lg:flex-row items-center md:justify-center w-full lg:gap-12"
+        >
+          <div className="container text-start lg:text-left flex items-start flex-col">
+            <div className="mb-6 mt-6">
+              <FadeInSection>
+                <p className="text-3xl font-bold text-start">
+                  <span className="text-brand-200">
+                    {polyglot.t("about.tech.title")}
+                  </span>
+                </p>
+                <ul>
+                  <li>{polyglot.t("about.tech.nationality")}</li>
+                  <li>{polyglot.t("about.tech.age")}</li>
+                  <li>{polyglot.t("about.tech.birth")}</li>
+                  <li>{polyglot.t("about.tech.height")}</li>
+                  <li>{polyglot.t("about.tech.weight")}</li>
+                  <li>{polyglot.t("about.tech.shoe")}</li>
+                  <li>{polyglot.t("about.tech.skin")}</li>
+                  <li>{polyglot.t("about.tech.eyes")}</li>
+                  <li>{polyglot.t("about.tech.status")}</li>
+                </ul>
+              </FadeInSection>
             </div>
+          </div>
 
-            <div className="lg:w-1/2 mt-10 md:mt-0 flex justify-center md:justify-start container">
-              <motion.div
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{
-                  duration: 0.4,
-                  scale: {
-                    type: "spring",
-                    bounce: 0.5,
-                  },
-                }}
-                className="w-full h-auto rounded-2xl overflow-hidden shadow-2xl"
-              >
-                <Image
-                  src="/img/about-image-2.png"
-                  alt="Rodrigo Tavella"
-                  title="Dance and Performance Artist"
-                  width={500}
-                  height={500}
-                  className="rounded-2xl object-cover w-full h-full"
-                />
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
+          <div className="lg:w-1/2 mt-10 md:mt-0 flex justify-center md:justify-start container">
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: 0.4,
+                scale: {
+                  type: "spring",
+                  bounce: 0.5,
+                },
+              }}
+              className="w-full h-auto rounded-2xl overflow-hidden shadow-2xl"
+            >
+              <Image
+                src="/img/about-image-2.png"
+                alt="Tech Sheet Rodrigo Tavella"
+                title="Dance and Performance Artist"
+                width={500}
+                height={500}
+                className="rounded-2xl object-cover w-full h-full"
+                priority
+              />
+            </motion.div>
+          </div>
+        </motion.div>
       </section>
     </>
   );

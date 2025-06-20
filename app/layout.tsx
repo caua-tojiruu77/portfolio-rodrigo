@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: "Portfólio Rdorigo Tavella",
     images: [
       {
-        url: "/img/logo-colorida.png",
+        url: "/img/logo-header.png",
         width: 845,
         height: 471,
       },
@@ -71,6 +71,7 @@ export default function RootLayout({
     <html lang="en" className={outfit.className}>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/scq2zya.css" />
+        <link rel="icon" href="/img/logo-header.png" type="image/x-icon" />
       </head>
       <body className="bg-brand-400 font-omnes scroll-smooth">
         <LanguageProvider>
