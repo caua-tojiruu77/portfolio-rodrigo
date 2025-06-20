@@ -28,7 +28,10 @@ export default function Header() {
     { name: polyglot.t("header.about"), href: "/about" },
     { name: polyglot.t("header.experience"), href: "/experience" },
     { name: polyglot.t("header.danceexp"), href: "/danceExperience" },
-    { name: polyglot.t("header.academicFormation"), href: "/academicFormation" },
+    {
+      name: polyglot.t("header.academicFormation"),
+      href: "/academicFormation",
+    },
     { name: polyglot.t("header.gallery"), href: "/gallery" },
   ];
 
@@ -130,7 +133,7 @@ export default function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden fixed top-0 left-0 w-full h-screen bg-brand-500 z-40 px-6 pt-28"
+            className="lg:hidden fixed top-0 left-0 w-full h-screen min-h-screen max-h-screen bg-brand-500 z-40 px-6 pt-28 pb-6 overflow-y-auto"
           >
             <div className="flex flex-col gap-12 items-center">
               {navigation.map((item, index) => (

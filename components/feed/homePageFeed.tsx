@@ -63,9 +63,9 @@ export default function HomePageSection() {
               </p>
             </FadeInSection>
           </div>
-          <p className="text-sm md:text-base text-gray-300 mb-2 text-start">
-            <h1>{polyglot.t("page.welcome")}</h1>
-          </p>
+          <h1 className="text-sm md:text-base text-gray-300 mb-2 text-start">
+            {polyglot.t("page.welcome")}
+          </h1>
           <div className="mt-4 flex items-center text-center gap-2 text-brand-200 animate-bounce w-full">
             <Mouse size={30} />
             <p className="text-sm">{polyglot.t("page.rolldown")}</p>
