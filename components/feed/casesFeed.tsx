@@ -32,35 +32,35 @@ export default CasesFeed;
 
 const cases = [
   {
-    name: "Pinturas planejadas",
-    img: "/img/gallery/22.webp",
+    name: "Professional Dancer and Choreographer",
+    img: "/img/gallery/1.webp",
   },
   {
-    name: "Pinturas planejadas",
+    name: "Professional Dancer and Choreographer",
     img: "/img/gallery/2.webp",
   },
   {
-    name: "Pinturas planejadas",
+    name: "Professional Dancer and Choreographer",
     img: "/img/gallery/4.webp",
   },
   {
-    name: "Pinturas planejadas",
+    name: "Professional Dancer and Choreographer",
     img: "/img/gallery/5.webp",
   },
   {
-    name: "Pinturas planejadas",
+    name: "Professional Dancer and Choreographer",
     img: "/img/gallery/6.webp",
   },
   {
-    name: "Pinturas planejadas",
+    name: "Professional Dancer and Choreographer",
     img: "/img/gallery/7.webp",
   },
   {
-    name: "Pinturas planejadas",
+    name: "Professional Dancer and Choreographer",
     img: "/img/gallery/24.webp",
   },
   {
-    name: "Pinturas planejadas",
-    img: "/img/gallery/25.webp",
+    name: "Professional Dancer and Choreographer",
+    img: "/img/gallery/3.webp",
   },
 ];
