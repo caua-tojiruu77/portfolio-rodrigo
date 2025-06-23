@@ -118,9 +118,9 @@ export default function GalleryFeed() {
                 src={selectedImg}
                 alt="Rodrigo Web Gallery Image"
                 title="Web gallery for Rodrigo Tavella"
-                width={800}
-                height={800}
-                className="rounded-lg max-h-[80vh] w-auto h-auto object-contain shadow-2xl"
+                width={1200}
+                height={1200}
+                className="rounded-lg max-h-[100vh] max-w-[100vw] w-auto h-auto object-contain shadow-2xl"
                 draggable={false}
               />
               <button

@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import FadeInSection from "../animations/fadeAnimation";
 import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
+import ContactButton from "../buttons/contactButton";
 
 export default function DanceExperienceFeed() {
   const { language } = useLanguage();
@@ -155,7 +156,7 @@ export default function DanceExperienceFeed() {
 
     de: {
       titleBg: "Tanzerfahrung",
-      title: "Professionelle Tanzerfahrung", 
+      title: "Professionelle Tanzerfahrung",
       items: [
         {
           title: "Tänzer",
@@ -281,6 +282,9 @@ export default function DanceExperienceFeed() {
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
+          <div className="pt-6 w-full flex justify-center">
+            <ContactButton />
+          </div>
         </div>
       </div>
     </section>

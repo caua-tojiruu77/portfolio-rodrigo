@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
 import FadeInSection from "../animations/fadeAnimation";
+import ContactButton from "../buttons/contactButton";
 
 export default function ExperienceSection() {
   const { language } = useLanguage();
@@ -131,6 +132,9 @@ export default function ExperienceSection() {
                   {language === "de" &&
                     "Jedes Projekt hat meine Leidenschaft für die Kunst des bewegten Körpers gestärkt."}
                 </p>
+                <div className="pt-6">
+                  <ContactButton />
+                </div>
               </FadeInSection>
             </div>
           </div>

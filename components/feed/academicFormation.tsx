@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import FadeInSection from "../animations/fadeAnimation";
 import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
+import ContactButton from "../buttons/contactButton";
 
 export default function AcademicFormationFeed() {
   const { language } = useLanguage();
@@ -22,26 +23,26 @@ export default function AcademicFormationFeed() {
         {
           title: "Classical Ballet",
           company: "Ballet-Art School Sandra Godoy – Americana, São Paulo",
-          subtitle: "With Professor Vanessa Chieus from 2016 until now",
-          date: "2016 - Present",
+          subtitle: "With Professor Vanessa Chieus (2016 - 2019)",
+          date: "2016 - 2019",
         },
         {
           title: "Jazz",
           company: "Ballet-Art School Sandra Godoy – Americana, São Paulo",
-          subtitle: "With Professors Kely Golveia and Mayne Sass from 2015 until now",
-          date: "2015 - Present",
+          subtitle: "With Professors Kely Golveia and Mayne Sass (2015 - 2018)",
+          date: "2015 - 2018",
         },
         {
           title: "Artistic Gymnastics",
           company: "Civic Center – Americana, São Paulo",
-          subtitle: "With Professor Diara Peressinotto from 2015 until now",
-          date: "2015 - Present",
+          subtitle: "With Professor Diara Peressinotto (2015 - 2017)",
+          date: "2015 - 2017",
         },
         {
           title: "General Gymnastics",
           company: "City of Artur Nogueira, São Paulo",
           subtitle:
-            "Artistic, Rhythmic, Acrobatic Gymnastics and Dance Group with Professor Luiz Fernando dos Santos (2002 to 2011)",
+            "Artistic, Rhythmic, Acrobatic Gymnastics and Dance Group with Professor Luiz Fernando dos Santos (2002 - 2011)",
           date: "2002 - 2011",
         },
       ],
@@ -54,27 +55,27 @@ export default function AcademicFormationFeed() {
         {
           title: "Balletto Classico",
           company: "Scuola Ballet-Art Sandra Godoy – Americana, São Paulo",
-          subtitle: "Con la Professoressa Vanessa Chieus dal 2016 a oggi",
-          date: "2016 - Presente",
+          subtitle: "Con la Professoressa Vanessa Chieus (2016 - 2019)",
+          date: "2016 - 2019",
         },
         {
           title: "Jazz",
           company: "Scuola Ballet-Art Sandra Godoy – Americana, São Paulo",
           subtitle:
-            "Con le professoresse Kely Golveia e Mayne Sass dal 2015 a oggi",
-          date: "2015 - Presente",
+            "Con le professoresse Kely Golveia e Mayne Sass (2015 - 2018)",
+          date: "2015 - 2018",
         },
         {
           title: "Ginnastica Artistica",
           company: "Centro Civico – Americana, São Paulo",
-          subtitle: "Con la Professoressa Diara Peressinotto dal 2015 a oggi",
-          date: "2015 - Presente",
+          subtitle: "Con la Professoressa Diara Peressinotto (2015 - 2017)",
+          date: "2015 - 2017",
         },
         {
           title: "Ginnastica Generale",
           company: "Città di Artur Nogueira, São Paulo",
           subtitle:
-            "Ginnastica Artistica, Ritmica, Acrobatica e Gruppo Danza con il Professore Luiz Fernando dos Santos (2002-2011)",
+            "Ginnastica Artistica, Ritmica, Acrobatica e Gruppo Danza con il Professore Luiz Fernando dos Santos (2002 - 2011)",
           date: "2002 - 2011",
         },
       ],
@@ -86,28 +87,30 @@ export default function AcademicFormationFeed() {
       items: [
         {
           title: "Klassisches Ballett",
-          company: "Ballettschule Ballet-Art Sandra Godoy – Americana, São Paulo",
-          subtitle: "Bei Professorin Vanessa Chieus von 2016 bis heute",
-          date: "2016 - Heute",
+          company:
+            "Ballettschule Ballet-Art Sandra Godoy – Americana, São Paulo",
+          subtitle: "Bei Professorin Vanessa Chieus (2016 - 2019)",
+          date: "2016 - 2019",
         },
         {
           title: "Jazz",
-          company: "Ballettschule Ballet-Art Sandra Godoy – Americana, São Paulo",
+          company:
+            "Ballettschule Ballet-Art Sandra Godoy – Americana, São Paulo",
           subtitle:
-            "Bei Professorinnen Kely Golveia und Mayne Sass von 2015 bis heute",
-          date: "2015 - Heute",
+            "Bei Professorinnen Kely Golveia und Mayne Sass (2015 - 2018)",
+          date: "2015 - 2018",
         },
         {
           title: "Kunstturnen",
           company: "Bürgerzentrum – Americana, São Paulo",
-          subtitle: "Bei Professorin Diara Peressinotto von 2015 bis heute",
-          date: "2015 - Heute",
+          subtitle: "Bei Professorin Diara Peressinotto (2015 - 2017)",
+          date: "2015 - 2017",
         },
         {
           title: "Allgemeine Gymnastik",
           company: "Stadt Artur Nogueira, São Paulo",
           subtitle:
-            "Kunst-, Rhythmus- und Akrobatikgymnastik sowie Tanzgruppe mit Professor Luiz Fernando dos Santos (2002 bis 2011)",
+            "Kunst-, Rhythmus- und Akrobatikgymnastik sowie Tanzgruppe mit Professor Luiz Fernando dos Santos (2002 - 2011)",
           date: "2002 - 2011",
         },
       ],
@@ -172,6 +175,9 @@ export default function AcademicFormationFeed() {
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
+          <div className="pt-6 w-full flex justify-center">
+            <ContactButton />
+          </div>
         </div>
       </div>
     </section>

@@ -19,21 +19,21 @@ export default function HomePageSection() {
       "page.welcome":
         "Willkommen in meinem Universum. Hier erfährst du mehr über den Weg, den ich gegangen bin, um der Tänzer zu werden, der ich heute bin ein Weg voller Hingabe, Mut und Liebe zur Kunst.\nFühle dich frei, zu erkunden, dich inspirieren zu lassen und dich mit jeder Bewegung dieser Geschichte zu verbinden.",
       "page.profession":
-        "Professioneller Tänzer | Tanzlehrer | Pole-Dance-Lehrer",
+        "Professioneller Tänzer | Turnakrobat | Choreografischer Tänzer",
       "page.rolldown": "Runterscrollen!",
     },
     it: {
       "page.welcome":
         "Benvenuto nel mio universo. Qui scoprirai di più sul percorso che ho intrapreso per diventare il danzatore che sono oggi un cammino fatto di dedizione, coraggio e amore per l’arte.\nSentiti libero di esplorare, lasciarti ispirare e connetterti con ogni movimento di questa storia.",
       "page.profession":
-        "Ballerino professionista | Insegnante di danza | Insegnante di pole dance",
+        "Ballerino Professionista | Acrobata Ginnico | Ballerino Coreografico",
       "page.rolldown": "Scorri giù!",
     },
     en: {
       "page.welcome":
         "Welcome to my universe. Here you will learn more about the path I have taken to become the dancer I am today a journey shaped by dedication, courage, and love for the art.\nFeel free to explore, be inspired, and connect with every movement of this story.",
       "page.profession":
-        "Professional dancer | Dancing teacher | Pole dance teacher",
+        "Professional Dancer | Gymnastics Acrobat | Choreographic Dancer",
       "page.rolldown": "Roll down!",
     },
   };
@@ -88,7 +88,7 @@ export default function HomePageSection() {
             className="w-96 h-96 lg:w-full lg:h-auto rounded-2xl overflow-hidden shadow-2xl"
           >
             <Image
-              src="/img/perfil-photo.jpg"
+              src="/img/gallery/19.webp"
               alt="Rodrigo Tavella, Professional Dancer and Teacher"
               title="Professional Dancer and Teacher"
               width={500}

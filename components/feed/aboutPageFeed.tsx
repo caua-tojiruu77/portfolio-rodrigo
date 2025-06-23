@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
 import FadeInSection from "../animations/fadeAnimation";
+import ContactButton from "../buttons/contactButton";
 
 export default function AboutSection() {
   const [showContent, setShowContent] = useState(false);
@@ -137,9 +138,7 @@ export default function AboutSection() {
           <div className="container text-start lg:text-left flex items-start flex-col">
             <div className="mb-6 mt-6">
               <FadeInSection>
-                <p>
-                  {polyglot.t("about.intro")}
-                </p>
+                <p>{polyglot.t("about.intro")}</p>
                 <br />
                 <h2 className="text-xl font-bold">
                   {polyglot.t("about.specialties.title")}
@@ -159,6 +158,9 @@ export default function AboutSection() {
                     {polyglot.t("about.mission.highlight")}
                   </span>
                 </p>
+                <div className="pt-8">
+                  <ContactButton />
+                </div>
               </FadeInSection>
             </div>
           </div>
@@ -201,11 +203,9 @@ export default function AboutSection() {
           <div className="container text-start lg:text-left flex items-start flex-col">
             <div className="mb-6 mt-6">
               <FadeInSection>
-                <p className="text-3xl font-bold text-start">
-                  <span className="text-brand-200">
-                    {polyglot.t("about.tech.title")}
-                  </span>
-                </p>
+                <h2 className="text-6xl font-bold text-start text-brand-200">
+                  {polyglot.t("about.tech.title")}
+                </h2>
                 <ul>
                   <li>{polyglot.t("about.tech.nationality")}</li>
                   <li>{polyglot.t("about.tech.age")}</li>
@@ -217,6 +217,9 @@ export default function AboutSection() {
                   <li>{polyglot.t("about.tech.eyes")}</li>
                   <li>{polyglot.t("about.tech.status")}</li>
                 </ul>
+                <div className="pt-8">
+                  <ContactButton />
+                </div>
               </FadeInSection>
             </div>
           </div>

@@ -1,6 +1,13 @@
+import { Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { FaWhatsapp, FaInstagram, FaLinkedinIn, FaTelegram } from "react-icons/fa";
+import {
+  FaWhatsapp,
+  FaInstagram,
+  FaLinkedinIn,
+  FaTelegram,
+  FaYoutube,
+} from "react-icons/fa";
 import { FaMapLocation, FaPhoneVolume } from "react-icons/fa6";
 import { IoMdMail } from "react-icons/io";
 
@@ -38,7 +45,7 @@ const Footer = () => {
                     <FaTelegram size={iconSize} />
                   </a>
                   <a
-                    href="https://www.instagram.com/tojiruu77/"
+                    href="https://www.instagram.com/rodrigo.tavella/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2 border border-white rounded-full text-white hover:bg-white hover:text-brand-100 transition duration-300"
@@ -47,13 +54,13 @@ const Footer = () => {
                     <FaInstagram size={iconSize} />
                   </a>
                   <a
-                    href="https://api.whatsapp.com/send/?phone=5519971265295&text=Olá%2C%20Cauã%21%0AEstou%20interessado%20em%20contratar%20seus%20serviços%20de%20desenvolvimento%20de%20landing%20pages.%20Quero%20criar%20uma%20página%20moderna%2C%20responsiva%20e%20focada%20em%20conversão%20para%20transformar%20visitantes%20em%20clientes.%20Você%20poderia%20me%20passar%20mais%20informações%20sobre%20o%20processo%2C%20prazos%20e%20valores%3F%0A%0AObrigado%21&type=phone_number&app_absent=0"
+                    href="https://www.youtube.com/@Rodrigotavella"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2 border border-white rounded-full text-white hover:bg-white hover:text-brand-100 transition duration-300"
                   >
-                    <span className="sr-only">WhatsApp</span>
-                    <FaWhatsapp size={iconSize} />
+                    <span className="sr-only">Youtube Channel</span>
+                    <FaYoutube size={iconSize} />
                   </a>
                 </div>
               </div>
@@ -74,17 +81,17 @@ const Footer = () => {
 
               {/* Coluna 3: Contato e E-mail */}
               <div>
-                <h2 className="text-xl text-white mb-4 font-bold">TELEFONE</h2>
+                <h2 className="text-xl text-white mb-4 font-bold">CONTACT</h2>
                 <ul className="space-y-2">
                   <li>
                     <a
-                      href="https://api.whatsapp.com/send/?phone=5519971265295&text=Olá%2C%20Cauã%21%0AEstou%20interessado%20em%20contratar%20seus%20serviços%20de%20desenvolvimento%20de%20landing%20pages.%20Quero%20criar%20uma%20página%20moderna%2C%20responsiva%20e%20focada%20em%20conversão%20para%20transformar%20visitantes%20em%20clientes.%20Você%20poderia%20me%20passar%20mais%20informações%20sobre%20o%20processo%2C%20prazos%20e%20valores%3F%0A%0AObrigado%21&type=phone_number&app_absent=0"
+                      href="tel:+4915234679241"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center text-white transition duration-300 hover:text-brand-200"
                     >
-                      <FaWhatsapp size={iconSize} className="mr-2" />
-                      +55 (19) 97126-5295
+                      <Phone size={iconSize} className="mr-2" />
+                      +49 1523 4679241
                     </a>
                   </li>
                 </ul>

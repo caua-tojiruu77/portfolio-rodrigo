@@ -40,15 +40,15 @@ export default function Header() {
       <nav
         className={`fixed z-50 top-0 left-0 w-full transition-all duration-300 ${
           navbar ? "shadow-md" : ""
-        } bg-brand-500 px-5 lg:top-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-6xl lg:rounded-full`}
+        } bg-brand-500/30 px-5 lg:top-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-6xl lg:rounded-full backdrop-blur-md`}
       >
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="pr-20">
+          <Link href="/" className="pr-10">
             <Image
-              src="/img/logo-header.png"
-              width={30}
-              height={30}
+              src="/img/logo-header-1.webp"
+              width={150}
+              height={150}
               alt="Logo"
             />
           </Link>
@@ -59,7 +59,7 @@ export default function Header() {
               <Link
                 key={index}
                 href={item.href}
-                className="relative text-brand-100 font-semibold transition-colors duration-200
+                className="relative text-brand-500 font-semibold transition-colors duration-200
                 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5
                 after:bg-brand-200 after:transition-all after:duration-300 hover:after:w-full hover:text-brand-200"
               >
@@ -74,13 +74,40 @@ export default function Header() {
               <button
                 key={lang}
                 onClick={() => setLanguage(lang as "it" | "de")}
-                className={`px-3 py-1 rounded-full text-sm font-bold ${
+                className={`p-0 rounded-full w-12 h-8 overflow-hidden border-2 ${
                   language === lang
-                    ? "bg-brand-200 text-brand-500"
-                    : "bg-brand-100 text-white hover:bg-blue-400 hover:text-brand-500"
-                } transition-all duration-200`}
+                    ? "border-brand-200"
+                    : "border-transparent hover:border-brand-200"
+                } transition-all duration-200 flex items-center justify-center`}
+                style={{ background: "transparent" }}
               >
-                {lang.toUpperCase()}
+                {lang === "it" && (
+                  <Image
+                    src={"/img/flags/flag-italy.webp"}
+                    alt="Italian"
+                    width={32}
+                    height={32}
+                    className="object-cover w-full h-full"
+                  />
+                )}
+                {lang === "de" && (
+                  <Image
+                    src={"/img/flags/flag-germany.webp"}
+                    alt="German"
+                    width={32}
+                    height={32}
+                    className="object-cover w-full h-full"
+                  />
+                )}
+                {lang === "en" && (
+                  <Image
+                    src={"/img/flags/flag-eua.webp"}
+                    alt="English"
+                    width={32}
+                    height={32}
+                    className="object-cover w-full h-full"
+                  />
+                )}
               </button>
             ))}
           </div>
@@ -89,7 +116,7 @@ export default function Header() {
           <div className="lg:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-brand-100 focus:outline-none"
+              className="text-brand-200 focus:outline-none"
             >
               {mobileMenuOpen ? (
                 <svg
@@ -155,13 +182,40 @@ export default function Header() {
                       setLanguage(lang as "it" | "de");
                       setMobileMenuOpen(false);
                     }}
-                    className={`px-3 py-1 rounded-full text-sm font-bold ${
+                    className={`p-0 rounded-full w-8 h-8 overflow-hidden border-2 ${
                       language === lang
-                        ? "bg-brand-200 text-brand-500"
-                        : "bg-brand-100 text-white hover:bg-blue-400 hover:text-brand-500"
-                    }`}
+                        ? "border-brand-200"
+                        : "border-transparent hover:border-brand-200"
+                    } flex items-center justify-center`}
+                    style={{ background: "transparent" }}
                   >
-                    {lang.toUpperCase()}
+                    {lang === "it" && (
+                      <Image
+                        src={"/img/flags/flag-italy.webp"}
+                        alt="Italian"
+                        width={32}
+                        height={32}
+                        className="object-cover w-full h-full"
+                      />
+                    )}
+                    {lang === "de" && (
+                      <Image
+                        src={"/img/flags/flag-germany.webp"}
+                        alt="German"
+                        width={32}
+                        height={32}
+                        className="object-cover w-full h-full"
+                      />
+                    )}
+                    {lang === "en" && (
+                      <Image
+                        src={"/img/flags/flag-eua.webp"}
+                        alt="English"
+                        width={32}
+                        height={32}
+                        className="object-cover w-full h-full"
+                      />
+                    )}
                   </button>
                 ))}
               </div>

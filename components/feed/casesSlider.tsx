@@ -85,22 +85,36 @@ const CasesSlider = ({ cases }: CasesSliderProps) => {
       </div>
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black/80 bg-opacity-70 flex items-center justify-center z-50 transition-all duration-500"
+          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
           onClick={() => setSelectedImage(null)}
         >
-          <div className="relative max-w-4xl w-full p-4">
+          <div className="relative" onClick={(e) => e.stopPropagation()}>
             <Image
               src={selectedImage}
               alt="An enlarged view of the selected case"
-              width={500}
-              height={500}
-              className="w-full h-auto object-contain rounded-2xl"
+              width={1200}
+              height={1200}
+              className="rounded-lg max-h-[90vh] max-w-[90vw] w-auto h-auto object-contain shadow-2xl"
+              draggable={false}
             />
             <button
-              className="absolute -top-2 right-0 text-white text-3xl cursor-pointer"
+              className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-2 hover:bg-black/80 transition"
               onClick={() => setSelectedImage(null)}
+              aria-label="Close"
             >
-              &times;
+              <svg
+                width={24}
+                height={24}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
           </div>
         </div>
