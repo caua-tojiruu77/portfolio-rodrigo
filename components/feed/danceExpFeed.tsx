@@ -8,6 +8,7 @@ import "react-vertical-timeline-component/style.min.css";
 import { FaTheaterMasks } from "react-icons/fa";
 import { motion } from "framer-motion";
 import FadeInSection from "../animations/fadeAnimation";
+import Image from "next/image";
 import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
 import ContactButton from "../buttons/contactButton";
@@ -21,209 +22,173 @@ export default function DanceExperienceFeed() {
       title: "Professional Dance Experience",
       items: [
         {
-          title: "Dancer",
-          company: "Theater und Philharmonie Essen Gmb",
+          title: "Dancer of musical Ronja Räubertochter",
+          company: "Theater und Philharmonie / Essen-Germany",
           subtitle: "Dancer 3 months (April to June 2025)",
           date: "Apr - Jun 2025",
+          img: "/img/danceExperience/8.webp",
         },
         {
           title: "Dancer",
-          company: "Movie Park - Bottrop",
+          company: "Movie Park / Bottrop-Germany",
           subtitle: "Dancer 7 months (March to September 2025)",
           date: "Mar - Sep 2025",
+          img: "/img/danceExperience/7.webp",
         },
         {
           title: "Dancer of musical Anatevka",
-          company: "DEUTSCHE OPER AM RHEIN DÜSSELDORF DUISBURG",
+          company: "Deutsche Oper am Rhein Düsseldorf / Duisburg-Germany",
           subtitle:
-            "6 months (first season in Düsseldorf April to July 2024 and second season in Duisburg October to December 2024)",
+            "6 months(first season in Düsseldorf April to July 2024 and second season in Duisburg October to December 2024)",
           date: "Apr - Dec 2024",
+          img: "/img/danceExperience/6.webp",
         },
         {
           title: "Aerial hoop, handbalance and poledance numbers",
-          company: "Circus Harryson – Italy",
+          company: "Circus Harryson / Italy",
           subtitle: "7 months (April 2023 until October 2023)",
           date: "Apr - Oct 2023",
+          img: "/img/danceExperience/5.webp",
         },
         {
           title: "Dancer and handbalance number",
-          company: "Studio LDI, Intershow Ltd – Eilat Israel",
+          company: "Studio LDI, Intershow Ltd / Eilat-Israel",
           subtitle: "11 months (November 2021 until October 2022)",
           date: "Nov 2021 - Oct 2022",
+          img: "/img/danceExperience/3.webp",
         },
         {
           title: "Dancer and aerial hoop and handbalance numbers",
-          company: "EZGI Events – Alanya, Turkey",
-          subtitle: "7 months in 2021",
+          company: "EZGI Events / Alanya-Turkey.",
+          subtitle: "7 months 2021",
           date: "2021",
+          img: "/img/danceExperience/4.webp",
         },
         {
           title: "Dancer and acrobat",
-          company: "Parker Taihu Longemont Paradise – China",
+          company: "Parker Taihu Longemont Paradise / China",
           subtitle: "In the year 2019 to 2020",
           date: "2019 - 2020",
-        },
-        {
-          title: "Moana Theme Show",
-          company: "32° Ballet-Art Show Sandra Godoy – Americana, São Paulo",
-          subtitle: "2018",
-          date: "2018",
-        },
-        {
-          title: "The Hunchback of Notre Dame Theme Show",
-          company: "31° Sandra Godoy Ballet-Art Show",
-          subtitle: "In the city of Americana, São Paulo (2017)",
-          date: "2017",
-        },
-        {
-          title: "30th Ballet-Art Show",
-          company: "Sandra Godoy",
-          subtitle:
-            "30 years of Sandra Godoy, involving all themes arising from the past years, in the city of Americana - São Paulo in 2016 with the Michael Jackson Dances, Hairspray, Moulin Rouge and Dream Girls. Americana - São Paulo in 2017 with Gypsies, Prayer, Heavenly Light, Faithful and Fire. With People of the Tribe, Know Who I Am, Ancestors and Ocean.",
-          date: "2016 - 2017",
+          img: "/img/danceExperience/1.webp",
         },
       ],
     },
 
     it: {
-      titleBg: "Professionale di Danza",
+      titleBg: "ESPERIENZA DI DANZA",
       title: "Esperienza Professionale di Danza",
       items: [
         {
-          title: "Ballerino",
-          company: "Theater und Philharmonie Essen Gmb",
-          subtitle: "Ballerino 3 mesi (aprile - giugno 2025)",
+          title: "Ballerino del musical Ronja Räubertochter",
+          company: "Theater und Philharmonie / Essen-Germania",
+          subtitle: "Ballerino per 3 mesi (aprile - giugno 2025)",
           date: "Apr - Giu 2025",
+          img: "/img/danceExperience/8.webp",
         },
         {
           title: "Ballerino",
-          company: "Movie Park - Bottrop",
-          subtitle: "Ballerino 7 mesi (marzo - settembre 2025)",
+          company: "Movie Park / Bottrop-Germania",
+          subtitle: "Ballerino per 7 mesi (marzo - settembre 2025)",
           date: "Mar - Set 2025",
+          img: "/img/danceExperience/7.webp",
         },
         {
           title: "Ballerino del musical Anatevka",
-          company: "DEUTSCHE OPER AM RHEIN DÜSSELDORF DUISBURG",
+          company: "Deutsche Oper am Rhein Düsseldorf / Duisburg-Germania",
           subtitle:
-            "6 mesi (prima stagione a Düsseldorf aprile - luglio 2024 e seconda stagione a Duisburg ottobre - dicembre 2024)",
+            "6 mesi (prima stagione a Düsseldorf da aprile a luglio 2024 e seconda stagione a Duisburg da ottobre a dicembre 2024)",
           date: "Apr - Dic 2024",
+          img: "/img/danceExperience/6.webp",
         },
         {
-          title: "Numeri cerchio aereo, handbalance e pole dance",
-          company: "Circus Harryson – Italia",
-          subtitle: "7 mesi (aprile 2023 fino a ottobre 2023)",
+          title: "Numeri con cerchio aereo, equilibrio sulle mani e pole dance",
+          company: "Circus Harryson / Italia",
+          subtitle: "7 mesi (aprile - ottobre 2023)",
           date: "Apr - Ott 2023",
+          img: "/img/danceExperience/5.webp",
         },
         {
-          title: "Ballerino e numero di handbalance",
-          company: "Studio LDI, Intershow Ltd – Eilat Israele",
-          subtitle: "11 mesi (novembre 2021 fino a ottobre 2022)",
+          title: "Ballerino e numero di equilibrio sulle mani",
+          company: "Studio LDI, Intershow Ltd / Eilat-Israele",
+          subtitle: "11 mesi (novembre 2021 - ottobre 2022)",
           date: "Nov 2021 - Ott 2022",
+          img: "/img/danceExperience/3.webp",
         },
         {
-          title: "Ballerino e numeri cerchio aereo e handbalance",
-          company: "EZGI Events – Alanya, Turchia",
+          title:
+            "Ballerino e numeri con cerchio aereo ed equilibrio sulle mani",
+          company: "EZGI Events / Alanya-Turchia",
           subtitle: "7 mesi nel 2021",
           date: "2021",
+          img: "/img/danceExperience/4.webp",
         },
         {
           title: "Ballerino e acrobata",
-          company: "Parker Taihu Longemont Paradise – Cina",
-          subtitle: "Nell'anno 2019 a 2020",
+          company: "Parker Taihu Longemont Paradise / Cina",
+          subtitle: "Nell'anno 2019-2020",
           date: "2019 - 2020",
-        },
-        {
-          title: "Spettacolo a tema Moana",
-          company: "32° Show Ballet-Art Sandra Godoy – Americana, São Paulo",
-          subtitle: "2018",
-          date: "2018",
-        },
-        {
-          title: "Spettacolo a tema Il Gobbo di Notre Dame",
-          company: "31° Show Ballet-Art Sandra Godoy",
-          subtitle: "Nella città di Americana, São Paulo (2017)",
-          date: "2017",
-        },
-        {
-          title: "30° Show Ballet-Art",
-          company: "Sandra Godoy",
-          subtitle:
-            "30 anni di Sandra Godoy, con tutti i temi emersi negli anni precedenti, nella città di Americana - São Paulo nel 2016 con Michael Jackson Dances, Hairspray, Moulin Rouge e Dream Girls. Americana - São Paulo nel 2017 con Gypsies, Prayer, Heavenly Light, Faithful e Fire. Con People of the Tribe, Know Who I Am, Ancestors e Ocean.",
-          date: "2016 - 2017",
+          img: "/img/danceExperience/1.webp",
         },
       ],
     },
 
     de: {
-      titleBg: "Tanzerfahrung",
+      titleBg: "TANZERFAHRUNG",
       title: "Professionelle Tanzerfahrung",
       items: [
         {
-          title: "Tänzer",
-          company: "Theater und Philharmonie Essen Gmb",
+          title: "Tänzer des Musicals Ronja Räubertochter",
+          company: "Theater und Philharmonie / Essen-Deutschland",
           subtitle: "Tänzer 3 Monate (April bis Juni 2025)",
           date: "Apr - Jun 2025",
+          img: "/img/danceExperience/8.webp",
         },
         {
           title: "Tänzer",
-          company: "Movie Park - Bottrop",
+          company: "Movie Park / Bottrop-Deutschland",
           subtitle: "Tänzer 7 Monate (März bis September 2025)",
           date: "Mär - Sep 2025",
+          img: "/img/danceExperience/7.webp",
         },
         {
-          title: "Musical-Tänzer Anatevka",
-          company: "DEUTSCHE OPER AM RHEIN DÜSSELDORF DUISBURG",
+          title: "Tänzer des Musicals Anatevka",
+          company: "Deutsche Oper am Rhein Düsseldorf / Duisburg-Deutschland",
           subtitle:
             "6 Monate (erste Saison in Düsseldorf April bis Juli 2024 und zweite Saison in Duisburg Oktober bis Dezember 2024)",
           date: "Apr - Dez 2024",
+          img: "/img/danceExperience/6.webp",
         },
         {
-          title: "Nummern Luftreifen, Handbalance und Poledance",
-          company: "Circus Harryson – Italien",
-          subtitle: "7 Monate (April 2023 bis Oktober 2023)",
+          title: "Luftring-, Handbalance- und Poledance-Nummern",
+          company: "Circus Harryson / Italien",
+          subtitle: "7 Monate (April bis Oktober 2023)",
           date: "Apr - Okt 2023",
+          img: "/img/danceExperience/5.webp",
         },
         {
           title: "Tänzer und Handbalance-Nummer",
-          company: "Studio LDI, Intershow Ltd – Eilat Israel",
+          company: "Studio LDI, Intershow Ltd / Eilat-Israel",
           subtitle: "11 Monate (November 2021 bis Oktober 2022)",
           date: "Nov 2021 - Okt 2022",
+          img: "/img/danceExperience/3.webp",
         },
         {
-          title: "Tänzer und Nummern Luftreifen und Handbalance",
-          company: "EZGI Events – Alanya, Türkei",
-          subtitle: "7 Monate im Jahr 2021",
+          title: "Tänzer und Luftring- und Handbalance-Nummern",
+          company: "EZGI Events / Alanya-Türkei",
+          subtitle: "7 Monate 2021",
           date: "2021",
+          img: "/img/danceExperience/4.webp",
         },
         {
           title: "Tänzer und Akrobat",
-          company: "Parker Taihu Longemont Paradise – China",
+          company: "Parker Taihu Longemont Paradise / China",
           subtitle: "Im Jahr 2019 bis 2020",
           date: "2019 - 2020",
-        },
-        {
-          title: "Moana Themen-Show",
-          company: "32° Ballet-Art Show Sandra Godoy – Americana, São Paulo",
-          subtitle: "2018",
-          date: "2018",
-        },
-        {
-          title: "Thema Der Glöckner von Notre Dame Show",
-          company: "31° Sandra Godoy Ballet-Art Show",
-          subtitle: "In der Stadt Americana, São Paulo (2017)",
-          date: "2017",
-        },
-        {
-          title: "30. Ballet-Art Show",
-          company: "Sandra Godoy",
-          subtitle:
-            "30 Jahre Sandra Godoy, mit allen Themen der vergangenen Jahre, in der Stadt Americana - São Paulo im Jahr 2016 mit Michael Jackson Tänzen, Hairspray, Moulin Rouge und Dream Girls. Americana - São Paulo im Jahr 2017 mit Gypsies, Prayer, Heavenly Light, Faithful und Fire. Mit People of the Tribe, Know Who I Am, Ancestors und Ocean.",
-          date: "2016 - 2017",
+          img: "/img/danceExperience/1.webp",
         },
       ],
     },
   };
-
   const polyglot = new Polyglot({
     phrases: phrases[language],
     locale: language,
@@ -274,10 +239,26 @@ export default function DanceExperienceFeed() {
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
+                  className="flex flex-row items-center justify-between gap-4"
                 >
-                  <h3 className="text-lg font-bold">{item.title}</h3>
-                  <p className="text-brand-600 text-sm mb-2">{item.company}</p>
-                  <h4 className="text-sm text-gray-300">{item.subtitle}</h4>
+                  {/* Informações */}
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold">{item.title}</h3>
+                    <p className="text-brand-600 text-sm mb-2">
+                      {item.company}
+                    </p>
+                    <h4 className="text-sm text-gray-300">{item.subtitle}</h4>
+                  </div>
+                  {/* Imagem do lado oposto da seta */}
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={`/img/danceExperience/${index + 1}.webp`}
+                      alt={item.title}
+                      width={500}
+                      height={500}
+                      className="rounded-lg object-cover shadow-md w-52 h-52 transition-transform duration-200 hover:scale-105"
+                    />
+                  </div>
                 </motion.div>
               </VerticalTimelineElement>
             ))}
