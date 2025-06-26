@@ -43,7 +43,7 @@ export default function HomePageSection() {
   });
 
   return (
-    <section className="h-screen flex items-center justify-center text-white relative">
+    <section className="min-h-screen flex items-center justify-center text-white relative">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
