@@ -43,7 +43,18 @@ export default function HomePageSection() {
   });
 
   return (
-    <section className="min-h-screen flex items-center justify-center text-white relative">
+    <section className="min-h-screen flex items-center justify-center text-white relative overflow-hidden">
+      {/* Background image */}
+      <div className="absolute inset-0 -z-10 opacity-15">
+        <Image
+          src="/img/teste-bg.webp"
+          alt="Background"
+          fill
+          quality={100}
+          className="object-cover w-full h-full sm:object-center object-[center_top]"
+          priority
+        />
+      </div>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
