@@ -1,29 +1,31 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useLanguage } from "@/context/languageContext";
-import { MessageCircle } from "lucide-react"; // Adicione este import para o ícone
+import { Download } from "lucide-react"; // ou outro ícone de download
 
 const buttonTexts: Record<string, string> = {
-  en: "Contact me",
-  it: "Contattami",
-  de: "Kontaktiere mich",
+  en: "Download Curriculum",
+  it: "Scarica Curriculum",
+  de: "Lebenslauf herunterladen",
 };
 
-export default function ContactButton() {
+export default function CvDownoladButton() {
   const { language } = useLanguage();
 
   return (
     <div className="px-1">
       <Link
-        href="https://api.whatsapp.com/send/?phone=4915234679241&text=Hello%2C%20am%20I%20speaking%20with%20Rodrigo%3F"
-        passHref
+        href="/CV-RodrigoTavella.pdf"
+        download
         target="_blank"
+        rel="noopener noreferrer"
       >
-        <motion.p
+        <motion.button
+          type="button"
           className="inline-flex items-center gap-2 bg-brand-200 transition text-brand-100 px-5 py-2 rounded-full shadow-md cursor-pointer relative overflow-hidden"
           whileHover={{ scale: 1.05 }}
         >
-          <MessageCircle size={18} /> {/* Ícone adicionado aqui */}
+          <Download size={18} />
           {buttonTexts[language] || buttonTexts.en}
           <motion.span
             className="absolute top-0 left-0 w-full h-full pointer-events-none"
@@ -35,7 +37,7 @@ export default function ContactButton() {
                 "linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent)",
             }}
           />
-        </motion.p>
+        </motion.button>
       </Link>
     </div>
   );

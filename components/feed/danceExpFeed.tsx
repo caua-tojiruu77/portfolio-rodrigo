@@ -12,6 +12,7 @@ import Image from "next/image";
 import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
 import ContactButton from "../buttons/contactButton";
+import CvDownoladButton from "../buttons/cvDowloadButton";
 
 export default function DanceExperienceFeed() {
   const { language } = useLanguage();
@@ -36,7 +37,8 @@ export default function DanceExperienceFeed() {
       c.includes("deutschland")
     )
       return countryFlags.germany;
-    if (c.includes("italy") || c.includes("italia") || c.includes("italien"))  return countryFlags.italy;
+    if (c.includes("italy") || c.includes("italia") || c.includes("italien"))
+      return countryFlags.italy;
     if (c.includes("israel") || c.includes("israele"))
       return countryFlags.israel;
     if (c.includes("turkey") || c.includes("turchia") || c.includes("türkei"))
@@ -112,14 +114,16 @@ export default function DanceExperienceFeed() {
         },
         {
           title: "Dancer in Ballet-Art Show Sandra Godoy",
-          company: "Ballet-art performance with the Moana theme / Americana-São Paulo",
+          company:
+            "Ballet-art performance with the Moana theme / Americana-São Paulo",
           subtitle: "2018",
           date: "2018",
           img: "/img/danceExperience/9.webp",
         },
         {
           title: "Dancer in Ballet-Art Show Sandra Godoy",
-          company: "Performance with the theme The Hunchback of Notre Dame / Americana-São Paulo",
+          company:
+            "Performance with the theme The Hunchback of Notre Dame / Americana-São Paulo",
           subtitle: "2018",
           date: "2018",
           img: "/img/danceExperience/10.webp",
@@ -192,14 +196,16 @@ export default function DanceExperienceFeed() {
         },
         {
           title: "Ballerino nello spettacolo Ballet-Art di Sandra Godoy",
-          company: "Spettacolo di balletto con il tema di Moana / Americana-San Paolo",
+          company:
+            "Spettacolo di balletto con il tema di Moana / Americana-San Paolo",
           subtitle: "2018",
           date: "2018",
           img: "/img/danceExperience/9.webp",
         },
         {
           title: "Ballerino nello spettacolo Ballet-Art di Sandra Godoy",
-          company: "Spettacolo con il tema Il gobbo di Notre Dame / Americana-San Paolo",
+          company:
+            "Spettacolo con il tema Il gobbo di Notre Dame / Americana-San Paolo",
           subtitle: "2018",
           date: "2018",
           img: "/img/danceExperience/10.webp",
@@ -271,18 +277,20 @@ export default function DanceExperienceFeed() {
         },
         {
           title: "Tänzer in der Ballett-Show von Sandra Godoy",
-          company: "Ballettaufführung mit dem Thema Vaiana / Americana-São Paulo",
+          company:
+            "Ballettaufführung mit dem Thema Vaiana / Americana-São Paulo",
           subtitle: "2018",
           date: "2018",
           img: "/img/danceExperience/9.webp",
         },
         {
           title: "Tänzer in der Ballett-Show von Sandra Godoy",
-          company: "Aufführung mit dem Thema Der Glöckner von Notre Dame / Americana-São Paulo",
+          company:
+            "Aufführung mit dem Thema Der Glöckner von Notre Dame / Americana-São Paulo",
           subtitle: "2018",
           date: "2018",
           img: "/img/danceExperience/10.webp",
-        },     
+        },
       ],
     },
   };
@@ -370,8 +378,9 @@ export default function DanceExperienceFeed() {
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
-          <div className="pt-6 w-full flex justify-center">
+          <div className="pt-8 flex flex-col gap-4 justify-center items-center">
             <ContactButton />
+            <CvDownoladButton />
           </div>
         </div>
       </div>

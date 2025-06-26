@@ -7,6 +7,7 @@ import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
 import FadeInSection from "../animations/fadeAnimation";
 import ContactButton from "../buttons/contactButton";
+import CvDownoladButton from "../buttons/cvDowloadButton";
 
 export default function AboutSection() {
   const [showContent, setShowContent] = useState(false);
@@ -24,6 +25,15 @@ export default function AboutSection() {
         "about.specialties.acrobatics":
           "Acrobatics: solo, group, duo, aerial hoop, handbalance, pole dance.",
         "about.specialties.stage": "Stage performance and musical theater.",
+        "about.specialties.professional":
+          "Professional Dancer (Ballet Basic, Jazz, Contemporary, moderne Dance, Burlesque Dance and Commercial).",
+        "about.specialties.acrobat": "Acrobat (solo and duo, group work).",
+        "about.specialties.artistic": "Artistic gymnastics.",
+        "about.specialties.aerial": "Aerial Hoop.",
+        "about.specialties.hand": "Hand Balance.",
+        "about.specialties.poledance": "Poledance.",
+        "about.specialties.teacher":
+          "Teacher: SexyDance, ChairDance, AerialHoop and Stretching.",
         "about.statement.1":
           "My art is visceral, physical, and symbolic, driven by a constant search for transformation and connection. I believe the body is a living language, and the stage is the place where soul and technique meet.",
         "about.statement.2":
@@ -53,6 +63,16 @@ export default function AboutSection() {
         "about.specialties.acrobatics":
           "Acrobazie: da solo, in gruppo, in coppia, cerchio aereo, handbalance, pole dance.",
         "about.specialties.stage": "Performance teatrale e musical.",
+        "about.specialties.professional":
+          "Ballerino professionista (Balletto base, Jazz, Contemporaneo, danza moderna, Burlesque e Commercial).",
+        "about.specialties.acrobat":
+          "Acrobata (lavoro solista e in duo, lavoro di gruppo).",
+        "about.specialties.artistic": "Ginnastica artistica.",
+        "about.specialties.aerial": "Cerchio aereo.",
+        "about.specialties.hand": "Hand Balance.",
+        "about.specialties.poledance": "Pole dance.",
+        "about.specialties.teacher":
+          "Insegnante: SexyDance, ChairDance, Cerchio aereo e Stretching.",
         "about.statement.1":
           "La mia arte è viscerale, fisica e simbolica, guidata da una costante ricerca di trasformazione e connessione. Credo che il corpo sia un linguaggio vivente e che il palco sia il luogo dove anima e tecnica si incontrano.",
         "about.statement.2":
@@ -82,6 +102,16 @@ export default function AboutSection() {
         "about.specialties.acrobatics":
           "Akrobatik: solo, Gruppe, Duo, Luftring, Handbalance, Pole Dance.",
         "about.specialties.stage": "Bühnenperformance und Musicaltheater.",
+        "about.specialties.professional":
+          "Professioneller Tänzer (Basis Ballett, Jazz, Zeitgenössisch, Moderner Tanz, Burlesque und Commercial).",
+        "about.specialties.acrobat":
+          "Akrobat (Solo- und Duoarbeit, Gruppenarbeit).",
+        "about.specialties.artistic": "Künstlerische Gymnastik.",
+        "about.specialties.aerial": "Luftring.",
+        "about.specialties.hand": "Handbalance.",
+        "about.specialties.poledance": "Pole Dance.",
+        "about.specialties.teacher":
+          "Lehrer: SexyDance, ChairDance, Luftring und Stretching.",
         "about.statement.1":
           "Meine Kunst ist visceral, körperlich und symbolisch – angetrieben von einem ständigen Streben nach Transformation und Verbindung. Ich glaube, der Körper ist eine lebendige Sprache, und die Bühne ist der Ort, an dem sich Seele und Technik begegnen.",
         "about.statement.2":
@@ -147,6 +177,13 @@ export default function AboutSection() {
                   <li>{polyglot.t("about.specialties.dance")}</li>
                   <li>{polyglot.t("about.specialties.acrobatics")}</li>
                   <li>{polyglot.t("about.specialties.stage")}</li>
+                  <li>{polyglot.t("about.specialties.acrobat")}</li>
+                  <li>{polyglot.t("about.specialties.artistic")}</li>
+                  <li>{polyglot.t("about.specialties.aerial")}</li>
+                  <li>{polyglot.t("about.specialties.hand")}</li>
+                  <li>{polyglot.t("about.specialties.poledance")}</li>
+                  <li>{polyglot.t("about.specialties.teacher")}</li>
+                  <li>{polyglot.t("about.specialties.professional")}</li>
                 </ul>
                 <br />
                 <p>{polyglot.t("about.statement.1")}</p>
@@ -158,8 +195,9 @@ export default function AboutSection() {
                     {polyglot.t("about.mission.highlight")}
                   </span>
                 </p>
-                <div className="pt-8">
+                <div className="pt-8 flex gap-4">
                   <ContactButton />
+                  <CvDownoladButton />
                 </div>
               </FadeInSection>
             </div>
@@ -217,8 +255,9 @@ export default function AboutSection() {
                   <li>{polyglot.t("about.tech.eyes")}</li>
                   <li>{polyglot.t("about.tech.status")}</li>
                 </ul>
-                <div className="pt-8">
+                <div className="pt-8 flex gap-4">
                   <ContactButton />
+                  <CvDownoladButton />
                 </div>
               </FadeInSection>
             </div>

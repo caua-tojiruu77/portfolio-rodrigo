@@ -11,6 +11,7 @@ import FadeInSection from "../animations/fadeAnimation";
 import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
 import ContactButton from "../buttons/contactButton";
+import CvDownoladButton from "../buttons/cvDowloadButton";
 
 export default function AcademicFormationFeed() {
   const { language } = useLanguage();
@@ -175,8 +176,9 @@ export default function AcademicFormationFeed() {
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
-          <div className="pt-6 w-full flex justify-center">
+          <div className="pt-8 flex flex-col gap-4 justify-center items-center">
             <ContactButton />
+            <CvDownoladButton />
           </div>
         </div>
       </div>
