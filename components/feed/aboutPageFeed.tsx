@@ -140,7 +140,7 @@ export default function AboutSection() {
               <FadeInSection>
                 <p>{polyglot.t("about.intro")}</p>
                 <br />
-                <h2 className="text-xl font-bold">
+                <h2 className="text-lg font-bold text-brand-200 mb-4">
                   {polyglot.t("about.specialties.title")}
                 </h2>
                 <ul className="list-disc pl-5">

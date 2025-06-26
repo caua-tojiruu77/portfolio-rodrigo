@@ -83,11 +83,11 @@ export default function ExperienceSection() {
                 <ul className="list-disc pl-5">
                   <li>
                     {language === "en" &&
-                      "Dancer and acrobat in theatrical productions, especially musical and visual shows on major European stages."}
+                      "Dancer and acrobat in theatrical productions, especially musical and visual shows on major European stages and in Asia and the Middle East."}
                     {language === "it" &&
-                      "Ballerino e acrobata in produzioni teatrali, in particolare spettacoli musicali e visivi su grandi palchi europei."}
+                      "Ballerino e acrobata in produzioni teatrali, soprattutto spettacoli musicali e visivi sui principali palcoscenici europei e in Asia e Medio Oriente."}
                     {language === "de" &&
-                      "Tänzer und Akrobat in Theaterproduktionen, insbesondere Musik- und visuelle Shows auf großen Bühnen in Europa."}
+                      "Tänzer und Akrobat in Theaterproduktionen, insbesondere musikalischen und visuellen Shows auf großen europäischen Bühnen sowie in Asien und dem Nahen Osten."}
                   </li>
                   <li>
                     {language === "en" &&
@@ -115,11 +115,11 @@ export default function ExperienceSection() {
                   </li>
                   <li>
                     {language === "en" &&
-                      "Participation in artistic events and shows in Brazil and Europe, bringing not only technique but also emotion, fluidity, and intense physical energy to the stage."}
+                      "Participation in artistic events and shows in Brazil, Asia, the Middle East, and Europe, bringing not only technique but also emotion, fluidity, and intense physical energy to the stage."}
                     {language === "it" &&
-                      "Partecipazione a eventi e spettacoli artistici in Brasile e in Europa, portando sul palco non solo tecnica, ma anche emozione, fluidità ed energia fisica intensa."}
+                      "Partecipazione a eventi e spettacoli artistici in Brasile, Asia, Medio Oriente ed Europa, portando sul palco non solo tecnica, ma anche emozione, fluidità ed energia fisica intensa."}
                     {language === "de" &&
-                      "Teilnahme an künstlerischen Veranstaltungen und Shows in Brasilien und Europa, wobei ich nicht nur Technik, sondern auch Emotion, Fluss und intensive körperliche Energie auf die Bühne bringe."}
+                      "Teilnahme an künstlerischen Veranstaltungen und Shows in Brasilien, Asien, dem Nahen Osten und Europa – mit einer Bühnenpräsenz, die nicht nur Technik, sondern auch Emotion, Fluss und intensive körperliche Energie vermittelt."}
                   </li>
                 </ul>
 

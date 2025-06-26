@@ -44,11 +44,11 @@ export default function Header() {
       >
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="pr-10">
+          <Link href="/">
             <Image
               src="/img/logo-header-1.webp"
-              width={150}
-              height={150}
+              width={140}
+              height={140}
               alt="Logo"
             />
           </Link>

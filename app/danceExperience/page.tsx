@@ -4,9 +4,9 @@ import DanceExperienceFeed from "@/components/feed/danceExpFeed";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Dance Experience - Rodrigo Tavella",
+  title: "Professional Experience  - Rodrigo Tavella",
   description:
-    "My dance experience as a dancer, choreographer, and performer with over 10 years in the dance industry. Specializing in contemporary dance, acrobatics, and performance art, I have collaborated with renowned artists and companies worldwide.",
+    "My Professional Experience as a dancer, choreographer, and performer with over 10 years in the dance industry. Specializing in contemporary dance, acrobatics, and performance art, I have collaborated with renowned artists and companies worldwide.",
   keywords: ["dancer", "choreographer", "performer", "dance portfolio", "contemporary dance", "acrobatics", "performance art"],
   alternates: {
     canonical: "https://meu-portfolio-v1-chi.vercel.app",
@@ -15,9 +15,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "Dance Experience - Rodrigo Tavella",
+    title: "Professional Experience - Rodrigo Tavella",
     description:
-      "My dance experience as a dancer, choreographer, and performer with over 10 years in the dance industry. Specializing in contemporary dance, acrobatics, and performance art, I have collaborated with renowned artists and companies worldwide.",
+      "My Professional Experience as a dancer, choreographer, and performer with over 10 years in the dance industry. Specializing in contemporary dance, acrobatics, and performance art, I have collaborated with renowned artists and companies worldwide.",
     url: "https://meu-portfolio-v1-chi.vercel.app",
     locale: "pt_BR",
     type: "website",

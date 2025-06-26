@@ -1,11 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { Mail, ArrowBigDown, Mouse } from "lucide-react";
-import Link from "next/link";
+import { ArrowBigDown, Mouse } from "lucide-react";
 import FadeInSection from "../animations/fadeAnimation";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Polyglot from "node-polyglot";
 import { useLanguage } from "@/context/languageContext";
 
@@ -19,21 +18,21 @@ export default function HomePageSection() {
       "page.welcome":
         "Willkommen in meinem Universum. Hier erfährst du mehr über den Weg, den ich gegangen bin, um der Tänzer zu werden, der ich heute bin ein Weg voller Hingabe, Mut und Liebe zur Kunst.\nFühle dich frei, zu erkunden, dich inspirieren zu lassen und dich mit jeder Bewegung dieser Geschichte zu verbinden.",
       "page.profession":
-        "Professioneller Tänzer | Turnakrobat | Choreografischer Tänzer",
+        "Professioneller Tänzer (Ballett, Jazz, Zeitgenössisch, Modern, Burlesque, Commercial) | Akrobat (Solo, Duo, Gruppe) | Kunstturner | Performer für Aerial Hoop und Handbalance | Poledancer | Lehrer: SexyDance, ChairDance, Aerial Hoop, Stretching.",
       "page.rolldown": "Runterscrollen!",
     },
     it: {
       "page.welcome":
         "Benvenuto nel mio universo. Qui scoprirai di più sul percorso che ho intrapreso per diventare il danzatore che sono oggi un cammino fatto di dedizione, coraggio e amore per l’arte.\nSentiti libero di esplorare, lasciarti ispirare e connetterti con ogni movimento di questa storia.",
       "page.profession":
-        "Ballerino Professionista | Acrobata Ginnico | Ballerino Coreografico",
+        "Ballerino Professionista (Balletto, Jazz, Contemporaneo, Moderno, Burlesque, Commercial) | Acrobata (solo, duo, in gruppo) | Ginnasta Artistico | Performer di Aerial Hoop e Hand Balance | Poledancer | Insegnante: SexyDance, ChairDance, Aerial Hoop, Stretching.",
       "page.rolldown": "Scorri giù!",
     },
     en: {
       "page.welcome":
         "Welcome to my universe. Here you will learn more about the path I have taken to become the dancer I am today a journey shaped by dedication, courage, and love for the art.\nFeel free to explore, be inspired, and connect with every movement of this story.",
       "page.profession":
-        "Professional Dancer | Gymnastics Acrobat | Choreographic Dancer",
+        "Professional Dancer (Ballet, Jazz, Contemporary, Modern, Burlesque, Commercial) | Acrobat (solo, duo, group) | Artistic Gymnast | Aerial Hoop & Hand Balance Performer | Poledancer | Teacher: SexyDance, ChairDance, Aerial Hoop, Stretching.",
       "page.rolldown": "Roll down!",
     },
   };
@@ -55,17 +54,17 @@ export default function HomePageSection() {
         <div className="container text-start lg:text-left flex items-start flex-col">
           <div className="mb-4 mt-4">
             <FadeInSection>
-              <p className="text-4xl md:text-5xl font-bold text-start">
+              <h1 className="text-4xl md:text-5xl font-bold text-start">
                 Rodrigo <span className="text-brand-200">Tavella</span>
-              </p>
+              </h1>
               <p className="mt-2 text-lg text-start">
                 {polyglot.t("page.profession")}
               </p>
             </FadeInSection>
           </div>
-          <h1 className="text-sm md:text-base text-gray-300 mb-2 text-start">
+          <h2 className="text-sm md:text-base text-gray-300 mb-2 text-start">
             {polyglot.t("page.welcome")}
-          </h1>
+          </h2>
           <div className="mt-4 flex items-center text-center gap-2 text-brand-200 animate-bounce w-full">
             <Mouse size={30} />
             <p className="text-sm">{polyglot.t("page.rolldown")}</p>
