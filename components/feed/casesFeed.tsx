@@ -1,12 +1,8 @@
 "use client"
 
-import Link from "next/link";
-import { FaArrowUpRightFromSquare } from "react-icons/fa6";
 import CasesSlider from "./casesSlider";
 import Polyglot from "node-polyglot";
 import { useLanguage } from "@/context/languageContext";
-import { createPolyglot } from "@/utils/polyglot";
-
 
 const CasesFeed = () => {
   const { language } = useLanguage();
