@@ -12,6 +12,7 @@ const galleryItems = [
   { type: "video", src: "https://www.youtube.com/embed/7FUkCa85thY?si=4_GMUi32me7yBHDY" }, // exemplo
   { type: "video", src: "https://www.youtube.com/embed/k4QatTbbGno?si=rgJ1hdn-H1-duLA4" }, // exemplo
   { type: "video", src: "https://www.youtube.com/embed/1TMq6kDOfMo?si=5zAqDwrBMLoVkd58" }, // exemplo
+  { type: "video", src: "https://www.youtube.com/embed/pRVIoJaZuHA?si=NCCv6g7HsshcyrNh" }, // exemplo
   { type: "image", src: "/img/gallery/1.webp" },
   { type: "image", src: "/img/gallery/2.webp" },
   { type: "image", src: "/img/gallery/21.webp" },

@@ -27,19 +27,23 @@ export default VideosFeed;
 
 const videos = [
   {
-    name: "Professional Dancer and Choreographer",
+    name: "Dance performance…2025",
     video: "https://www.youtube.com/embed/DAf2vscAHiY?si=XwmPMhNzFZzCwN_F",
   },
   {
-    name: "Professional Dancer and Choreographer",
+    name: "Show at the circus, numbers AERIALHOOP, POLEDANCE and HANDBALANCE",
     video: "https://www.youtube.com/embed/7FUkCa85thY?si=4_GMUi32me7yBHDY",
   },
   {
-    name: "Burlesque Performance",
+    name: "Israel hand balance number",
     video: "https://www.youtube.com/embed/k4QatTbbGno?si=rgJ1hdn-H1-duLA4",
   },
   {
-    name: "Burlesque Performance",
+    name: "Jazz dance, Rodrigo Tavella coreógrafa Kely Gouveia",
     video: "https://www.youtube.com/embed/1TMq6kDOfMo?si=5zAqDwrBMLoVkd58",
+  },
+  {
+    name: "HandBalance Show",
+    video: "https://www.youtube.com/embed/pRVIoJaZuHA?si=NCCv6g7HsshcyrNh"
   },
 ];

@@ -28,7 +28,7 @@ export default function AcademicFormationFeed() {
           date: "2016 - 2019",
         },
         {
-          title: "Jazz",
+          title: "Jazz and Contemporary",
           company: "Ballet-Art School Sandra Godoy – Americana, São Paulo",
           subtitle: "With Professors Kely Golveia and Mayne Sass (2015 - 2018)",
           date: "2015 - 2018",
@@ -60,7 +60,7 @@ export default function AcademicFormationFeed() {
           date: "2016 - 2019",
         },
         {
-          title: "Jazz",
+          title: "Jazz e Contemporaneo",
           company: "Scuola Ballet-Art Sandra Godoy – Americana, São Paulo",
           subtitle:
             "Con le professoresse Kely Golveia e Mayne Sass (2015 - 2018)",
@@ -94,7 +94,7 @@ export default function AcademicFormationFeed() {
           date: "2016 - 2019",
         },
         {
-          title: "Jazz",
+          title: "Jazz und Zeitgenössisch",
           company:
             "Ballettschule Ballet-Art Sandra Godoy – Americana, São Paulo",
           subtitle:
@@ -176,7 +176,7 @@ export default function AcademicFormationFeed() {
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
-          <div className="pt-8 flex flex-col gap-4 justify-center items-center">
+          <div className="pt-8 md:flex-rol flex-col flex gap-4 md:justify-center md:items-center">
             <ContactButton />
             <CvDownoladButton />
           </div>

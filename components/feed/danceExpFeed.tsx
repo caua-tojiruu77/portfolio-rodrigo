@@ -378,7 +378,7 @@ export default function DanceExperienceFeed() {
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
-          <div className="pt-8 flex flex-col gap-4 justify-center items-center">
+          <div className="pt-8 md:flex-rol flex-col flex gap-4 md:justify-center md:items-center">
             <ContactButton />
             <CvDownoladButton />
           </div>

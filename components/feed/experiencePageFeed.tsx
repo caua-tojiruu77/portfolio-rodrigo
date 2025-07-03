@@ -133,7 +133,7 @@ export default function ExperienceSection() {
                   {language === "de" &&
                     "Jedes Projekt hat meine Leidenschaft für die Kunst des bewegten Körpers gestärkt."}
                 </p>
-                <div className="pt-8 flex gap-4">
+                <div className="pt-8 md:flex-rol flex-col flex gap-4">
                   <ContactButton />
                   <CvDownoladButton />
                 </div>

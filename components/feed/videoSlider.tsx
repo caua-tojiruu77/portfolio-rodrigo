@@ -57,7 +57,7 @@ const VideoSlider = ({ cases }: VideoSliderProps) => {
         className="mySwiperAplicacoes !pb-[40px]"
         breakpoints={{
           760: {
-            slidesPerView: 4,
+            slidesPerView: 5,
           },
           320: {
             slidesPerView: 1,
@@ -70,19 +70,19 @@ const VideoSlider = ({ cases }: VideoSliderProps) => {
               className="rounded-2xl aspect-video cursor-pointer overflow-hidden shadow-2xl transition-transform"
               onClick={() => setSelectedVideo(video)}
             >
-<div className="relative w-full h-full">
-  <iframe
-    src={video}
-    title={`${name} video`}
-    className="w-full h-full rounded-xl pointer-events-none"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-    allowFullScreen
-  ></iframe>
-  <div
-    className="absolute inset-0 cursor-pointer"
-    onClick={() => setSelectedVideo(video)}
-  />
-</div>
+              <div className="relative w-full h-full">
+                <iframe
+                  src={video}
+                  title={`${name} video`}
+                  className="w-full h-full rounded-xl pointer-events-none"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  allowFullScreen
+                ></iframe>
+                <div
+                  className="absolute inset-0 cursor-pointer"
+                  onClick={() => setSelectedVideo(video)}
+                />
+              </div>
             </div>
           </SwiperSlide>
         ))}

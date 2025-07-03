@@ -22,12 +22,10 @@ export default function AboutSection() {
         "about.specialties.title": "My specialties include:",
         "about.specialties.dance":
           "Dance: classical ballet, jazz, contemporary and modern dance.",
-        "about.specialties.acrobatics":
-          "Acrobatics: solo, group, duo, aerial hoop, handbalance, pole dance.",
+        "about.specialties.acrobatics": "Acrobatics: solo, group and duo.",
         "about.specialties.stage": "Stage performance and musical theater.",
         "about.specialties.professional":
           "Professional Dancer (Ballet Basic, Jazz, Contemporary, moderne Dance, Burlesque Dance and Commercial).",
-        "about.specialties.acrobat": "Acrobat (solo and duo, group work).",
         "about.specialties.artistic": "Artistic gymnastics.",
         "about.specialties.aerial": "Aerial Hoop.",
         "about.specialties.hand": "Hand Balance.",
@@ -60,13 +58,10 @@ export default function AboutSection() {
         "about.specialties.title": "Le mie specialità includono:",
         "about.specialties.dance":
           "Danza: balletto classico, jazz, danza contemporanea e moderna.",
-        "about.specialties.acrobatics":
-          "Acrobazie: da solo, in gruppo, in coppia, cerchio aereo, handbalance, pole dance.",
+        "about.specialties.acrobatics": "Acrobazie: Solo, Coppia e Gruppo.",
         "about.specialties.stage": "Performance teatrale e musical.",
         "about.specialties.professional":
           "Ballerino professionista (Balletto base, Jazz, Contemporaneo, danza moderna, Burlesque e Commercial).",
-        "about.specialties.acrobat":
-          "Acrobata (lavoro solista e in duo, lavoro di gruppo).",
         "about.specialties.artistic": "Ginnastica artistica.",
         "about.specialties.aerial": "Cerchio aereo.",
         "about.specialties.hand": "Hand Balance.",
@@ -99,13 +94,10 @@ export default function AboutSection() {
         "about.specialties.title": "Meine Spezialgebiete sind:",
         "about.specialties.dance":
           "Tanz: klassisches Ballett, Jazz, zeitgenössischer und moderner Tanz.",
-        "about.specialties.acrobatics":
-          "Akrobatik: solo, Gruppe, Duo, Luftring, Handbalance, Pole Dance.",
+        "about.specialties.acrobatics": "Akrobatik: Solo, Duo und Gruppe.",
         "about.specialties.stage": "Bühnenperformance und Musicaltheater.",
         "about.specialties.professional":
           "Professioneller Tänzer (Basis Ballett, Jazz, Zeitgenössisch, Moderner Tanz, Burlesque und Commercial).",
-        "about.specialties.acrobat":
-          "Akrobat (Solo- und Duoarbeit, Gruppenarbeit).",
         "about.specialties.artistic": "Künstlerische Gymnastik.",
         "about.specialties.aerial": "Luftring.",
         "about.specialties.hand": "Handbalance.",
@@ -174,16 +166,14 @@ export default function AboutSection() {
                   {polyglot.t("about.specialties.title")}
                 </h2>
                 <ul className="list-disc pl-5">
-                  <li>{polyglot.t("about.specialties.dance")}</li>
+                  <li>{polyglot.t("about.specialties.professional")}</li>
                   <li>{polyglot.t("about.specialties.acrobatics")}</li>
                   <li>{polyglot.t("about.specialties.stage")}</li>
-                  <li>{polyglot.t("about.specialties.acrobat")}</li>
                   <li>{polyglot.t("about.specialties.artistic")}</li>
                   <li>{polyglot.t("about.specialties.aerial")}</li>
                   <li>{polyglot.t("about.specialties.hand")}</li>
                   <li>{polyglot.t("about.specialties.poledance")}</li>
                   <li>{polyglot.t("about.specialties.teacher")}</li>
-                  <li>{polyglot.t("about.specialties.professional")}</li>
                 </ul>
                 <br />
                 <p>{polyglot.t("about.statement.1")}</p>
@@ -195,7 +185,7 @@ export default function AboutSection() {
                     {polyglot.t("about.mission.highlight")}
                   </span>
                 </p>
-                <div className="pt-8 flex gap-4">
+                <div className="pt-8 md:flex-row flex-col flex gap-4">
                   <ContactButton />
                   <CvDownoladButton />
                 </div>
@@ -255,7 +245,7 @@ export default function AboutSection() {
                   <li>{polyglot.t("about.tech.eyes")}</li>
                   <li>{polyglot.t("about.tech.status")}</li>
                 </ul>
-                <div className="pt-8 flex gap-4">
+                <div className="pt-8 md:flex-row flex-col flex gap-4">
                   <ContactButton />
                   <CvDownoladButton />
                 </div>
