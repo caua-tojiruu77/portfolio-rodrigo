@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "../components/layout/header";
 import Footer from "../components/layout/footer";
-import ScrollAnimation from "@/components/animations/scrollAnimation";
 import { Outfit } from "next/font/google";
 import { LanguageProvider } from "@/context/languageContext";
 
@@ -76,7 +75,7 @@ export default function RootLayout({
       <body className="bg-brand-400 font-omnes scroll-smooth">
         <LanguageProvider>
           <Header />
-          <ScrollAnimation>{children}</ScrollAnimation>
+          {children}
           <Footer />
         </LanguageProvider>
       </body>

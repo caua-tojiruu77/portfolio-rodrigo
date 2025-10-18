@@ -42,7 +42,7 @@ export default function AboutSection() {
         "about.tech.title": "Technical sheet",
         "about.tech.nationality":
           "Nationality: Brazilian, with Italian citizenship (European Union)",
-        "about.tech.age": "Age: 32 years old",
+        "about.tech.age": "Age: 33 years old",
         "about.tech.birth": "Date of birth: September 17, 1992",
         "about.tech.height": "Height: 1.74 m (or 5'8\")",
         "about.tech.weight": "Weight: 70 kg",
@@ -78,7 +78,7 @@ export default function AboutSection() {
         "about.tech.title": "Scheda tecnica",
         "about.tech.nationality":
           "Nazionalità: Brasiliano, con cittadinanza italiana (Unione Europea)",
-        "about.tech.age": "Età: 32 anni",
+        "about.tech.age": "Età: 33 anni",
         "about.tech.birth": "Data di nascita: 17 settembre 1992",
         "about.tech.height": "Altezza: 1,74 m",
         "about.tech.weight": "Peso: 70 kg",
@@ -114,7 +114,7 @@ export default function AboutSection() {
         "about.tech.title": "Technisches Datenblatt",
         "about.tech.nationality":
           "Nationalität: Brasilianer mit italienischer Staatsbürgerschaft (Europäische Union)",
-        "about.tech.age": "Alter: 32 Jahre",
+        "about.tech.age": "Alter: 33 Jahre",
         "about.tech.birth": "Geburtsdatum: 17. September 1992",
         "about.tech.height": "Größe: 1,74 m",
         "about.tech.weight": "Gewicht: 70 kg",
