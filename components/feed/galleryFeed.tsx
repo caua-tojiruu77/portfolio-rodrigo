@@ -8,6 +8,24 @@ import Polyglot from "node-polyglot";
 
 // Lista com todas as imagens + vídeos
 const galleryItems = [
+  { type: "image", src: "/img/gallery/25.webp" },
+  { type: "image", src: "/img/gallery/26.webp" },
+  { type: "image", src: "/img/gallery/27.webp" },
+  { type: "image", src: "/img/gallery/28.webp" },
+  { type: "image", src: "/img/gallery/29.webp" },
+  { type: "image", src: "/img/gallery/30.webp" },
+  { type: "image", src: "/img/gallery/31.webp" },
+  { type: "image", src: "/img/gallery/32.webp" },
+  { type: "image", src: "/img/gallery/33.webp" },
+  { type: "image", src: "/img/gallery/34.webp" },
+  { type: "image", src: "/img/gallery/35.webp" },
+  { type: "image", src: "/img/gallery/36.webp" },
+  { type: "image", src: "/img/gallery/37.webp" },
+  { type: "image", src: "/img/gallery/38.webp" },
+  { type: "image", src: "/img/gallery/39.webp" },
+  { type: "image", src: "/img/gallery/40.webp" },
+  { type: "image", src: "/img/gallery/41.webp" },
+
   { type: "video", src: "https://www.youtube.com/embed/DAf2vscAHiY?si=XwmPMhNzFZzCwN_F" }, // exemplo
   { type: "video", src: "https://www.youtube.com/embed/7FUkCa85thY?si=4_GMUi32me7yBHDY" }, // exemplo
   { type: "video", src: "https://www.youtube.com/embed/k4QatTbbGno?si=rgJ1hdn-H1-duLA4" }, // exemplo
