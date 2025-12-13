@@ -1,221 +1,120 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { galleryLibraries } from "@/utils/galleryConfig";
 import { useLanguage } from "@/context/languageContext";
-import Polyglot from "node-polyglot";
 
-// === GALERIA ORGANIZADA EM CATEGORIAS ===
-const galleryItems = [
-  // 🩰 Dança
-  { type: "image", category: "dance", src: "/img/gallery/25.webp" },
-  { type: "image", category: "dance", src: "/img/gallery/26.webp" },
-  { type: "image", category: "dance", src: "/img/gallery/27.webp" },
-  { type: "image", category: "dance", src: "/img/gallery/28.webp" },
-  { type: "image", category: "dance", src: "/img/gallery/29.webp" },
-  { type: "image", category: "dance", src: "/img/gallery/30.webp" },
-  { type: "image", category: "dance", src: "/img/gallery/31.webp" },
-  { type: "image", category: "dance", src: "/img/gallery/32.webp" },
-  { type: "image", category: "dance", src: "/img/gallery/33.webp" },
-  { type: "image", category: "dance", src: "/img/gallery/34.webp" },
+interface GalleryFeedProps {
+  category: string;
+}
 
-  // 📸 Ensaios
-  { type: "image", category: "photoshoot", src: "/img/gallery/35.webp" },
-  { type: "image", category: "photoshoot", src: "/img/gallery/36.webp" },
-  { type: "image", category: "photoshoot", src: "/img/gallery/37.webp" },
-  { type: "image", category: "photoshoot", src: "/img/gallery/38.webp" },
-  { type: "image", category: "photoshoot", src: "/img/gallery/39.webp" },
-  { type: "image", category: "photoshoot", src: "/img/gallery/40.webp" },
-  { type: "image", category: "photoshoot", src: "/img/gallery/41.webp" },
-
-  // 🎥 YouTube
-  { type: "video", category: "youtube", src: "https://www.youtube.com/embed/DAf2vscAHiY?si=XwmPMhNzFZzCwN_F" },
-  { type: "video", category: "youtube", src: "https://www.youtube.com/embed/7FUkCa85thY?si=4_GMUi32me7yBHDY" },
-  { type: "video", category: "youtube", src: "https://www.youtube.com/embed/k4QatTbbGno?si=rgJ1hdn-H1-duLA4" },
-  { type: "video", category: "youtube", src: "https://www.youtube.com/embed/1TMq6kDOfMo?si=5zAqDwrBMLoVkd58" },
-  { type: "video", category: "youtube", src: "https://www.youtube.com/embed/pRVIoJaZuHA?si=NCCv6g7HsshcyrNh" },
-  { type: "video", category: "youtube", src: "https://youtube.com/embed/8mwOdZuE554?si=fCBR0y_TeC7z2BvY" },
-  { type: "video", category: "youtube", src: "https://www.youtube.com/embed/0pO3OEeUR9s?si=4_sZEydjKpS-w0kZ" },
-
-  // 💃 Outros (mistura)
-  { type: "image", category: "others", src: "/img/gallery/1.webp" },
-  { type: "image", category: "others", src: "/img/gallery/2.webp" },
-  { type: "image", category: "others", src: "/img/gallery/3.webp" },
-  { type: "image", category: "others", src: "/img/gallery/5.webp" },
-  { type: "image", category: "others", src: "/img/gallery/6.webp" },
-  { type: "image", category: "others", src: "/img/gallery/7.webp" },
-  { type: "image", category: "others", src: "/img/gallery/8.webp" },
-  { type: "image", category: "others", src: "/img/gallery/9.webp" },
-  { type: "image", category: "others", src: "/img/gallery/10.webp" },
-  { type: "image", category: "others", src: "/img/gallery/11.webp" },
-  { type: "image", category: "others", src: "/img/gallery/12.webp" },
-  { type: "image", category: "others", src: "/img/gallery/13.webp" },
-  { type: "image", category: "others", src: "/img/gallery/14.webp" },
-  { type: "image", category: "others", src: "/img/gallery/15.webp" },
-  { type: "image", category: "others", src: "/img/gallery/16.webp" },
-  { type: "image", category: "others", src: "/img/gallery/17.webp" },
-  { type: "image", category: "others", src: "/img/gallery/18.webp" },
-  { type: "image", category: "others", src: "/img/gallery/19.webp" },
-  { type: "image", category: "others", src: "/img/gallery/20.webp" },
-  { type: "image", category: "others", src: "/img/gallery/21.webp" },
-  { type: "image", category: "others", src: "/img/gallery/23.webp" },
-  { type: "image", category: "others", src: "/img/gallery/24.webp" },
-];
-
-const phrases = {
-  en: { titleBg: "GALLERY", title: "Gallery" },
-  it: { titleBg: "GALLERIA", title: "Galleria" },
-  de: { titleBg: "GALERIE", title: "Galerie" },
-};
-
-export default function GalleryFeed() {
+export default function GalleryFeed({ category }: GalleryFeedProps) {
+  const lib = galleryLibraries[category as keyof typeof galleryLibraries];
   const { language } = useLanguage();
-  const polyglot = useMemo(
-    () => new Polyglot({ phrases: phrases[language], locale: language }),
-    [language]
-  );
+  const [selected, setSelected] = useState<string | null>(null);
 
-  const [selectedItem, setSelectedItem] = useState<{ type: string; src: string } | null>(null);
-  const [category, setCategory] = useState("all");
+  type RenderItem = {
+    type: "image" | "video";
+    src: string;
+    title?: { en: string; it: string; de: string } | undefined;
+  };
 
-  // Filtro dinâmico
-  const filteredItems = useMemo(() => {
-    if (category === "all") return galleryItems;
-    return galleryItems.filter((item) => item.category === category);
-  }, [category]);
+  const items = useMemo<RenderItem[]>(() => {
+  if (!lib) return [];
+
+  if (lib.type === "image") {
+    return lib.items.map((item) => {
+      if (typeof item === "string") {
+        return {
+          type: "image",
+          src: `${lib.path}/${item}`,
+          title: undefined as undefined,
+        };
+      }
+
+      // item is object with src and optional title
+      return {
+        type: "image",
+        src: `${lib.path}/${item.src}`,
+        title: item.title,
+      };
+    });
+  }
+
+  // video
+  return lib.items.map((item) => ({
+    type: "video",
+    src: item,
+  }));
+}, [lib]);
+
+  const selectedItem = items.find((i) => i.src === selected);
+
+
+  if (!lib) {
+    return <p className="text-center mt-20">Categoria não encontrada</p>;
+  }
 
   return (
-    <section className="flex flex-col items-center min-h-screen">
-      {/* Título */}
-      <div className="relative lg:py-8 mb-8 w-full flex flex-col items-center">
-        <h2
-          className="hidden lg:flex absolute inset-0 justify-center items-center md:text-[4rem] xl:text-[6rem] font-extrabold text-gray-300 opacity-10 select-none pointer-events-none -z-10 text-center uppercase"
-          aria-hidden="true"
-        >
-          {polyglot.t("titleBg")}
-        </h2>
-        <h2 className="relative text-4xl font-bold text-center">
-          {polyglot.t("title")}
-        </h2>
-      </div>
+    <section className="max-w-6xl mx-auto px-4 py-20">
+    <h1 className="text-4xl font-bold text-center mb-8">{lib.title[language]}</h1>
 
-      {/* Botões de categoria */}
-      <div className="flex gap-3 mb-8 flex-wrap justify-center">
-        {[
-          { key: "all", label: "Todos" },
-          { key: "dance", label: "Dança" },
-          { key: "photoshoot", label: "Ensaios" },
-          { key: "youtube", label: "YouTube" },
-          { key: "others", label: "Outros" },
-        ].map((btn) => (
-          <motion.button
-            key={btn.key}
-            whileTap={{ scale: 0.92 }}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition 
-              ${category === btn.key
-                ? "bg-white text-black shadow-lg"
-                : "bg-black/40 text-white hover:bg-black/60"}`}
-            onClick={() => setCategory(btn.key)}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {items.map((item, idx) => (
+          <motion.div
+            key={idx}
+            whileHover={{ scale: 1.05 }}
+            className="rounded-lg overflow-hidden shadow-lg cursor-pointer"
+            onClick={() => setSelected(item.src)}
           >
-            {btn.label}
-          </motion.button>
+            {item.type === "image" ? (
+              <>
+                <Image
+                  src={item.src}
+                  alt={item.title ? item.title[language] : ""}
+                  width={400}
+                  height={400}
+                  className="object-cover w-full h-48"
+                />
+                {/* thumbnails: no titles or descriptions (kept clean as requested) */}
+              </>
+            ) : (
+              <iframe
+                src={item.src}
+                className="w-full h-48"
+                allowFullScreen
+              />
+            )}
+          </motion.div>
         ))}
       </div>
 
-      {/* Grid de Itens */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full max-w-6xl">
-        <AnimatePresence>
-          {filteredItems.map((item, idx) => (
-            <motion.div
-              key={`${item.type}-${item.src}-${idx}`}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3 }}
-              whileHover={{ scale: 1.04 }}
-              className="cursor-pointer rounded-lg overflow-hidden shadow-lg"
-              onClick={() => setSelectedItem(item)}
-            >
-              {item.type === "image" ? (
-                <Image
-                  src={item.src}
-                  alt={`Gallery image ${idx + 1}`}
-                  width={400}
-                  height={400}
-                  className="object-cover w-full h-48 md:h-56 lg:h-60 transition-transform duration-200"
-                  draggable={false}
-                />
-              ) : (
-                <div className="w-full h-48 md:h-56 lg:h-60 bg-black flex items-center justify-center">
-                  <iframe
-                    src={item.src}
-                    title={`Video ${idx + 1}`}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                </div>
-              )}
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
-
-      {/* Modal de visualização */}
+      {/* Modal */}
       <AnimatePresence>
-        {selectedItem && (
+        {selected && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setSelectedItem(null)}
+            onClick={() => setSelected(null)}
           >
             <motion.div
-              className="relative"
-              initial={{ scale: 0.8 }}
+              initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
-              onClick={(e) => e.stopPropagation()}
+              exit={{ scale: 0.9 }}
             >
-              {selectedItem.type === "image" ? (
-                <Image
-                  src={selectedItem.src}
-                  alt="Gallery image"
-                  width={1200}
-                  height={1200}
-                  className="rounded-lg max-h-[100vh] max-w-[100vw] object-contain shadow-2xl"
-                  draggable={false}
-                />
-              ) : (
-                <iframe
-                  src={selectedItem.src}
-                  className="rounded-lg max-h-[90vh] max-w-[90vw] w-[80vw] h-[45vw] object-contain shadow-2xl"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              )}
-
-              <button
-                className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-2 hover:bg-black/80 transition"
-                onClick={() => setSelectedItem(null)}
-                aria-label="Close"
-              >
-                <svg
-                  width={24}
-                  height={24}
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
+                <div className="flex flex-col items-center gap-4">
+                  <Image
+                    src={selected as string}
+                    alt={selectedItem?.title ? selectedItem.title[language] : ""}
+                    width={1200}
+                    height={1200}
+                    className="max-h-[70vh] max-w-[80vw] object-contain"
                   />
-                </svg>
-              </button>
+                </div>
             </motion.div>
           </motion.div>
         )}
