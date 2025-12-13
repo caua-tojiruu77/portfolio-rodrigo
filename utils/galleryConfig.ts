@@ -72,7 +72,7 @@ export const galleryLibraries: Record<string, GalleryLibrary> = {
     title: { en: "Aerial Hoop", it: "Aerial Hoop", de: "Aerial Hoop" },
     type: "image",
     path: "/img/gallery/fotos-aerialhoop",
-    items: ["1.webp", "2.webp"],
+    items: ["1.webp", "2.webp", "3.webp", "4.webp"],
     description: { en: "Aerial hoop training and performances.", it: "Allenamento e performance con il cerchio aereo.", de: "Aerial-Hoop-Training und Auftritte." },
   },
 
