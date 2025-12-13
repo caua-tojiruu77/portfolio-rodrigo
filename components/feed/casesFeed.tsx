@@ -29,34 +29,34 @@ export default CasesFeed;
 const cases = [
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/1.webp",
+    img: "/img/gallery/fotos-dance/1.webp",
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/2.webp",
+    img: "/img/gallery/fotos-dance/2.webp",
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/4.webp",
+    img: "/img/gallery/fotos-artisticas/1.webp",
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/5.webp",
+    img: "/img/gallery/fotos-artisticas/2.webp",
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/6.webp",
+    img: "/img/gallery/fotos-aerialhoop/1.webp",
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/7.webp",
+    img: "/img/gallery/fotos-handbalance/1.webp",
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/24.webp",
+    img: "/img/gallery/fotos-artisticas/3.webp",
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/3.webp",
+    img: "/img/gallery/fotos-dance/3.webp",
   },
 ];
