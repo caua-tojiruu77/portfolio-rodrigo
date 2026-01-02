@@ -37,11 +37,11 @@ const cases = [
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/fotos-artisticas/1.webp",
+    img: "/img/gallery/fotos-dance/3.webp",
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/fotos-artisticas/2.webp",
+    img: "/img/gallery/fotos-artisticas/1.webp",
   },
   {
     name: "Professional Dancer and Choreographer",
@@ -57,6 +57,11 @@ const cases = [
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/fotos-dance/3.webp",
+    img: "/img/gallery/fotos-posada/7.webp",
   },
+  {
+    name: "Professional Dancer and Choreographer",
+    img: "/img/gallery/fotos-artisticas/11.webp",
+  },
+
 ];

@@ -16,7 +16,7 @@ const VideosFeed = () => {
   });
 
   return (
-    <section className="px-0! text-center" id="aplicacoes">
+    <section className="px-6! text-center" id="aplicacoes">
       <h1 className="mainTitle">{polyglot.t("page.title")}</h1>
       <VideoSlider cases={videos} />
     </section>
@@ -27,7 +27,7 @@ export default VideosFeed;
 
 const videos = [
   {
-    name: "Dance performance…2025",
+    name: "Dance performance 2025",
     video: "https://www.youtube.com/embed/DAf2vscAHiY?si=XwmPMhNzFZzCwN_F",
   },
   {
