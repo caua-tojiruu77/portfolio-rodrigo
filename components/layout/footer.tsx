@@ -111,7 +111,7 @@ const Footer = () => {
             <p className="mt-2 md:mt-0">
               Desenvolvido por{" "}
               <a
-                href="https://www.instagram.com/tojiruu77/"
+                href="https://www.instagram.com/bigaoftn/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="underline text-brand-50 transition duration-300"

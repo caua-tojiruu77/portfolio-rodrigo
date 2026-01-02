@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { galleryLibraries } from "@/utils/galleryConfig";
 import { useLanguage } from "@/context/languageContext";
@@ -51,6 +51,38 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
 }, [lib]);
 
   const selectedItem = items.find((i) => i.src === selected);
+
+  const goToIndex = useCallback((index: number) => {
+    const clamped = (index + items.length) % items.length;
+    setSelected(items[clamped].src);
+  }, [items]);
+
+  const goNext = useCallback(() => {
+    if (!selected) return;
+    const idx = items.findIndex((i) => i.src === selected);
+    if (idx === -1) return;
+    goToIndex(idx + 1);
+  }, [items, selected, goToIndex]);
+
+  const goPrev = useCallback(() => {
+    if (!selected) return;
+    const idx = items.findIndex((i) => i.src === selected);
+    if (idx === -1) return;
+    goToIndex(idx - 1);
+  }, [items, selected, goToIndex]);
+
+  useEffect(() => {
+    if (!selected) return;
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") goNext();
+      if (e.key === "ArrowLeft") goPrev();
+      if (e.key === "Escape") setSelected(null);
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [selected, goNext, goPrev]);
 
 
   if (!lib) {
@@ -105,6 +137,8 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative"
             >
                 <div className="flex flex-col items-center gap-4">
                   <Image
@@ -114,6 +148,23 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
                     height={1200}
                     className="max-h-[70vh] max-w-[80vw] object-contain"
                   />
+
+                  {/* Nav buttons */}
+                  <button
+                    aria-label="Anterior"
+                    onClick={goPrev}
+                    className="absolute left-[-48px] top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white rounded-full w-10 h-10 flex items-center justify-center"
+                  >
+                    ‹
+                  </button>
+
+                  <button
+                    aria-label="Próximo"
+                    onClick={goNext}
+                    className="absolute right-[-48px] top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white rounded-full w-10 h-10 flex items-center justify-center"
+                  >
+                    ›
+                  </button>
                 </div>
             </motion.div>
           </motion.div>

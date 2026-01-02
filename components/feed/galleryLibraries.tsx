@@ -37,7 +37,7 @@ export default function GalleryLibraries() {
                       ? (lib as any).cover
                       : lib.type === "image" && lib.items && lib.items.length > 0
                       ? `${lib.path}/${typeof lib.items[0] === 'string' ? lib.items[0] : (lib.items[0] as any).src}`
-                      : "/img/gallery/fotos-artisticas/10.webp"
+                      : "/img/gallery/fotos-youtube/capa-yt.png"
                   }
                   alt={lib.title[language]}
                   fill
