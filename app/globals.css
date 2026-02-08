@@ -22,6 +22,7 @@ body {
   background-color: #050123;
   overflow-x: hidden;
   scroll-behavior: smooth;
+  font-family: "Outfit", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
 }
 
 section {

@@ -105,7 +105,7 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
               <>
                 <Image
                   src={item.src}
-                  alt={item.title ? item.title[language] : ""}
+                  alt={item.title ? item.title[language] : `${lib.title[language]} image ${idx + 1}`}
                   width={400}
                   height={400}
                   className="object-cover w-full h-48"
@@ -143,7 +143,7 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
                 <div className="flex flex-col items-center gap-4">
                   <Image
                     src={selected as string}
-                    alt={selectedItem?.title ? selectedItem.title[language] : ""}
+                    alt={selectedItem?.title ? selectedItem.title[language] : `${lib.title[language]} image`}
                     width={1200}
                     height={1200}
                     className="max-h-[70vh] max-w-[80vw] object-contain"

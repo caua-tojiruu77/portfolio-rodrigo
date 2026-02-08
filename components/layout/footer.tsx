@@ -29,8 +29,8 @@ const Footer = () => {
                     src="/img/logo-header.png"
                     width={100}
                     height={100}
-                    alt=""
-                    title=""
+                    alt="Logo Rodrigo Tavella"
+                    title="Rodrigo Tavella"
                     className="w-full h-auto"
                   />
                 </Link>

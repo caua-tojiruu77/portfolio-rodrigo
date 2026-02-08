@@ -20,9 +20,9 @@ export const metadata: Metadata = {
     description:
       "Explore my professional journey as a dancer, choreographer, and performer with over 10 years of experience in the dance industry. Discover my expertise in contemporary dance, acrobatics, and performance art through this portfolio.",
     url: "https://meu-portfolio-v1-chi.vercel.app",
-    locale: "pt_BR",
+    locale: "pt-BR",
     type: "website",
-    siteName: "Portfólio Rdorigo Tavella",
+    siteName: "Portfólio Rodrigo Tavella",
     images: [
       {
         url: "/img/logo-header.png",

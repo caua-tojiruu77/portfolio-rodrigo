@@ -8,6 +8,7 @@ import { LanguageProvider } from "@/context/languageContext";
 const outfit = Outfit({
   subsets: ["latin"],
   weight: ["400", "700"], // pesos que você deseja
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -26,9 +27,9 @@ export const metadata: Metadata = {
     description:
       "dancer, choreographer, and performer with over 10 years of experience in the dance industry. Specializing in contemporary dance, acrobatics, and performance art, I have collaborated with renowned artists and companies worldwide.",
     url: "https://meu-portfolio-v1-chi.vercel.app",
-    locale: "pt_BR",
+    locale: "pt-BR",
     type: "website",
-    siteName: "Portfólio Rdorigo Tavella",
+    siteName: "Portfólio Rodrigo Tavella",
     images: [
       {
         url: "/img/logo-header.png",
@@ -36,6 +37,15 @@ export const metadata: Metadata = {
         height: 471,
       },
     ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Rodrigo Tavella - Professional dancer and choreographer",
+    description:
+      "Dancer, choreographer and performer. Portfolio of Rodrigo Tavella.",
+    site: "@Rodrigotavella",
+    creator: "@Rodrigotavella",
+    images: ["/img/logo-header.png"],
   },
   robots: {
     index: true,
@@ -61,16 +71,53 @@ export const metadata: Metadata = {
   },
 };
 
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://meu-portfolio-v1-chi.vercel.app/#website",
+      "url": "https://meu-portfolio-v1-chi.vercel.app",
+      "name": "Rodrigo Tavella - Portfólio",
+      "description": "Portfolio of Rodrigo Tavella, dancer and choreographer.",
+      "publisher": {
+        "@type": "Person",
+        "name": "Rodrigo Tavella"
+      }
+    },
+    {
+      "@type": "Person",
+      "@id": "https://meu-portfolio-v1-chi.vercel.app/#person",
+      "name": "Rodrigo Tavella",
+      "url": "https://meu-portfolio-v1-chi.vercel.app",
+      "sameAs": [
+        "https://www.instagram.com/rodrigo.tavella/",
+        "https://www.youtube.com/@Rodrigotavella"
+      ]
+    }
+  ]
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={outfit.className}>
+    <html lang="pt-BR" className={outfit.className}>
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href={metadata.alternates?.canonical} />
+        <link rel="preconnect" href="https://use.typekit.net" crossOrigin="" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="stylesheet" href="https://use.typekit.net/scq2zya.css" />
+        <link rel="preload" as="image" href="/img/home-photo.webp" />
         <link rel="icon" href="/img/logo-header.png" type="image/x-icon" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
       </head>
       <body className="bg-brand-400 font-omnes scroll-smooth">
         <LanguageProvider>
