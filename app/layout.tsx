@@ -103,11 +103,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const canonicalHref = metadata.alternates?.canonical
+    ? String(metadata.alternates.canonical)
+    : undefined;
   return (
     <html lang="pt-BR" className={outfit.className}>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="canonical" href={metadata.alternates?.canonical} />
+        <link rel="canonical" href={canonicalHref} />
         <link rel="preconnect" href="https://use.typekit.net" crossOrigin="" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
