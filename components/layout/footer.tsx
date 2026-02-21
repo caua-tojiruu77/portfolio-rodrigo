@@ -24,11 +24,11 @@ const Footer = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-0 pb-5">
               {/* Coluna 1: Logo e Redes Sociais */}
               <div>
-                <Link href="/" className="block max-w-[8rem] md:max-w-[9rem]">
+                <Link href="/" className="block w-44 pr-2 md:w-56 md:pr-0">
                   <Image
-                    src="/img/logo-header.png"
-                    width={100}
-                    height={100}
+                    src="/img/logo-bottom.png"
+                    width={200}
+                    height={200}
                     alt="Logo Rodrigo Tavella"
                     title="Rodrigo Tavella"
                     className="w-full h-auto"
