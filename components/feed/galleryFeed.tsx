@@ -144,9 +144,9 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
                   <Image
                     src={selected as string}
                     alt={selectedItem?.title ? selectedItem.title[language] : `${lib.title[language]} image`}
-                    width={1200}
-                    height={1200}
-                    className="max-h-[70vh] max-w-[80vw] object-contain"
+                    width={900}
+                    height={900}
+                    className="max-h-[50vh] max-w-[60vw] object-contain"
                   />
 
                   {/* Nav buttons */}

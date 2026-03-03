@@ -66,10 +66,10 @@ export default function HomePageSection() {
           <div className="mb-4 mt-4">
             <FadeInSection>
               <h1 className="text-4xl md:text-5xl font-bold text-start">
-                Rodrigo <span className="text-brand-200">Tavella</span>
+                {polyglot.t("site.title")} <span className="text-brand-200" />
               </h1>
               <p className="mt-2 text-lg text-start">
-                {polyglot.t("page.profession")}
+                {polyglot.t("site.subtitle")}
               </p>
             </FadeInSection>
           </div>
@@ -84,29 +84,29 @@ export default function HomePageSection() {
         </div>
 
         {/* Image */}
-        <div className="lg:w-1/2 md:mt-0 mt-12 flex justify-start container">
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{
-              duration: 0.4,
-              scale: {
-                type: "spring",
-                bounce: 0.5,
-              },
-            }}
-            className="w-96 h-96 lg:w-full lg:h-auto rounded-2xl overflow-hidden shadow-2xl"
-          >
-            <Image
-              src="/img/home-photo.webp"
-              alt="Rodrigo Tavella, Professional Dancer and Teacher"
-              title="Professional Dancer and Teacher"
-              width={500}
-              height={500}
-              priority
-              className="rounded-2xl object-cover w-full h-full"
-            />
-          </motion.div>
+        <div className="lg:w-10/12 md:mt-0 mt-12 flex justify-start container">
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: 0.4,
+                scale: {
+                  type: "spring",
+                  bounce: 0.5,
+                },
+              }}
+              className="w-[28rem] h-[28rem] md:w-[36rem] md:h-[36rem] lg:w-full lg:h-auto rounded-2xl overflow-hidden"
+            >
+              <Image
+                src="/img/home-photo.png"
+                alt="Rodrigo Tavella, Professional Dancer and Teacher"
+                title="Professional Dancer and Teacher"
+                width={900}
+                height={900}
+                priority
+                className="rounded-2xl object-cover w-full h-full"
+              />
+            </motion.div>
         </div>
       </motion.div>
     </section>

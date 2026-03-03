@@ -69,13 +69,10 @@ const Footer = () => {
               <div>
                 <h2 className="text-xl text-white mb-2 font-bold">E-MAIL</h2>
                 <div>
-                  <a
-                    href="mailto:digotavela@hotmail.com"
-                    className="flex items-center text-white transition duration-300 break-all hover:text-brand-200"
-                  >
+                  <Link href="/contact" className="flex items-center text-white transition duration-300 break-all hover:text-brand-200">
                     <IoMdMail size={iconSize} className="mr-2" />
-                    digotavela@hotmail.com
-                  </a>
+                    Entrar em contato
+                  </Link>
                 </div>
               </div>
 
@@ -84,15 +81,10 @@ const Footer = () => {
                 <h2 className="text-xl text-white mb-4 font-bold">CONTACT</h2>
                 <ul className="space-y-2">
                   <li>
-                    <a
-                      href="tel:+4915234679241"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-white transition duration-300 hover:text-brand-200"
-                    >
+                    <Link href="/contact" className="flex items-center text-white transition duration-300 hover:text-brand-200">
                       <Phone size={iconSize} className="mr-2" />
-                      +49 1523 4679241
-                    </a>
+                      Entrar em contato
+                    </Link>
                   </li>
                 </ul>
               </div>

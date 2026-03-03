@@ -14,11 +14,7 @@ export default function ContactButton() {
 
   return (
     <div className="px-1">
-      <Link
-        href="https://api.whatsapp.com/send/?phone=4915234679241&text=Hello%2C%20am%20I%20speaking%20with%20Rodrigo%3F"
-        passHref
-        target="_blank"
-      >
+      <Link href="/contact">
         <motion.p
           className="inline-flex items-center gap-2 bg-brand-200 transition text-brand-100 px-5 py-2 rounded-full shadow-md cursor-pointer relative overflow-hidden"
           whileHover={{ scale: 1.05 }}
