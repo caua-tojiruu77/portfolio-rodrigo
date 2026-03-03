@@ -5,7 +5,7 @@ import { ArrowBigDown, Mouse } from "lucide-react";
 import FadeInSection from "../animations/fadeAnimation";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import Polyglot from "node-polyglot";
+import { createPolyglot } from "@/utils/polyglot";
 import { useLanguage } from "@/context/languageContext";
 
 export default function HomePageSection() {
@@ -37,10 +37,9 @@ export default function HomePageSection() {
     },
   };
 
-  const polyglot = new Polyglot({
-    phrases: phrases[language],
-    locale: language,
-  });
+  const polyglot = createPolyglot(language);
+  // add page-specific phrases (site.* comes from global translations)
+  polyglot.extend(phrases[language]);
 
   return (
     <section className="min-h-screen flex items-center justify-center text-white relative overflow-hidden">
