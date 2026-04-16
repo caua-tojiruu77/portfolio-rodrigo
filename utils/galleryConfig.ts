@@ -191,7 +191,6 @@ export const galleryLibraries: Record<string, GalleryLibrary> = {
       "2.jpeg",
       "3.jpeg",
       "4.jpeg",
-      "5.jpeg",
       "6.jpeg",
       "7.jpeg",
       "8.jpeg",
