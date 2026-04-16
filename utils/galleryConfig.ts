@@ -35,7 +35,7 @@ export type GalleryLibrary = ImageLibrary | VideoLibrary;
 export const galleryLibraries: Record<string, GalleryLibrary> = {
   posada: {
     title: { en: "Headshot and FullBody", it: "Primo piano e figura intera", de: "Porträt und Ganzkörperaufnahm" },
-      title: { en: "Handbalance (Canes)", it: "Handbalance (Canne)", de: "Handbalance (Stöcke)" },
+    type: "image",
     path: "/img/gallery/fotos-posada",
     items: [
       "10.webp", // Foto capa da galleria
