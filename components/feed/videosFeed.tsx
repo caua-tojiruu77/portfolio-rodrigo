@@ -27,6 +27,10 @@ export default VideosFeed;
 
 const videos = [
   {
+    name: "Novo vídeo YouTube",
+    video: "https://www.youtube.com/embed/pDB1ngvz_4Q?si=0jJiGxOOnmRHVKzn",
+  },
+  {
     name: "Dance performance 2025",
     video: "https://www.youtube.com/embed/DAf2vscAHiY?si=XwmPMhNzFZzCwN_F",
   },

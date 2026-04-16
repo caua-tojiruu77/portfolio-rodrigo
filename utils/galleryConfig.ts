@@ -35,7 +35,7 @@ export type GalleryLibrary = ImageLibrary | VideoLibrary;
 export const galleryLibraries: Record<string, GalleryLibrary> = {
   posada: {
     title: { en: "Headshot and FullBody", it: "Primo piano e figura intera", de: "Porträt und Ganzkörperaufnahm" },
-    type: "image",
+      title: { en: "Handbalance (Canes)", it: "Handbalance (Canne)", de: "Handbalance (Stöcke)" },
     path: "/img/gallery/fotos-posada",
     items: [
       "10.webp", // Foto capa da galleria
@@ -67,25 +67,27 @@ export const galleryLibraries: Record<string, GalleryLibrary> = {
     title: { en: "Dance", it: "Dança", de: "Tanz" },
     type: "image",
     path: "/img/gallery/fotos-dance",
-    items: ["1.webp", 
-            "2.webp", 
-            "3.webp", 
-            "4.webp", 
-            "6.webp", 
-            "7.webp", 
-            "9.webp", 
-            "10.webp", 
-            "12.webp", 
-            "13.webp", 
-            "14.webp",
-            "15.webp",
-            "16.webp",
-            "17.webp",
-            "21.webp",
-            "18.webp",
-            "19.webp",
-            "20.webp",
-          ],
+    items: [
+      "1.webp",
+      "2.webp",
+      "3.webp",
+      "4.webp",
+      "5.jpeg",
+      "6.webp",
+      "7.webp",
+      "9.webp",
+      "10.webp",
+      "12.webp",
+      "13.webp",
+      "14.webp",
+      "15.webp",
+      "16.webp",
+      "17.webp",
+      "21.webp",
+      "18.webp",
+      "19.webp",
+      "20.webp",
+    ],
     description: { en: "A selection of dance photos showing stage work and movement.", it: "Selezione di foto di danza che mostrano performance e movimento.", de: "Eine Auswahl an Tanzfotos, die Bühnenarbeit und Bewegung zeigen." },
   },
 
@@ -153,7 +155,7 @@ export const galleryLibraries: Record<string, GalleryLibrary> = {
   },
 
   handbalance: {
-    title: { en: "Hand Balance", it: "Hand Balance", de: "Hand Balance" },
+    title: { en: "Handbalance (Canes)", it: "Handbalance (Canne)", de: "Handbalance (Stöcke)" },
     type: "image",
     path: "/img/gallery/fotos-handbalance",
     items: [
@@ -180,6 +182,23 @@ export const galleryLibraries: Record<string, GalleryLibrary> = {
 
   },
 
+  "chair-handbalance": {
+    title: { en: "Handbalance (Chair)", it: "Handbalance (Sedia)", de: "Handbalance (Stuhl)" },
+    type: "image",
+    path: "/img/gallery/chair-handbalance",
+    items: [
+      "1.jpeg",
+      "2.jpeg",
+      "3.jpeg",
+      "4.jpeg",
+      "5.jpeg",
+      "6.jpeg",
+      "7.jpeg",
+      "8.jpeg",
+    ],
+    description: { en: "Chair handbalance practice and performances.", it: "Esercizi e performance di handbalance con sedia.", de: "Handbalance-Übungen und Auftritte mit Stuhl." },
+  },
+
   poledance: {
     title: { en: "Poledance", it: "Poledance", de: "Poledance" },
     type: "image",
@@ -201,6 +220,7 @@ export const galleryLibraries: Record<string, GalleryLibrary> = {
     title: { en: "YouTube", it: "YouTube", de: "YouTube" },
     type: "video",
     items: [
+      "https://www.youtube.com/embed/pDB1ngvz_4Q?si=0jJiGxOOnmRHVKzn",
       "https://www.youtube.com/embed/DAf2vscAHiY",
       "https://www.youtube.com/embed/7FUkCa85thY",
       "https://www.youtube.com/embed/vRbIdb7xJVw?si=iL4A-V-ki7KfPcnB",
