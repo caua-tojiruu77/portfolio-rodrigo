@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState, useEffect, useCallback } from "react";
+import { useMemo, useState, useEffect, useCallback, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { galleryLibraries } from "@/utils/galleryConfig";
 import { useLanguage } from "@/context/languageContext";
@@ -50,6 +50,88 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
   }));
 }, [lib]);
 
+  const slideIframes = useRef<Record<number, HTMLIFrameElement | null>>({});
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [fullscreenIndex, setFullscreenIndex] = useState<number | null>(null);
+
+  const addParams = (url: string, params: Record<string, string | number | boolean>) => {
+    const [base, query] = url.split("?");
+    const q = new URLSearchParams(query || "");
+    const allParams = { ...params } as Record<string, string | number | boolean>;
+    try {
+      if (typeof window !== "undefined") {
+        allParams.origin = (window as any).location?.origin || allParams.origin || "";
+      }
+    } catch (e) {}
+    Object.entries(allParams).forEach(([k, v]) => q.set(k, String(v)));
+    return `${base}?${q.toString()}`;
+  };
+
+  const postCommand = (iframe: HTMLIFrameElement | null, command: string) => {
+    if (!iframe || !iframe.contentWindow) return;
+    try {
+      iframe.contentWindow.postMessage(JSON.stringify({ event: "command", func: command, args: [] }), "*");
+    } catch (e) {}
+  };
+
+  const pauseAllIframes = (except?: HTMLIFrameElement | null) => {
+    Object.values(slideIframes.current).forEach((f) => {
+      if (f && f !== except) postCommand(f, "pauseVideo");
+    });
+  };
+
+  const playWithRetry = (iframe: HTMLIFrameElement | null) => {
+    if (!iframe) return;
+    postCommand(iframe, "playVideo");
+    setTimeout(() => postCommand(iframe, "playVideo"), 500);
+    setTimeout(() => postCommand(iframe, "playVideo"), 1500);
+  };
+
+  const toWatchUrl = (url: string) => {
+    try {
+      // embed URL: https://www.youtube.com/embed/VIDEOID
+      const u = new URL(url);
+      const p = u.pathname;
+      // /embed/VIDEO or /shorts/VIDEO
+      const parts = p.split("/").filter(Boolean);
+      const id = parts.length ? parts[parts.length - 1] : null;
+      if (id) return `https://www.youtube.com/watch?v=${id}`;
+    } catch (e) {}
+    return url;
+  };
+
+  useEffect(() => {
+    const onFsChange = () => {
+      const el = document.fullscreenElement as HTMLElement | null;
+      if (!el) {
+        // exited fullscreen
+        setFullscreenIndex(null);
+        Object.values(slideIframes.current).forEach((f) => {
+          if (f) f.style.pointerEvents = "none";
+        });
+        return;
+      }
+
+      // find which iframe is now fullscreen (it may be the iframe itself)
+      const idx = Object.entries(slideIframes.current).find(([k, v]) => {
+        return v === el || (v && v.contains && el && v.contains(el));
+      });
+      if (idx) {
+        const index = Number(idx[0]);
+        setFullscreenIndex(index);
+        const f = slideIframes.current[index];
+        if (f) f.style.pointerEvents = "auto";
+      }
+    };
+
+    document.addEventListener("fullscreenchange", onFsChange);
+    document.addEventListener("webkitfullscreenchange", onFsChange as any);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      document.removeEventListener("webkitfullscreenchange", onFsChange as any);
+    };
+  }, []);
+
   const selectedItem = items.find((i) => i.src === selected);
 
   const goToIndex = useCallback((index: number) => {
@@ -97,9 +179,40 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
         {items.map((item, idx) => (
           <motion.div
             key={idx}
-            whileHover={{ scale: 1.05 }}
-            className="rounded-lg overflow-hidden shadow-lg cursor-pointer"
-            onClick={() => setSelected(item.src)}
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className={`rounded-lg overflow-hidden shadow-lg relative transition-transform duration-200 ${hoveredIndex === idx ? 'scale-105' : 'scale-100'}`}
+            onClick={() => {
+              if (item.type === "video") {
+                const iframe = slideIframes.current[idx];
+                pauseAllIframes(iframe || undefined);
+
+                if (iframe) {
+                  const req: any = iframe.requestFullscreen || iframe.webkitRequestFullscreen || iframe.mozRequestFullScreen || iframe.msRequestFullscreen;
+                  try {
+                    if (req) req.call(iframe);
+                  } catch (e) {}
+
+                  playWithRetry(iframe);
+
+                  // fallback: if fullscreen wasn't entered, open watch URL in new tab
+                  setTimeout(() => {
+                    if (!document.fullscreenElement) {
+                      const watch = toWatchUrl(item.src);
+                      window.open(watch, "_blank");
+                    }
+                  }, 700);
+                } else {
+                  // no iframe element available, open directly
+                  window.open(toWatchUrl(item.src), "_blank");
+                }
+                return;
+              }
+
+              setSelected(item.src);
+            }}
           >
             {item.type === "image" ? (
               <>
@@ -113,11 +226,20 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
                 {/* thumbnails: no titles or descriptions (kept clean as requested) */}
               </>
             ) : (
-              <iframe
-                src={item.src}
-                className="w-full h-48"
-                allowFullScreen
-              />
+              <>
+                <iframe
+                  ref={(el) => (slideIframes.current[idx] = el)}
+                  src={addParams(item.src, { enablejsapi: 1 })}
+                  className="w-full h-48 pointer-events-none"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  allowFullScreen
+                />
+                <div
+                  className={`absolute inset-0 z-10 cursor-pointer ${fullscreenIndex === idx ? 'hidden' : ''}`}
+                  onMouseEnter={() => setHoveredIndex(idx)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                />
+              </>
             )}
           </motion.div>
         ))}
@@ -125,7 +247,7 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
 
       {/* Modal */}
       <AnimatePresence>
-        {selected && (
+        {selected && selectedItem?.type === "image" && (
           <motion.div
             className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center"
             initial={{ opacity: 0 }}

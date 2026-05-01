@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
@@ -18,7 +18,70 @@ interface VideoSliderProps {
 }
 
 const VideoSlider = ({ cases }: VideoSliderProps) => {
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const slideIframes = useRef<Record<number, HTMLIFrameElement | null>>({});
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  const addParams = (url: string, params: Record<string, string | number | boolean>) => {
+    const [base, query] = url.split("?");
+    const q = new URLSearchParams(query || "");
+    const allParams = { ...params } as Record<string, string | number | boolean>;
+    try {
+      if (typeof window !== "undefined") {
+        allParams.origin = (window as any).location?.origin || allParams.origin || "";
+      }
+    } catch (e) {}
+    Object.entries(allParams).forEach(([k, v]) => q.set(k, String(v)));
+    return `${base}?${q.toString()}`;
+  };
+
+  const postCommand = (iframe: HTMLIFrameElement | null, command: string) => {
+    if (!iframe || !iframe.contentWindow) return;
+    try {
+      iframe.contentWindow.postMessage(JSON.stringify({ event: "command", func: command, args: [] }), "*");
+    } catch (e) {}
+  };
+
+  const playWithRetry = (iframe: HTMLIFrameElement | null) => {
+    if (!iframe) return;
+    postCommand(iframe, "playVideo");
+    setTimeout(() => postCommand(iframe, "playVideo"), 500);
+    setTimeout(() => postCommand(iframe, "playVideo"), 1500);
+  };
+
+  const pauseAllIframes = (except?: HTMLIFrameElement | null) => {
+    Object.values(slideIframes.current).forEach((f) => {
+      if (f && f !== except) postCommand(f, "pauseVideo");
+    });
+  };
+
+  React.useEffect(() => {
+    const onFsChange = () => {
+      const el = document.fullscreenElement as HTMLElement | null;
+      if (!el) {
+        // exited fullscreen
+        Object.values(slideIframes.current).forEach((f) => {
+          if (f) f.style.pointerEvents = "none";
+        });
+        return;
+      }
+
+      // find which iframe is now fullscreen
+      const idx = Object.entries(slideIframes.current).find(([k, v]) => {
+        return v === el || (v && v.contains && el && v.contains(el));
+      });
+      if (idx) {
+        const index = Number(idx[0]);
+        const f = slideIframes.current[index];
+        if (f) f.style.pointerEvents = "auto";
+      }
+    };
+    document.addEventListener("fullscreenchange", onFsChange);
+    document.addEventListener("webkitfullscreenchange", onFsChange as any);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      document.removeEventListener("webkitfullscreenchange", onFsChange as any);
+    };
+  }, []);
 
   return (
     <div className="mt-8 relative">
@@ -67,66 +130,45 @@ const VideoSlider = ({ cases }: VideoSliderProps) => {
         {cases.map(({ video, name }, i) => (
           <SwiperSlide key={i}>
             <div
-              className="rounded-2xl aspect-video cursor-pointer overflow-hidden shadow-2xl transition-transform"
-              onClick={() => setSelectedVideo(video)}
+              className={`rounded-2xl aspect-video overflow-hidden shadow-2xl transition-transform duration-200 ${hovered === i ? 'scale-105' : 'scale-100'}`}
+              onClick={() => {
+                // pause any playing videos first
+                const iframe = slideIframes.current[i];
+                pauseAllIframes(iframe || undefined);
+
+                // request fullscreen on the clicked iframe (must be a user gesture)
+                if (iframe) {
+                  const req: any = iframe.requestFullscreen || iframe.webkitRequestFullscreen || iframe.mozRequestFullScreen || iframe.msRequestFullscreen;
+                  if (req) {
+                    try { req.call(iframe); } catch (e) {}
+                  }
+                  // allow iframe to receive pointer events while in fullscreen
+                  try { iframe.style.pointerEvents = "auto"; } catch (e) {}
+                  // ask YouTube player to play (retry a couple times)
+                  playWithRetry(iframe);
+                }
+              }}
             >
               <div className="relative w-full h-full">
                 <iframe
-                  src={video}
+                  ref={(el) => (slideIframes.current[i] = el)}
+                  src={addParams(video, { enablejsapi: 1 })}
                   title={`${name} video`}
                   className="w-full h-full rounded-xl pointer-events-none"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                   allowFullScreen
                 ></iframe>
                 <div
-                  className="absolute inset-0 cursor-pointer"
-                  onClick={() => setSelectedVideo(video)}
+                  className="absolute inset-0 z-10 cursor-pointer"
+                  onMouseEnter={() => setHovered(i)}
+                  onMouseLeave={() => setHovered(null)}
                 />
               </div>
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
-
-      {/* Modal com vídeo ampliado em tela cheia */}
-      {selectedVideo && (
-        <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
-          onClick={() => setSelectedVideo(null)}
-        >
-          <div
-            className="relative w-[90vw] max-w-[1000px] aspect-video"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <iframe
-              src={selectedVideo}
-              title="Expanded video"
-              className="w-full h-full rounded-xl shadow-2xl"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-              allowFullScreen
-            ></iframe>
-            <button
-              className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-2 hover:bg-black/80 transition"
-              onClick={() => setSelectedVideo(null)}
-              aria-label="Close"
-            >
-              <svg
-                width={24}
-                height={24}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
+      
     </div>
   );
 };
