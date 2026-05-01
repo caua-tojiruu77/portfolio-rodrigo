@@ -138,7 +138,7 @@ const VideoSlider = ({ cases }: VideoSliderProps) => {
 
                 // request fullscreen on the clicked iframe (must be a user gesture)
                 if (iframe) {
-                  const req: any = iframe.requestFullscreen || iframe.webkitRequestFullscreen || iframe.mozRequestFullScreen || iframe.msRequestFullscreen;
+                  const req: any = (iframe as any).requestFullscreen || (iframe as any).webkitRequestFullscreen || (iframe as any).mozRequestFullScreen || (iframe as any).msRequestFullscreen;
                   if (req) {
                     try { req.call(iframe); } catch (e) {}
                   }
@@ -151,7 +151,7 @@ const VideoSlider = ({ cases }: VideoSliderProps) => {
             >
               <div className="relative w-full h-full">
                 <iframe
-                  ref={(el) => (slideIframes.current[i] = el)}
+                  ref={(el) => { slideIframes.current[i] = el; }}
                   src={addParams(video, { enablejsapi: 1 })}
                   title={`${name} video`}
                   className="w-full h-full rounded-xl pointer-events-none"

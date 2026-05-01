@@ -190,7 +190,7 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
                 pauseAllIframes(iframe || undefined);
 
                 if (iframe) {
-                  const req: any = iframe.requestFullscreen || iframe.webkitRequestFullscreen || iframe.mozRequestFullScreen || iframe.msRequestFullscreen;
+                  const req: any = (iframe as any).requestFullscreen || (iframe as any).webkitRequestFullscreen || (iframe as any).mozRequestFullScreen || (iframe as any).msRequestFullscreen;
                   try {
                     if (req) req.call(iframe);
                   } catch (e) {}
@@ -228,7 +228,7 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
             ) : (
               <>
                 <iframe
-                  ref={(el) => (slideIframes.current[idx] = el)}
+                  ref={(el) => { slideIframes.current[idx] = el; }}
                   src={addParams(item.src, { enablejsapi: 1 })}
                   className="w-full h-48 pointer-events-none"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
