@@ -33,15 +33,15 @@ const cases = [
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/fotos-dance/2.webp",
+    img: "/img/gallery/chair-handbalance/4.png",
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/fotos-dance/3.webp",
+    img: "/img/gallery/chair-handbalance/1.png",
   },
   {
     name: "Professional Dancer and Choreographer",
-    img: "/img/gallery/fotos-artisticas/1.webp",
+    img: "/img/gallery/chair-handbalance/7.png",
   },
   {
     name: "Professional Dancer and Choreographer",
