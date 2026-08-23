@@ -6,16 +6,46 @@ import {
 } from "react-vertical-timeline-component";
 import "react-vertical-timeline-component/style.min.css";
 import { FaTheaterMasks } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import FadeInSection from "../animations/fadeAnimation";
 import Image from "next/image";
 import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
 import ContactButton from "../buttons/contactButton";
 import CvDownoladButton from "../buttons/cvDowloadButton";
+import { danceExperienceGalleries } from "@/utils/danceExperienceGallery";
 
 export default function DanceExperienceFeed() {
   const { language } = useLanguage();
+  const [selectedGallery, setSelectedGallery] = useState<{
+    images: string[];
+    index: number;
+    title: string;
+  } | null>(null);
+  const [swipeStartX, setSwipeStartX] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!selectedGallery) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedGallery(null);
+      if (event.key === "ArrowRight") {
+        setSelectedGallery((current) => current ? { ...current, index: (current.index + 1) % current.images.length } : current);
+      }
+      if (event.key === "ArrowLeft") {
+        setSelectedGallery((current) => current ? { ...current, index: (current.index - 1 + current.images.length) % current.images.length } : current);
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedGallery]);
 
   const countryFlags: Record<string, string> = {
     germany: "/img/flags/flag-germany.webp",
@@ -53,6 +83,10 @@ export default function DanceExperienceFeed() {
     en: {
       titleBg: "PROFESSIONAL EXPERIENCE",
       title: "Professional Experience",
+      viewGallery: "View event photos",
+      closeGallery: "Close gallery",
+      previousPhoto: "Previous photo",
+      nextPhoto: "Next photo",
       items: [
         {
           title: "Exploria Party",
@@ -134,6 +168,10 @@ export default function DanceExperienceFeed() {
     it: {
       titleBg: "ESPERIENZA PROFESSINALE",
       title: "Esperienza Professionale",
+      viewGallery: "Vedi foto dell'evento",
+      closeGallery: "Chiudi galleria",
+      previousPhoto: "Foto precedente",
+      nextPhoto: "Foto successiva",
       items: [
         {
           title: "Exploria Party",
@@ -216,6 +254,10 @@ export default function DanceExperienceFeed() {
     de: {
       titleBg: "BERUFSERFAHRUNG",
       title: "Berufserfahrung",
+      viewGallery: "Eventfotos ansehen",
+      closeGallery: "Galerie schließen",
+      previousPhoto: "Vorheriges Foto",
+      nextPhoto: "Nächstes Foto",
       items: [
         {
           title: "Exploria Party",
@@ -299,6 +341,27 @@ export default function DanceExperienceFeed() {
     locale: language,
   });
 
+  const getGalleryImages = (cover: string) => {
+    const filename = cover.split("/").pop() ?? cover;
+    const gallery = danceExperienceGalleries[filename];
+    return gallery?.items.length ? gallery.items.map((item) => `${gallery.path}/${item}`) : [cover];
+  };
+
+  const handleSwipeEnd = (endX: number) => {
+    if (swipeStartX === null || !selectedGallery || selectedGallery.images.length < 2) return;
+
+    const distance = endX - swipeStartX;
+    if (Math.abs(distance) >= 50) {
+      setSelectedGallery((current) => current ? {
+        ...current,
+        index: distance < 0
+          ? (current.index + 1) % current.images.length
+          : (current.index - 1 + current.images.length) % current.images.length,
+      } : current);
+    }
+    setSwipeStartX(null);
+  };
+
   return (
     <section id="dance-experience">
       <div className="row">
@@ -365,7 +428,12 @@ export default function DanceExperienceFeed() {
                     <h4 className="text-sm text-gray-300">{item.subtitle}</h4>
                   </div>
                   {/* Imagem do lado oposto da seta */}
-                  <div className="flex-shrink-0 w-full md:w-52">
+                  <button
+                    type="button"
+                    className="flex-shrink-0 w-full md:w-52 text-left"
+                    aria-label={`${polyglot.t("viewGallery")}: ${item.title}`}
+                    onClick={() => setSelectedGallery({ images: getGalleryImages(item.img), index: 0, title: item.title })}
+                  >
                     <Image
                       src={item.img}
                       alt={item.title}
@@ -373,11 +441,87 @@ export default function DanceExperienceFeed() {
                       height={500}
                       className="rounded-lg object-cover shadow-md w-full h-48 md:w-52 md:h-52 max-w-xs mx-auto transition-transform duration-200 hover:scale-105"
                     />
-                  </div>
+                  </button>
                 </motion.div>
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
+          <AnimatePresence>
+            {selectedGallery && (
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-label={selectedGallery.title}
+                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 md:p-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setSelectedGallery(null)}
+              >
+                <motion.div
+                  className="relative flex max-h-full w-full max-w-5xl flex-col items-center gap-4"
+                  initial={{ scale: 0.96 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0.96 }}
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <div className="flex min-h-12 w-full shrink-0 items-center justify-between gap-4 self-stretch text-white">
+                    <h3 className="truncate text-lg font-semibold md:text-xl">{selectedGallery.title}</h3>
+                    <button type="button" onClick={() => setSelectedGallery(null)} aria-label={polyglot.t("closeGallery")} className="rounded-full bg-white/10 p-2 transition hover:bg-white/20">
+                      <X size={24} />
+                    </button>
+                  </div>
+
+                  <div
+                    className="relative flex min-h-0 w-full touch-pan-y select-none items-center justify-center"
+                    onPointerDown={(event) => setSwipeStartX(event.clientX)}
+                    onPointerUp={(event) => handleSwipeEnd(event.clientX)}
+                    onPointerCancel={() => setSwipeStartX(null)}
+                  >
+                    <AnimatePresence initial={false} mode="wait">
+                      <motion.div
+                        key={selectedGallery.images[selectedGallery.index]}
+                        initial={{ opacity: 0, x: 24 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -24 }}
+                        transition={{ duration: 0.24, ease: "easeOut" }}
+                        className="flex max-h-[65vh] w-full items-center justify-center"
+                      >
+                        <Image
+                          src={selectedGallery.images[selectedGallery.index]}
+                          alt={`${selectedGallery.title} ${selectedGallery.index + 1}`}
+                          width={1400}
+                          height={1000}
+                          className="max-h-[65vh] w-auto max-w-full object-contain"
+                          priority
+                        />
+                      </motion.div>
+                    </AnimatePresence>
+                    {selectedGallery.images.length > 1 && (
+                      <>
+                        <button type="button" aria-label={polyglot.t("previousPhoto")} onClick={() => setSelectedGallery((current) => current ? { ...current, index: (current.index - 1 + current.images.length) % current.images.length } : current)} className="absolute left-2 rounded-full bg-black/60 p-3 text-white transition hover:bg-black/80 md:left-4">
+                          <ChevronLeft size={26} />
+                        </button>
+                        <button type="button" aria-label={polyglot.t("nextPhoto")} onClick={() => setSelectedGallery((current) => current ? { ...current, index: (current.index + 1) % current.images.length } : current)} className="absolute right-2 rounded-full bg-black/60 p-3 text-white transition hover:bg-black/80 md:right-4">
+                          <ChevronRight size={26} />
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {selectedGallery.images.length > 1 && (
+                    <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
+                      {selectedGallery.images.map((image, index) => (
+                        <button type="button" key={image} aria-label={`${selectedGallery.title} ${index + 1}`} onClick={() => setSelectedGallery((current) => current ? { ...current, index } : current)} className={`h-16 w-16 flex-none overflow-hidden rounded border-2 ${index === selectedGallery.index ? "border-brand-300" : "border-transparent opacity-60"}`}>
+                          <Image src={image} alt="" width={80} height={80} className="h-full w-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <div className="pt-8 md:flex-rol flex-col flex gap-4 md:justify-center md:items-center">
             <ContactButton />
             <CvDownoladButton />
