@@ -313,7 +313,9 @@ export default function DanceExperienceFeed() {
   const getGalleryImages = (cover: string) => {
     const filename = cover.split("/").pop() ?? cover;
     const gallery = danceExperienceGalleries[filename];
-    return gallery?.items.length ? gallery.items.map((item) => `${gallery.path}/${item}`) : [cover];
+    return gallery?.items.length
+      ? gallery.items.map((item) => (item.startsWith("/") ? item : `${gallery.path}/${item}`))
+      : [cover];
   };
 
   return (
