@@ -7,7 +7,7 @@ import {
 import "react-vertical-timeline-component/style.min.css";
 import { FaTheaterMasks } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Images, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import FadeInSection from "../animations/fadeAnimation";
 import Image from "next/image";
@@ -84,6 +84,7 @@ export default function DanceExperienceFeed() {
       titleBg: "PROFESSIONAL EXPERIENCE",
       title: "Professional Experience",
       viewGallery: "View event photos",
+      galleryHint: "Open gallery",
       closeGallery: "Close gallery",
       previousPhoto: "Previous photo",
       nextPhoto: "Next photo",
@@ -169,6 +170,7 @@ export default function DanceExperienceFeed() {
       titleBg: "ESPERIENZA PROFESSINALE",
       title: "Esperienza Professionale",
       viewGallery: "Vedi foto dell'evento",
+      galleryHint: "Apri galleria",
       closeGallery: "Chiudi galleria",
       previousPhoto: "Foto precedente",
       nextPhoto: "Foto successiva",
@@ -255,6 +257,7 @@ export default function DanceExperienceFeed() {
       titleBg: "BERUFSERFAHRUNG",
       title: "Berufserfahrung",
       viewGallery: "Eventfotos ansehen",
+      galleryHint: "Galerie öffnen",
       closeGallery: "Galerie schließen",
       previousPhoto: "Vorheriges Foto",
       nextPhoto: "Nächstes Foto",
@@ -430,7 +433,7 @@ export default function DanceExperienceFeed() {
                   {/* Imagem do lado oposto da seta */}
                   <button
                     type="button"
-                    className="flex-shrink-0 w-full md:w-52 text-left"
+                    className="relative mx-auto w-full max-w-xs flex-shrink-0 overflow-hidden rounded-lg text-left md:w-52"
                     aria-label={`${polyglot.t("viewGallery")}: ${item.title}`}
                     onClick={() => setSelectedGallery({ images: getGalleryImages(item.img), index: 0, title: item.title })}
                   >
@@ -439,8 +442,14 @@ export default function DanceExperienceFeed() {
                       alt={item.title}
                       width={500}
                       height={500}
-                      className="rounded-lg object-cover shadow-md w-full h-48 md:w-52 md:h-52 max-w-xs mx-auto transition-transform duration-200 hover:scale-105"
+                      className="h-48 w-full rounded-lg object-cover shadow-md md:h-52"
                     />
+                    <span className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-white/30 bg-black/60 px-3 py-1.5 text-xs font-semibold text-white shadow-lg backdrop-blur-sm">
+                      <span className="flex h-5 w-5 animate-pulse items-center justify-center rounded-full bg-brand-300 text-brand-100">
+                        <Images size={12} strokeWidth={2.5} />
+                      </span>
+                      {polyglot.t("galleryHint")}
+                    </span>
                   </button>
                 </motion.div>
               </VerticalTimelineElement>
