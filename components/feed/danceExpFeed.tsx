@@ -382,26 +382,33 @@ export default function DanceExperienceFeed() {
                     <h4 className="text-sm text-gray-300">{item.subtitle}</h4>
                   </div>
                   {/* Imagem do lado oposto da seta */}
-                  <button
-                    type="button"
-                    className="relative mx-auto w-full max-w-xs flex-shrink-0 overflow-hidden rounded-lg text-left md:w-52"
-                    aria-label={`${polyglot.t("viewGallery")}: ${item.title}`}
-                    onClick={() => setSelectedGallery({ images: getGalleryImages(item.img), index: 0, title: item.title })}
-                  >
-                    <Image
-                      src={item.img}
-                      alt={item.title}
-                      width={500}
-                      height={500}
-                      className="h-48 w-full rounded-lg object-cover shadow-md md:h-52"
-                    />
-                    <span className="pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-white/30 bg-black/60 px-3 py-1.5 text-xs font-semibold text-white shadow-lg backdrop-blur-sm">
+                  <div className="mx-auto flex w-full max-w-xs flex-shrink-0 flex-col items-center md:w-52">
+                    <button
+                      type="button"
+                      className="w-full overflow-hidden rounded-lg text-left"
+                      aria-label={`${polyglot.t("viewGallery")}: ${item.title}`}
+                      onClick={() => setSelectedGallery({ images: getGalleryImages(item.img), index: 0, title: item.title })}
+                    >
+                      <Image
+                        src={item.img}
+                        alt={item.title}
+                        width={500}
+                        height={500}
+                        className="h-48 w-full rounded-lg object-cover shadow-md md:h-52"
+                      />
+                    </button>
+                    <button
+                      type="button"
+                      className="mt-3 flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full border border-white/30 bg-black/60 px-3 py-1.5 text-xs font-semibold text-white shadow-lg backdrop-blur-sm"
+                      aria-label={`${polyglot.t("viewGallery")}: ${item.title}`}
+                      onClick={() => setSelectedGallery({ images: getGalleryImages(item.img), index: 0, title: item.title })}
+                    >
                       <span className="flex h-5 w-5 animate-pulse items-center justify-center rounded-full bg-brand-300 text-brand-100">
                         <Images size={12} strokeWidth={2.5} />
                       </span>
                       {polyglot.t("galleryHint")}
-                    </span>
-                  </button>
+                    </button>
+                  </div>
                 </motion.div>
               </VerticalTimelineElement>
             ))}

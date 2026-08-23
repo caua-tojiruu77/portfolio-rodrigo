@@ -78,7 +78,7 @@ const CasesSlider = ({ cases }: CasesSliderProps) => {
           </SwiperSlide>
         ))}
       </Swiper>
-      <div className="py-12">
+      <div className="flex justify-center pt-6">
         <GalleryButton />
       </div>
       <ImageLightbox
