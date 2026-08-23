@@ -154,6 +154,7 @@ const VideoSlider = ({ cases }: VideoSliderProps) => {
                   ref={(el) => { slideIframes.current[i] = el; }}
                   src={addParams(video, { enablejsapi: 1 })}
                   title={`${name} video`}
+                  loading="lazy"
                   className="w-full h-full rounded-xl pointer-events-none"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                   allowFullScreen

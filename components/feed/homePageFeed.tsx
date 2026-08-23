@@ -49,9 +49,7 @@ export default function HomePageSection() {
           src="/img/teste-bg.webp"
           alt="Background"
           fill
-          quality={100}
           className="object-cover w-full h-full sm:object-center object-[center_top]"
-          priority
         />
       </div>
       <motion.div

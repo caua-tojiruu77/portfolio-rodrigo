@@ -6,15 +6,16 @@ import {
 } from "react-vertical-timeline-component";
 import "react-vertical-timeline-component/style.min.css";
 import { FaTheaterMasks } from "react-icons/fa";
-import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Images, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Images } from "lucide-react";
+import { useState } from "react";
 import FadeInSection from "../animations/fadeAnimation";
 import Image from "next/image";
 import { useLanguage } from "@/context/languageContext";
 import Polyglot from "node-polyglot";
 import ContactButton from "../buttons/contactButton";
 import CvDownoladButton from "../buttons/cvDowloadButton";
+import ImageLightbox from "../gallery/ImageLightbox";
 import { danceExperienceGalleries } from "@/utils/danceExperienceGallery";
 
 export default function DanceExperienceFeed() {
@@ -24,28 +25,6 @@ export default function DanceExperienceFeed() {
     index: number;
     title: string;
   } | null>(null);
-  const [swipeStartX, setSwipeStartX] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (!selectedGallery) return;
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSelectedGallery(null);
-      if (event.key === "ArrowRight") {
-        setSelectedGallery((current) => current ? { ...current, index: (current.index + 1) % current.images.length } : current);
-      }
-      if (event.key === "ArrowLeft") {
-        setSelectedGallery((current) => current ? { ...current, index: (current.index - 1 + current.images.length) % current.images.length } : current);
-      }
-    };
-
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [selectedGallery]);
 
   const countryFlags: Record<string, string> = {
     germany: "/img/flags/flag-germany.webp",
@@ -56,26 +35,14 @@ export default function DanceExperienceFeed() {
     americana: "/img/flags/flag-brasil.webp",
   };
 
-  function getCountryFlag(
-    company: string,
-    countryFlags: Record<string, string>
-  ) {
-    const c = company.toLowerCase();
-    if (
-      c.includes("germany") ||
-      c.includes("germania") ||
-      c.includes("deutschland")
-    )
-      return countryFlags.germany;
-    if (c.includes("italy") || c.includes("italia") || c.includes("italien"))
-      return countryFlags.italy;
-    if (c.includes("israel") || c.includes("israele"))
-      return countryFlags.israel;
-    if (c.includes("turkey") || c.includes("turchia") || c.includes("türkei"))
-      return countryFlags.turkey;
-    if (c.includes("china") || c.includes("cina")) return countryFlags.china;
-    if (c.includes("americana") || c.includes("americana"))
-      return countryFlags.americana;
+  function getCountryFlag(company: string, flags: Record<string, string>) {
+    const companyName = company.toLowerCase();
+    if (companyName.includes("germany") || companyName.includes("germania") || companyName.includes("deutschland")) return flags.germany;
+    if (companyName.includes("italy") || companyName.includes("italia") || companyName.includes("italien")) return flags.italy;
+    if (companyName.includes("israel") || companyName.includes("israele")) return flags.israel;
+    if (companyName.includes("turkey") || companyName.includes("turchia") || companyName.includes("türkei")) return flags.turkey;
+    if (companyName.includes("china") || companyName.includes("cina")) return flags.china;
+    if (companyName.includes("americana")) return flags.americana;
     return null;
   }
 
@@ -91,8 +58,7 @@ export default function DanceExperienceFeed() {
       items: [
         {
           title: "Exploria Party",
-          company:
-            "It's an event for the 20th year party, with my choreographies Elegante Emotion and ChairDance / Bottrop-Germany",
+          company: "It's an event for the 20th year party, with my choreographies Elegante Emotion and ChairDance / Bottrop-Germany",
           subtitle: "Dancer with 2024 to 2025",
           date: "2024 - 2025",
           img: "/img/danceExperience/7.webp",
@@ -350,21 +316,6 @@ export default function DanceExperienceFeed() {
     return gallery?.items.length ? gallery.items.map((item) => `${gallery.path}/${item}`) : [cover];
   };
 
-  const handleSwipeEnd = (endX: number) => {
-    if (swipeStartX === null || !selectedGallery || selectedGallery.images.length < 2) return;
-
-    const distance = endX - swipeStartX;
-    if (Math.abs(distance) >= 50) {
-      setSelectedGallery((current) => current ? {
-        ...current,
-        index: distance < 0
-          ? (current.index + 1) % current.images.length
-          : (current.index - 1 + current.images.length) % current.images.length,
-      } : current);
-    }
-    setSwipeStartX(null);
-  };
-
   return (
     <section id="dance-experience">
       <div className="row">
@@ -455,82 +406,16 @@ export default function DanceExperienceFeed() {
               </VerticalTimelineElement>
             ))}
           </VerticalTimeline>
-          <AnimatePresence>
-            {selectedGallery && (
-              <motion.div
-                role="dialog"
-                aria-modal="true"
-                aria-label={selectedGallery.title}
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 md:p-8"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setSelectedGallery(null)}
-              >
-                <motion.div
-                  className="relative flex max-h-full w-full max-w-5xl flex-col items-center gap-4"
-                  initial={{ scale: 0.96 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0.96 }}
-                  onClick={(event) => event.stopPropagation()}
-                >
-                  <div className="flex min-h-12 w-full shrink-0 items-center justify-between gap-4 self-stretch text-white">
-                    <h3 className="truncate text-lg font-semibold md:text-xl">{selectedGallery.title}</h3>
-                    <button type="button" onClick={() => setSelectedGallery(null)} aria-label={polyglot.t("closeGallery")} className="rounded-full bg-white/10 p-2 transition hover:bg-white/20">
-                      <X size={24} />
-                    </button>
-                  </div>
-
-                  <div
-                    className="relative flex min-h-0 w-full touch-pan-y select-none items-center justify-center"
-                    onPointerDown={(event) => setSwipeStartX(event.clientX)}
-                    onPointerUp={(event) => handleSwipeEnd(event.clientX)}
-                    onPointerCancel={() => setSwipeStartX(null)}
-                  >
-                    <AnimatePresence initial={false} mode="wait">
-                      <motion.div
-                        key={selectedGallery.images[selectedGallery.index]}
-                        initial={{ opacity: 0, x: 24 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -24 }}
-                        transition={{ duration: 0.24, ease: "easeOut" }}
-                        className="flex max-h-[65vh] w-full items-center justify-center"
-                      >
-                        <Image
-                          src={selectedGallery.images[selectedGallery.index]}
-                          alt={`${selectedGallery.title} ${selectedGallery.index + 1}`}
-                          width={1400}
-                          height={1000}
-                          className="max-h-[65vh] w-auto max-w-full object-contain"
-                          priority
-                        />
-                      </motion.div>
-                    </AnimatePresence>
-                    {selectedGallery.images.length > 1 && (
-                      <>
-                        <button type="button" aria-label={polyglot.t("previousPhoto")} onClick={() => setSelectedGallery((current) => current ? { ...current, index: (current.index - 1 + current.images.length) % current.images.length } : current)} className="absolute left-2 rounded-full bg-black/60 p-3 text-white transition hover:bg-black/80 md:left-4">
-                          <ChevronLeft size={26} />
-                        </button>
-                        <button type="button" aria-label={polyglot.t("nextPhoto")} onClick={() => setSelectedGallery((current) => current ? { ...current, index: (current.index + 1) % current.images.length } : current)} className="absolute right-2 rounded-full bg-black/60 p-3 text-white transition hover:bg-black/80 md:right-4">
-                          <ChevronRight size={26} />
-                        </button>
-                      </>
-                    )}
-                  </div>
-
-                  {selectedGallery.images.length > 1 && (
-                    <div className="flex max-w-full gap-2 overflow-x-auto pb-1">
-                      {selectedGallery.images.map((image, index) => (
-                        <button type="button" key={image} aria-label={`${selectedGallery.title} ${index + 1}`} onClick={() => setSelectedGallery((current) => current ? { ...current, index } : current)} className={`h-16 w-16 flex-none overflow-hidden rounded border-2 ${index === selectedGallery.index ? "border-brand-300" : "border-transparent opacity-60"}`}>
-                          <Image src={image} alt="" width={80} height={80} className="h-full w-full object-cover" />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <ImageLightbox
+            images={selectedGallery?.images ?? []}
+            selectedIndex={selectedGallery?.index ?? null}
+            title={selectedGallery?.title ?? ""}
+            closeLabel={polyglot.t("closeGallery")}
+            previousLabel={polyglot.t("previousPhoto")}
+            nextLabel={polyglot.t("nextPhoto")}
+            onClose={() => setSelectedGallery(null)}
+            onIndexChange={(index) => setSelectedGallery((current) => current ? { ...current, index } : current)}
+          />
           <div className="pt-8 md:flex-rol flex-col flex gap-4 md:justify-center md:items-center">
             <ContactButton />
             <CvDownoladButton />

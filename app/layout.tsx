@@ -12,6 +12,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://meu-portfolio-v1-chi.vercel.app"),
   title: "Rodrigo Tavella - Professional dancer and choreographer",
   description:
     "dancer, choreographer, and performer with over 10 years of experience in the dance industry. Specializing in contemporary dance, acrobatics, and performance art, I have collaborated with renowned artists and companies worldwide.",
@@ -115,7 +116,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="stylesheet" href="https://use.typekit.net/scq2zya.css" />
-        <link rel="preload" as="image" href="/img/home-photo.webp" />
         <link rel="icon" href="/img/logo-header.png" type="image/x-icon" />
         <script
           type="application/ld+json"

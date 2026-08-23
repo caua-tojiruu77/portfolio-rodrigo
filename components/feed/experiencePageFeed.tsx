@@ -158,7 +158,6 @@ export default function ExperienceSection() {
                 src="/img/exp-image.png"
                 alt="Experience for Rodrigo Tavella"
                 title="My experience in dance and acrobatics"
-                priority
                 width={500}
                 height={900}
                 className="rounded-2xl object-cover w-full h-full"

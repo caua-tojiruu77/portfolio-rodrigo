@@ -230,6 +230,7 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
                 <iframe
                   ref={(el) => { slideIframes.current[idx] = el; }}
                   src={addParams(item.src, { enablejsapi: 1 })}
+                  loading="lazy"
                   className="w-full h-48 pointer-events-none"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                   allowFullScreen

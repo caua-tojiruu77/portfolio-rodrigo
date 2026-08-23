@@ -11,6 +11,7 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 // Import Swiper styles
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import GalleryButton from "../buttons/galleryButton";
+import ImageLightbox from "../gallery/ImageLightbox";
 
 interface CasesSliderProps {
   cases: {
@@ -20,7 +21,7 @@ interface CasesSliderProps {
 }
 
 const CasesSlider = ({ cases }: CasesSliderProps) => {
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   return (
     <div className="mt-8 relative">
@@ -72,7 +73,7 @@ const CasesSlider = ({ cases }: CasesSliderProps) => {
               title=""
               alt={`${name} Rodrigo Tavella professional dancer`}
               className="cursor-pointer rounded-2xl"
-              onClick={() => setSelectedImage(`${img}`)}
+              onClick={() => setSelectedIndex(i)}
             />
           </SwiperSlide>
         ))}
@@ -80,42 +81,16 @@ const CasesSlider = ({ cases }: CasesSliderProps) => {
       <div className="py-12">
         <GalleryButton />
       </div>
-      {selectedImage && (
-        <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50"
-          onClick={() => setSelectedImage(null)}
-        >
-          <div className="relative" onClick={(e) => e.stopPropagation()}>
-            <Image
-              src={selectedImage}
-              alt="An enlarged view of the selected case"
-              width={1200}
-              height={1200}
-              className="rounded-lg max-h-[90vh] max-w-[90vw] w-auto h-auto object-contain shadow-2xl"
-              draggable={false}
-            />
-            <button
-              className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-2 hover:bg-black/80 transition"
-              onClick={() => setSelectedImage(null)}
-              aria-label="Close"
-            >
-              <svg
-                width={24}
-                height={24}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-      )}
+      <ImageLightbox
+        images={cases.map(({ img }) => img)}
+        selectedIndex={selectedIndex}
+        title="Professional gallery"
+        closeLabel="Close gallery"
+        previousLabel="Previous image"
+        nextLabel="Next image"
+        onClose={() => setSelectedIndex(null)}
+        onIndexChange={setSelectedIndex}
+      />
     </div>
   );
 };

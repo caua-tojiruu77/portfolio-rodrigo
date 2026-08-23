@@ -16,6 +16,7 @@ const translations = {
     },
     contact: {
       title: "Contact",
+      enter: "Get in touch",
       description: "Fill the form to get in touch — your message will arrive by email.",
       nome: "First name",
       sobrenome: "Last name",
@@ -48,6 +49,7 @@ const translations = {
     },
     contact: {
       title: "Contatto",
+      enter: "Mettiti in contatto",
       description: "Compila il modulo per metterti in contatto — il tuo messaggio arriverà via e-mail.",
       nome: "Nome",
       sobrenome: "Cognome",
@@ -84,6 +86,7 @@ const translations = {
     },
     contact: {
       title: "Kontakt",
+      enter: "Kontakt aufnehmen",
       description: "Füllen Sie das Formular aus, um Kontakt aufzunehmen — Ihre Nachricht wird per E-Mail zugestellt.",
       nome: "Vorname",
       sobrenome: "Nachname",

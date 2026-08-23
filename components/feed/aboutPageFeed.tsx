@@ -213,7 +213,6 @@ export default function AboutSection() {
                 width={500}
                 height={500}
                 className="rounded-2xl object-cover w-full h-full"
-                priority
               />
             </motion.div>
           </div>
@@ -273,7 +272,6 @@ export default function AboutSection() {
                 width={500}
                 height={500}
                 className="rounded-2xl object-cover w-full h-full"
-                priority
               />
             </motion.div>
           </div>

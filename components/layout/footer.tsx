@@ -1,3 +1,5 @@
+"use client";
+
 import { Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,10 +12,14 @@ import {
 } from "react-icons/fa";
 import { FaMapLocation, FaPhoneVolume } from "react-icons/fa6";
 import { IoMdMail } from "react-icons/io";
+import { createPolyglot } from "@/utils/polyglot";
+import { useLanguage } from "@/context/languageContext";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
   const iconSize = 24; // Tamanho fixo para todos os ícones
+  const { language } = useLanguage();
+  const polyglot = createPolyglot(language);
 
   return (
     <footer className="bg-brand-100 pt-10">
@@ -71,7 +77,7 @@ const Footer = () => {
                 <div>
                   <Link href="/contact" className="flex items-center text-white transition duration-300 break-all hover:text-brand-200">
                     <IoMdMail size={iconSize} className="mr-2" />
-                    Entrar em contato
+                    {polyglot.t("contact.enter")}
                   </Link>
                 </div>
               </div>
@@ -83,7 +89,7 @@ const Footer = () => {
                   <li>
                     <Link href="/contact" className="flex items-center text-white transition duration-300 hover:text-brand-200">
                       <Phone size={iconSize} className="mr-2" />
-                      Entrar em contato
+                      {polyglot.t("contact.enter")}
                     </Link>
                   </li>
                 </ul>
