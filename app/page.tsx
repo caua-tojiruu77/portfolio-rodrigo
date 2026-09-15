@@ -2,6 +2,7 @@ import React from 'react';
 import HomePageSection from '@/components/feed/homePageFeed';
 import CasesFeed from '@/components/feed/casesFeed';
 import VideosFeed from '@/components/feed/videosFeed';
+import WorkshopsPopup from '@/components/feed/workshopsPopup';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -33,6 +34,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <main className="text-white mt-0 scroll-smooth">
+      <WorkshopsPopup />
       <HomePageSection />
       <VideosFeed />
       <CasesFeed />

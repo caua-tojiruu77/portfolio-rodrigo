@@ -6,6 +6,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPolyglot } from "@/utils/polyglot";
 import { useLanguage } from "@/context/languageContext";
+import { workshopsEnabled } from "@/utils/workshops";
 
 export default function Header() {
   const [navbar, setNavbar] = useState(false);
@@ -33,6 +34,9 @@ export default function Header() {
       href: "/academicFormation",
     },
     { name: polyglot.t("header.gallery"), href: "/gallery" },
+    ...(workshopsEnabled
+      ? [{ name: polyglot.t("header.workshops"), href: "/workshops" }]
+      : []),
   ];
 
   return (
@@ -40,26 +44,27 @@ export default function Header() {
       <nav
         className={`fixed z-50 top-0 left-0 w-full transition-all duration-300 ${
           navbar ? "shadow-md" : ""
-        } bg-brand-500/30 px-5 lg:top-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-full lg:max-w-6xl lg:rounded-full backdrop-blur-md`}
+        } bg-brand-500/30 px-3 sm:px-5 lg:top-4 lg:left-1/2 lg:-translate-x-1/2 lg:w-[calc(100%-2rem)] lg:max-w-6xl lg:rounded-full backdrop-blur-md`}
       >
-        <div className="flex justify-between items-center h-20">
+        <div className="flex h-20 items-center justify-between gap-2 sm:gap-3">
           {/* Logo */}
-          <Link href="/">
+          <Link href="/" className="shrink-0">
             <Image
               src="/img/logo-header-1.png"
               width={170}
               height={170}
               alt="Logo"
+              className="h-auto w-[120px] sm:w-[140px] lg:w-[170px]"
             />
           </Link>
 
           {/* Navegação Desktop */}
-          <div className="hidden lg:flex gap-6">
+          <div className="hidden flex-1 items-center justify-center lg:flex lg:gap-2 xl:gap-4 2xl:gap-5">
             {navigation.map((item, index) => (
               <Link
                 key={index}
                 href={item.href}
-                className="relative text-brand-500 font-semibold transition-colors duration-200
+                className="relative whitespace-nowrap text-[10px] font-semibold text-brand-500 transition-colors duration-200 sm:text-[11px] xl:text-sm
                 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-0 after:h-0.5
                 after:bg-brand-200 after:transition-all after:duration-300 hover:after:w-full hover:text-brand-200"
               >
@@ -69,12 +74,12 @@ export default function Header() {
           </div>
 
           {/* Seletor de Idiomas */}
-          <div className="hidden lg:flex gap-2">
+          <div className="hidden shrink-0 lg:flex gap-2">
             {languages.map((lang) => (
               <button
                 key={lang}
                 onClick={() => setLanguage(lang as "it" | "de")}
-                className={`p-0 rounded-full w-12 h-8 overflow-hidden border-2 ${
+                className={`p-0 rounded-full w-10 h-7 overflow-hidden border-2 ${
                   language === lang
                     ? "border-brand-200"
                     : "border-transparent hover:border-brand-200"

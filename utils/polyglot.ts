@@ -9,6 +9,7 @@ const translations = {
       danceexp: "Professional Experience",
       academicFormation: "Academic Formation",
       gallery: "Gallery",
+      workshops: "Workshops",
     },
     site: {
       title: "Rodrigo Tavella",
@@ -37,6 +38,22 @@ const translations = {
       body: "By submitting this form you agree that your information will be used to contact you. I will not share your data with third parties.",
     },
     success: "Send completed",
+    workshops: {
+      page: {
+        title: "Workshops",
+        subtitle: "Learn technique, balance and confidence in a practical environment.",
+      },
+      card: {
+        register: "Enroll now",
+      },
+      popup: {
+        eyebrow: "New workshops",
+        title: "Discover new movement and performance experiences",
+        description: "Explore the available opportunities and sign up for the next sessions in dance, technique and body expression.",
+        close: "Close",
+        action: "See workshops",
+      },
+    },
   },
   it: {
     header: {
@@ -46,6 +63,7 @@ const translations = {
       danceexp: "Esperienza Professionale",
       academicFormation: "Formazione Accademica",
       gallery: "Galleria",
+      workshops: "Workshop",
     },
     contact: {
       title: "Contatto",
@@ -74,6 +92,22 @@ const translations = {
         body: "Inviando questo modulo accetti che le tue informazioni vengano utilizzate per contattarti. Non condividerò i tuoi dati con terze parti.",
       },
       success: "Invio completato",
+      workshops: {
+        page: {
+          title: "Workshop",
+          subtitle: "Impara tecnica, equilibrio e sicurezza in un ambiente pratico.",
+        },
+        card: {
+          register: "Iscriviti",
+        },
+        popup: {
+          eyebrow: "Nuovi workshop",
+          title: "Scopri nuove esperienze di movimento e performance",
+          description: "Esplora le opportunità disponibili e iscriviti ai prossimi incontri di danza, tecnica ed espressione corporea.",
+          close: "Chiudi",
+          action: "Vedi workshop",
+        },
+      },
   },
   de: {
     header: {
@@ -83,6 +117,7 @@ const translations = {
       danceexp: "Berufserfahrung",
       academicFormation: "Akademische Ausbildung",
       gallery: "Galerie",
+      workshops: "Workshops",
     },
     contact: {
       title: "Kontakt",
@@ -111,6 +146,22 @@ const translations = {
         body: "Durch das Absenden dieses Formulars stimmen Sie zu, dass Ihre Daten verwendet werden, um Sie zu kontaktieren. Ich werde Ihre Daten nicht an Dritte weitergeben.",
       },
       success: "Versand abgeschlossen",
+      workshops: {
+        page: {
+          title: "Workshops",
+          subtitle: "Lerne Technik, Gleichgewicht und Selbstvertrauen in einer praktischen Umgebung.",
+        },
+        card: {
+          register: "Jetzt anmelden",
+        },
+        popup: {
+          eyebrow: "Neue Workshops",
+          title: "Entdecke neue Bewegungs- und Performance-Erlebnisse",
+          description: "Entdecke die verfügbaren Möglichkeiten und melde dich für die nächsten Tanz-, Technik- und Körperexpressionseinheiten an.",
+          close: "Schließen",
+          action: "Workshops ansehen",
+        },
+      },
   },
 };
 
