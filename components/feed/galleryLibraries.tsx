@@ -14,6 +14,11 @@ export default function GalleryLibraries() {
     <section className="max-w-6xl mx-auto px-4 py-20 space-y-24">
       {entries.map(([key, lib], index) => {
         const isReversed = index % 2 !== 0;
+        const isComingSoon = lib.type === "image" && lib.comingSoon;
+
+        const cover = lib.type === "image" && lib.items.length > 0
+          ? `${lib.path}/${typeof lib.items[0] === "string" ? lib.items[0] : lib.items[0].src}`
+          : "/img/logo-header.png";
 
         return (
           <motion.div
@@ -27,25 +32,23 @@ export default function GalleryLibraries() {
             } items-center gap-10`}
           >
             {/* Imagem */}
-            <Link href={`/gallery/${key}`} className="w-full md:w-1/2">
+            <div className="w-full md:w-1/2">
               <div className="relative w-full h-64 md:h-80 rounded-2xl overflow-hidden shadow-xl">
-                {/* fallback to an existing local image if the library has no image items */}
-                <Image
-                  src={
-                    // prefer explicit cover if provided (local path under /public)
-                    (lib as any).cover
-                      ? (lib as any).cover
-                      : lib.type === "image" && lib.items && lib.items.length > 0
-                      ? `${lib.path}/${typeof lib.items[0] === 'string' ? lib.items[0] : (lib.items[0] as any).src}`
-                      : "/img/gallery/fotos-youtube/capa-yt.png"
-                  }
-                  alt={lib.title[language]}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="object-cover hover:scale-105 transition-transform duration-300"
-                />
+                {isComingSoon ? (
+                  <div className="flex h-full items-center justify-center bg-white/5 text-sm uppercase tracking-[0.2em] text-brand-200">
+                    Coming soon
+                  </div>
+                ) : (
+                  <Image
+                    src={(lib as any).cover || cover}
+                    alt={lib.title[language]}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                )}
               </div>
-            </Link>
+            </div>
 
             {/* Texto */}
             <div className="w-full md:w-1/2 text-center md:text-left">
@@ -54,7 +57,11 @@ export default function GalleryLibraries() {
                 <p className="text-sm text-gray-300 mb-4">{lib.description[language]}</p>
               )}
 
-              <Link href={`/gallery/${key}`} className="px-1">
+              {isComingSoon ? (
+                <span className="inline-flex items-center rounded-full border border-brand-200/50 px-5 py-2 text-sm text-brand-200">
+                  Coming soon
+                </span>
+              ) : <Link href={`/gallery/${key}`} className="px-1">
                 <motion.p
                   className="inline-flex items-center gap-2 bg-brand-100 transition text-white px-5 py-2 rounded-full shadow-md cursor-pointer relative overflow-hidden"
                   whileHover={{ scale: 1.05 }}
@@ -79,7 +86,7 @@ export default function GalleryLibraries() {
                     }}
                   />
                 </motion.p>
-              </Link>
+              </Link>}
             </div>
           </motion.div>
         );

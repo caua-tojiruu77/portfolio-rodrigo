@@ -22,6 +22,12 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## Learn More
 
+## Workshop payments
+
+Each workshop has 12 seats split into 6 PayPal seats and 6 in-person cash seats. PayPal reservations remain temporary for 15 minutes until capture. Cash reservations are stored as `reserved_cash`, expire after 48 hours without confirmation, and can be marked as `cash_paid`, cancelled, and checked in from the admin panel.
+
+Keep PayPal in Sandbox while testing by setting `PAYPAL_MODE=sandbox`, using the sandbox API base URL and sandbox credentials. Configure the production API base URL only when the real payment flow is intentionally enabled.
+
 To learn more about Next.js, take a look at the following resources:
 
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.

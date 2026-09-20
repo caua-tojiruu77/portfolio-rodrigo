@@ -9,7 +9,9 @@ const PAYPAL_API_BASE_URL = process.env.PAYPAL_API_BASE_URL || "https://api-m.sa
 
 async function getPayPalAccessToken() {
   if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
-    throw new Error("PayPal credentials are not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in environment variables.");
+    const error = new Error("PayPal Sandbox is not configured. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in .env.local, then restart the server.");
+    error.name = "PayPalConfigurationError";
+    throw error;
   }
 
   const response = await fetch(`${PAYPAL_API_BASE_URL}/v1/oauth2/token`, {
@@ -22,7 +24,9 @@ async function getPayPalAccessToken() {
   });
 
   if (!response.ok) {
-    throw new Error("Unable to authenticate with PayPal.");
+    const error = new Error("PayPal Sandbox authentication failed. Check the Sandbox client ID, secret and API base URL.");
+    error.name = "PayPalAuthenticationError";
+    throw error;
   }
 
   const data = await response.json();
@@ -47,6 +51,10 @@ export async function POST(req: Request) {
     const existingRegistration = await getWorkshopRegistrationById(registrationId);
     if (!existingRegistration || existingRegistration.workshopId !== workshopId) {
       return NextResponse.json({ ok: false, error: "Reservation could not be found." }, { status: 404 });
+    }
+
+    if (existingRegistration.paymentMethod !== "paypal" || existingRegistration.status !== "pending") {
+      return NextResponse.json({ ok: false, error: "Only pending PayPal reservations can start checkout." }, { status: 409 });
     }
 
     const accessToken = await getPayPalAccessToken();
@@ -78,9 +86,11 @@ export async function POST(req: Request) {
       body: JSON.stringify(orderData),
     });
 
-    const data = await response.json();
+    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      throw new Error(data?.error?.message || "PayPal order creation failed.");
+      const error = new Error(data?.error?.message || "PayPal order creation failed.");
+      error.name = "PayPalOrderError";
+      throw error;
     }
 
     await updateWorkshopRegistration({
@@ -101,6 +111,9 @@ export async function POST(req: Request) {
       mode: PAYPAL_MODE,
     });
   } catch (error: any) {
-    return NextResponse.json({ ok: false, error: error?.message || "Unable to create PayPal order." }, { status: 500 });
+    const status = error?.name === "PayPalConfigurationError" ? 503
+      : error?.name === "PayPalAuthenticationError" || error?.name === "PayPalOrderError" ? 502
+        : 500;
+    return NextResponse.json({ ok: false, error: error?.message || "Unable to create PayPal order." }, { status });
   }
 }

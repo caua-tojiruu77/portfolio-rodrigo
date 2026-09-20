@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const os = require('node:os');
 
-const { getWorkshopMetrics, createWorkshopRegistration, expirePendingReservations } = require('../utils/workshopStore');
+const { getWorkshopMetrics, createWorkshopRegistration, expirePendingReservations, markCashPayment, confirmCashDeposit, cancelWorkshopRegistration, listActiveWorkshopRegistrations, listWorkshopRegistrations } = require('../utils/workshopStore');
 
 async function createTempStore() {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'workshops-'));
@@ -19,7 +19,7 @@ test('it blocks the 13th confirmed registration and keeps a temporary booking co
 
   await fs.writeFile(file, JSON.stringify({ registrations: [] }, null, 2));
 
-  for (let i = 0; i < 12; i += 1) {
+  for (let i = 0; i < 6; i += 1) {
     const reg = await createWorkshopRegistration({
       workshopId,
       participantName: `Participant ${i + 1}`,
@@ -32,9 +32,10 @@ test('it blocks the 13th confirmed registration and keeps a temporary booking co
   }
 
   const metrics = await getWorkshopMetrics(workshopId);
-  assert.equal(metrics.confirmedCount, 12);
-  assert.equal(metrics.availableSlots, 0);
-  assert.equal(metrics.isFull, true);
+  assert.equal(metrics.paypalConfirmedCount, 6);
+  assert.equal(metrics.paypalAvailableSlots, 0);
+  assert.equal(metrics.availableSlots, 6);
+  assert.equal(metrics.isFull, false);
 
   await assert.rejects(
     () => createWorkshopRegistration({
@@ -78,7 +79,7 @@ test('it prevents two simultaneous last-seat reservations from both succeeding',
 
   await fs.writeFile(file, JSON.stringify({ registrations: [] }, null, 2));
 
-  for (let i = 0; i < 11; i += 1) {
+  for (let i = 0; i < 5; i += 1) {
     await createWorkshopRegistration({
       workshopId,
       participantName: `Seat ${i + 1}`,
@@ -109,7 +110,148 @@ test('it prevents two simultaneous last-seat reservations from both succeeding',
   assert.equal(successes, 1);
 
   const metrics = await getWorkshopMetrics(workshopId, file);
-  assert.equal(metrics.confirmedCount, 11);
+  assert.equal(metrics.paypalConfirmedCount, 5);
   assert.equal(metrics.pendingCount, 1);
-  assert.equal(metrics.availableSlots, 0);
+  assert.equal(metrics.paypalAvailableSlots, 0);
+  assert.equal(metrics.availableSlots, 6);
+});
+
+test('it keeps six cash reservations separate from six PayPal seats', async () => {
+  const { file } = await createTempStore();
+  const workshopId = 'handstand-beginners';
+
+  await fs.writeFile(file, JSON.stringify({ registrations: [] }, null, 2));
+
+  for (let i = 0; i < 6; i += 1) {
+    await createWorkshopRegistration({
+      workshopId,
+      participantName: `Cash ${i + 1}`,
+      email: `cash${i + 1}@example.com`,
+      phone: `+1666${i}`,
+      status: 'reserved_cash',
+      paymentMethod: 'cash',
+      reservationExpiresAt: Date.now() + 60_000,
+    }, file);
+  }
+
+  const metrics = await getWorkshopMetrics(workshopId, file);
+  assert.equal(metrics.cashReservedCount, 6);
+  assert.equal(metrics.cashAvailableSlots, 0);
+  assert.equal(metrics.availableSlots, 6);
+
+  await assert.rejects(
+    () => createWorkshopRegistration({
+      workshopId,
+      participantName: 'Cash 7',
+      email: 'cash7@example.com',
+      phone: '+16667',
+      status: 'reserved_cash',
+      paymentMethod: 'cash',
+    }, file),
+    /six in-person|full/i,
+  );
+});
+
+test('it records cash payment and releases a cancelled in-person reservation', async () => {
+  const { file } = await createTempStore();
+  const registration = await createWorkshopRegistration({
+    workshopId: 'handstand-beginners',
+    participantName: 'Cash attendee',
+    email: 'cash-attendee@example.com',
+    phone: '+1777000',
+    status: 'reserved_cash',
+    paymentMethod: 'cash',
+    reservationExpiresAt: Date.now() + 60_000,
+  }, file);
+
+  const paid = await markCashPayment({ registrationId: registration.id, cashPaymentStatus: 'paid' }, file);
+  assert.equal(paid.status, 'cash_paid');
+  assert.equal((await getWorkshopMetrics('handstand-beginners', file)).cashReservedCount, 1);
+
+  await cancelWorkshopRegistration({ registrationId: registration.id }, file);
+  const metrics = await getWorkshopMetrics('handstand-beginners', file);
+  assert.equal(metrics.cashReservedCount, 0);
+  assert.equal(metrics.cashAvailableSlots, 6);
+});
+
+test('cancelled and expired registrations leave active operations but remain in history', async () => {
+  const { file } = await createTempStore();
+  const registration = await createWorkshopRegistration({
+    workshopId: 'handstand-beginners',
+    participantName: 'Historical attendee',
+    email: 'history@example.com',
+    phone: '+1777001',
+    status: 'reserved_cash',
+    paymentMethod: 'cash',
+    reservationExpiresAt: Date.now() + 60_000,
+  }, file);
+
+  await cancelWorkshopRegistration({ registrationId: registration.id }, file);
+  assert.equal((await listActiveWorkshopRegistrations(file)).some((entry) => entry.id === registration.id), false);
+  assert.equal((await listWorkshopRegistrations(file)).some((entry) => entry.id === registration.id), true);
+});
+
+test('it assigns unique six-character public codes without replacing internal IDs', async () => {
+  const { file } = await createTempStore();
+  const first = await createWorkshopRegistration({
+    workshopId: 'handstand-beginners',
+    participantName: 'Code One',
+    email: 'code-one@example.com',
+    phone: '+1777002',
+    status: 'reserved_cash',
+    paymentMethod: 'cash',
+    reservationExpiresAt: Date.now() + 60_000,
+  }, file);
+  const second = await createWorkshopRegistration({
+    workshopId: 'handstand-beginners',
+    participantName: 'Code Two',
+    email: 'code-two@example.com',
+    phone: '+1777003',
+    status: 'reserved_cash',
+    paymentMethod: 'cash',
+    reservationExpiresAt: Date.now() + 60_000,
+  }, file);
+
+  assert.match(first.publicCode, /^[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{6}$/);
+  assert.match(second.publicCode, /^[23456789ABCDEFGHJKLMNPQRSTUVWXYZ]{6}$/);
+  assert.notEqual(first.publicCode, second.publicCode);
+  assert.match(first.id, /^ws-/);
+});
+
+test('Stripe online payments share the six online seats with PayPal', async () => {
+  const { file } = await createTempStore();
+  for (let i = 0; i < 5; i += 1) {
+    await createWorkshopRegistration({
+      workshopId: 'handstand-beginners',
+      participantName: `Online ${i + 1}`,
+      email: `online${i + 1}@example.com`,
+      phone: `+1888${i}`,
+      status: 'paid',
+      paymentMethod: i === 0 ? 'stripe' : 'paypal',
+    }, file);
+  }
+
+  const metrics = await getWorkshopMetrics('handstand-beginners', file);
+  assert.equal(metrics.paypalConfirmedCount, 5);
+  assert.equal(metrics.paypalAvailableSlots, 1);
+});
+
+test('cash reservation requires a deposit and stays reserved after the deposit is paid', async () => {
+  const { file } = await createTempStore();
+  const registration = await createWorkshopRegistration({
+    workshopId: 'handstand-beginners',
+    participantName: 'Deposit attendee',
+    email: 'deposit@example.com',
+    phone: '+1888000',
+    status: 'reserved_cash',
+    paymentMethod: 'cash',
+    reservationExpiresAt: Date.now() + 60_000,
+  }, file);
+
+  assert.equal(registration.depositAmount, 5);
+  assert.equal(registration.depositStatus, 'pending');
+  const confirmed = await confirmCashDeposit({ registrationId: registration.id, stripeSessionId: 'cs_test', stripePaymentIntentId: 'pi_test' }, file);
+  assert.equal(confirmed.status, 'reserved_cash');
+  assert.equal(confirmed.depositStatus, 'paid');
+  assert.equal((await getWorkshopMetrics('handstand-beginners', file)).cashReservedCount, 1);
 });

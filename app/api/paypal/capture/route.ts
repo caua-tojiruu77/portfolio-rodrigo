@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { confirmWorkshopRegistration, getWorkshopRegistrationById, updateWorkshopRegistration } from "@/utils/workshopStore";
 import { getWorkshopById } from "@/utils/workshops";
+import { sendWorkshopConfirmationEmail } from "@/utils/workshopEmail";
 
 const PAYPAL_MODE = process.env.PAYPAL_MODE || process.env.NEXT_PUBLIC_PAYPAL_MODE || "sandbox";
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || "";
@@ -65,6 +66,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Registration not found after payment capture." }, { status: 404 });
     }
 
+    if (registration.paymentMethod !== "paypal" || registration.status !== "pending") {
+      return NextResponse.json({ ok: false, error: "This registration is not an active PayPal reservation." }, { status: 409 });
+    }
+
     const workshop = getWorkshopById(registration.workshopId);
     if (!workshop) {
       return NextResponse.json({ ok: false, error: "Workshop associated with the registration no longer exists." }, { status: 404 });
@@ -82,6 +87,30 @@ export async function POST(req: Request) {
       transactionId,
     });
 
+    if (!confirmedRegistration.confirmationEmailSentAt) {
+      try {
+        const emailResult = await sendWorkshopConfirmationEmail({
+          participantName: confirmedRegistration.participantName,
+          email: confirmedRegistration.email,
+          workshopName: workshop.translations.en.name,
+          workshopDate: workshop.translations.en.date,
+          workshopTime: workshop.translations.en.date,
+          workshopLocation: workshop.translations.en.location,
+          registrationCode: confirmedRegistration.publicCode,
+        });
+
+        if (!emailResult.skipped) {
+          await updateWorkshopRegistration({
+            registrationId: confirmedRegistration.id,
+            workshopId: confirmedRegistration.workshopId,
+            patch: { confirmationEmailSentAt: Date.now() },
+          });
+        }
+      } catch {
+        // Payment remains confirmed if SMTP is temporarily unavailable.
+      }
+    }
+
     await updateWorkshopRegistration({
       registrationId,
       workshopId: registration.workshopId,
@@ -97,7 +126,7 @@ export async function POST(req: Request) {
       ok: true,
       mode: PAYPAL_MODE,
       registration: confirmedRegistration,
-      workshopName: workshop.translations.it.name,
+      workshopName: workshop.translations.en.name,
     });
   } catch (error: any) {
     return NextResponse.json({ ok: false, error: error?.message || "Unable to confirm the PayPal payment." }, { status: 500 });

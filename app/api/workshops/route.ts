@@ -18,6 +18,13 @@ export async function GET() {
         capacity: metrics.capacity,
         confirmedCount: metrics.confirmedCount,
         pendingCount: metrics.pendingCount,
+        paypalCapacity: metrics.paypalCapacity,
+        paypalConfirmedCount: metrics.paypalConfirmedCount,
+        paypalPendingCount: metrics.paypalPendingCount,
+        paypalAvailableSlots: metrics.paypalAvailableSlots,
+        cashCapacity: metrics.cashCapacity,
+        cashReservedCount: metrics.cashReservedCount,
+        cashAvailableSlots: metrics.cashAvailableSlots,
         availableSlots: metrics.availableSlots,
         isFull: metrics.isFull,
       };

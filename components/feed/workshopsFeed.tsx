@@ -3,30 +3,39 @@
 import Image from "next/image";
 import { ArrowRight, CalendarDays, Clock3, MapPin, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import { createPolyglot } from "@/utils/polyglot";
 import { enabledWorkshops, getWorkshopContent, type Workshop } from "@/utils/workshops";
-import { useLanguage } from "@/context/languageContext";
 
 type RegistrationState = {
   id: string;
+  publicCode: string;
   workshopId: string;
   participantName: string;
   email: string;
   phone: string;
   reservationExpiresAt: number;
   status: string;
+  paymentMethod: "paypal" | "stripe" | "cash";
+  cashPaymentStatus?: string | null;
+  depositStatus?: "pending" | "paid" | null;
+  depositAmount?: number;
 };
 
 export default function WorkshopsFeed() {
-  const { language } = useLanguage();
-  const polyglot = createPolyglot(language);
   const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
-  const [formData, setFormData] = useState({ participantName: "", email: "", phone: "" });
+  const [formData, setFormData] = useState({ participantName: "", email: "", phone: "", paymentMethod: "paypal" as "paypal" | "stripe" | "cash" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reservation, setReservation] = useState<RegistrationState | null>(null);
   const [error, setError] = useState("");
 
-  const [liveMetrics, setLiveMetrics] = useState<Record<string, { availableSlots: number; isFull: boolean }>>({});
+  const [liveMetrics, setLiveMetrics] = useState<Record<string, {
+    availableSlots: number;
+    isFull: boolean;
+    paypalAvailableSlots: number;
+    cashAvailableSlots: number;
+  }>>({});
+  const selectedSlotInfo = selectedWorkshop
+    ? liveMetrics[selectedWorkshop.id] || { paypalAvailableSlots: 6, cashAvailableSlots: 6 }
+    : { paypalAvailableSlots: 6, cashAvailableSlots: 6 };
 
   useEffect(() => {
     const loadMetrics = async () => {
@@ -38,6 +47,8 @@ export default function WorkshopsFeed() {
         (data.workshops || []).map((workshop: any) => [workshop.id, {
           availableSlots: workshop.availableSlots,
           isFull: workshop.isFull,
+          paypalAvailableSlots: workshop.paypalAvailableSlots,
+          cashAvailableSlots: workshop.cashAvailableSlots,
         }]),
       );
 
@@ -53,14 +64,14 @@ export default function WorkshopsFeed() {
 
   const openRegister = (workshop: Workshop) => {
     setSelectedWorkshop(workshop);
-    setFormData({ participantName: "", email: "", phone: "" });
+    setFormData({ participantName: "", email: "", phone: "", paymentMethod: "paypal" });
     setReservation(null);
     setError("");
   };
 
   const closeDialog = () => {
     setSelectedWorkshop(null);
-    setFormData({ participantName: "", email: "", phone: "" });
+    setFormData({ participantName: "", email: "", phone: "", paymentMethod: "paypal" });
     setReservation(null);
     setError("");
   };
@@ -80,17 +91,18 @@ export default function WorkshopsFeed() {
           participantName: formData.participantName,
           email: formData.email,
           phone: formData.phone,
+          paymentMethod: formData.paymentMethod,
         }),
       });
 
       const data = await response.json();
       if (!response.ok || !data.ok) {
-        throw new Error(data.error || "Não foi possível reservar a vaga.");
+        throw new Error(data.error || "Unable to reserve a place.");
       }
 
       setReservation(data.registration);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Erro ao reservar a vaga.");
+      setError(submitError instanceof Error ? submitError.message : "Unable to reserve a place.");
     } finally {
       setIsSubmitting(false);
     }
@@ -99,7 +111,10 @@ export default function WorkshopsFeed() {
   const handleContinueToPayment = async () => {
     if (!selectedWorkshop || !reservation) return;
 
-    const response = await fetch("/api/paypal/create-order", {
+    const endpoint = reservation.paymentMethod === "stripe"
+      ? "/api/stripe/create-checkout-session"
+      : "/api/paypal/create-order";
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -110,7 +125,16 @@ export default function WorkshopsFeed() {
 
     const data = await response.json();
     if (!response.ok || !data.ok) {
-      setError(data.error || "Não foi possível iniciar o pagamento.");
+      setError(data.error || "Unable to start payment.");
+      return;
+    }
+
+    if (reservation.paymentMethod === "stripe") {
+      if (!data.checkoutUrl) {
+        setError("The card checkout URL was not returned.");
+        return;
+      }
+      window.location.href = data.checkoutUrl;
       return;
     }
 
@@ -130,15 +154,15 @@ export default function WorkshopsFeed() {
       <div className="row w-full px-5 lg:px-0">
         <div className="mb-10 text-center lg:text-left">
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-brand-200">
-            {polyglot.t("workshops.page.title")}
+            Workshops
           </p>
-          <h2 className="mainTitle text-white">{polyglot.t("workshops.page.subtitle")}</h2>
+          <h2 className="mainTitle text-white">Learn technique, balance and confidence in a practical environment.</h2>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
           {enabledWorkshops.map((workshop) => {
-            const content = getWorkshopContent(workshop, language);
-            const slotInfo = liveMetrics[workshop.id] || { availableSlots: 12, isFull: false };
+            const content = getWorkshopContent(workshop, "en");
+            const slotInfo = liveMetrics[workshop.id] || { availableSlots: 12, isFull: false, paypalAvailableSlots: 6, cashAvailableSlots: 6 };
 
             return (
               <article
@@ -182,7 +206,10 @@ export default function WorkshopsFeed() {
                       <span>{content.duration}</span>
                     </li>
                     <li className="text-xs uppercase tracking-[0.16em] text-brand-200">
-                      {slotInfo.isFull ? "LOTADO" : `${slotInfo.availableSlots}/12 vagas disponíveis`}
+                      {slotInfo.isFull ? "FULL" : `${slotInfo.availableSlots}/12 places available`}
+                    </li>
+                    <li className="text-xs text-gray-300">
+                      Online: {slotInfo.paypalAvailableSlots}/6 · Pay on the day: {slotInfo.cashAvailableSlots}/6
                     </li>
                   </ul>
 
@@ -192,7 +219,7 @@ export default function WorkshopsFeed() {
                     disabled={slotInfo.isFull}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition-colors hover:bg-[#f3d54d] disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-gray-300"
                   >
-                    {slotInfo.isFull ? "Lotado" : content.button}
+                    {slotInfo.isFull ? "Full" : "Enroll now"}
                     {!slotInfo.isFull && <ArrowRight size={16} />}
                   </button>
                 </div>
@@ -207,7 +234,7 @@ export default function WorkshopsFeed() {
           <div className="relative w-full max-w-xl rounded-3xl border border-white/10 bg-[#0d0a24] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
             <button
               type="button"
-              aria-label="Fechar"
+              aria-label="Close"
               onClick={closeDialog}
               className="absolute right-4 top-4 rounded-full border border-white/10 p-2 text-white transition hover:bg-white/10"
             >
@@ -216,23 +243,61 @@ export default function WorkshopsFeed() {
 
             <div className="mb-5 pr-10">
               <p className="text-xs uppercase tracking-[0.18em] text-brand-200">Workshop</p>
-              <h3 className="mt-2 text-2xl font-semibold text-white">{getWorkshopContent(selectedWorkshop, language).name}</h3>
+              <h3 className="mt-2 text-2xl font-semibold text-white">{getWorkshopContent(selectedWorkshop, "en").name}</h3>
               <p className="mt-2 text-sm text-gray-300">{selectedWorkshop.price}</p>
             </div>
 
             {!reservation ? (
               <form className="space-y-4" onSubmit={handleRegistrationSubmit}>
                 <div>
-                  <label htmlFor="participantName" className="mb-2 block text-sm text-gray-200">Nome completo</label>
+                  <label htmlFor="participantName" className="mb-2 block text-sm text-gray-200">Full name</label>
                   <input
                     id="participantName"
                     value={formData.participantName}
                     onChange={(event) => setFormData({ ...formData, participantName: event.target.value })}
                     className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none ring-0 placeholder:text-gray-400 focus:border-brand-200"
-                    placeholder="Seu nome completo"
+                    placeholder="Your full name"
                     required
                   />
                 </div>
+
+                <fieldset className="space-y-2">
+                  <legend className="mb-2 block text-sm text-gray-200">Payment method</legend>
+                  <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-gray-200">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="paypal"
+                      checked={formData.paymentMethod === "paypal"}
+                      onChange={() => setFormData({ ...formData, paymentMethod: "paypal" })}
+                      disabled={selectedSlotInfo.paypalAvailableSlots === 0}
+                      required
+                    />
+                    <span><strong className="text-white">Pay with PayPal</strong><br />6 online places · {selectedSlotInfo.paypalAvailableSlots} available</span>
+                  </label>
+                  <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-gray-200">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="stripe"
+                      checked={formData.paymentMethod === "stripe"}
+                      onChange={() => setFormData({ ...formData, paymentMethod: "stripe" })}
+                      disabled={selectedSlotInfo.paypalAvailableSlots === 0}
+                    />
+                    <span><strong className="text-white">Pay by card</strong><br />Credit or debit card · {selectedSlotInfo.paypalAvailableSlots} available</span>
+                  </label>
+                  <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-gray-200">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cash"
+                      checked={formData.paymentMethod === "cash"}
+                      onChange={() => setFormData({ ...formData, paymentMethod: "cash" })}
+                      disabled={selectedSlotInfo.cashAvailableSlots === 0}
+                    />
+                    <span><strong className="text-white">Pay on the day</strong><br />6 in-person places · {selectedSlotInfo.cashAvailableSlots} available</span>
+                  </label>
+                </fieldset>
 
                 <div>
                   <label htmlFor="email" className="mb-2 block text-sm text-gray-200">E-mail</label>
@@ -248,7 +313,7 @@ export default function WorkshopsFeed() {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="mb-2 block text-sm text-gray-200">Telefone / WhatsApp</label>
+                  <label htmlFor="phone" className="mb-2 block text-sm text-gray-200">Phone / WhatsApp</label>
                   <input
                     id="phone"
                     value={formData.phone}
@@ -266,30 +331,62 @@ export default function WorkshopsFeed() {
                   disabled={isSubmitting}
                   className="inline-flex w-full items-center justify-center rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d] disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isSubmitting ? "Reservando vaga..." : "Reservar vaga"}
+                  {isSubmitting ? "Reserving place..." : "Reserve place"}
                 </button>
               </form>
             ) : (
               <div className="space-y-5">
                 <div className="rounded-2xl border border-brand-200/50 bg-brand-200/10 p-4 text-sm text-white">
-                  <p className="font-semibold text-brand-200">Resumo da inscrição</p>
+                  <p className="font-semibold text-brand-200">Registration summary</p>
                   <ul className="mt-3 space-y-2 text-gray-200">
-                    <li><span className="font-medium text-white">Workshop:</span> {getWorkshopContent(selectedWorkshop, language).name}</li>
-                    <li><span className="font-medium text-white">Participante:</span> {reservation.participantName}</li>
-                    <li><span className="font-medium text-white">E-mail:</span> {reservation.email}</li>
-                    <li><span className="font-medium text-white">Telefone:</span> {reservation.phone}</li>
-                    <li><span className="font-medium text-white">Reserva:</span> {new Date(reservation.reservationExpiresAt).toLocaleString("pt-BR")}</li>
+                    <li><span className="font-medium text-white">Workshop:</span> {getWorkshopContent(selectedWorkshop, "en").name}</li>
+                    <li><span className="font-medium text-white">Participant:</span> {reservation.participantName}</li>
+                    <li><span className="font-medium text-white">Email:</span> {reservation.email}</li>
+                    <li><span className="font-medium text-white">Phone:</span> {reservation.phone}</li>
+                    <li><span className="font-medium text-white">Registration Code:</span> {reservation.publicCode}</li>
+                    <li><span className="font-medium text-white">Reservation expires:</span> {reservation.reservationExpiresAt ? new Date(reservation.reservationExpiresAt).toLocaleString("en-GB") : "No expiration"}</li>
                   </ul>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleContinueToPayment}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d]"
-                >
-                  Continuar para pagamento
-                  <ArrowRight size={16} />
-                </button>
+                {reservation.paymentMethod === "cash" && reservation.depositStatus !== "paid" ? (
+                  <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+                    <p className="font-semibold">Pay on the day · €5 deposit required</p>
+                    <p className="mt-2">Your place is temporarily reserved. Pay the €5 deposit now to confirm it. The remaining balance is paid in cash at the workshop.</p>
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        const response = await fetch("/api/stripe/create-cash-deposit-session", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ workshopId: selectedWorkshop.id, registrationId: reservation.id }),
+                        });
+                        const data = await response.json();
+                        if (!response.ok || !data.ok || !data.checkoutUrl) {
+                          setError(data.error || "Unable to start deposit payment.");
+                          return;
+                        }
+                        window.location.href = data.checkoutUrl;
+                      }}
+                      className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d]"
+                    >
+                      Pay €5 deposit by card
+                    </button>
+                  </div>
+                ) : reservation.paymentMethod === "cash" ? (
+                  <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+                    <p className="font-semibold">Place confirmed · balance payable in cash</p>
+                    <p className="mt-2">Your €5 deposit was received. Pay the remaining balance in cash at the workshop.</p>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleContinueToPayment}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d]"
+                  >
+                    {reservation.paymentMethod === "stripe" ? "Continue to card checkout" : "Continue to PayPal"}
+                    <ArrowRight size={16} />
+                  </button>
+                )}
               </div>
             )}
           </div>

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@next/font": "^14.2.15",
+    "@stripe/stripe-js": "^9.16.0",
     "@studio-freight/lenis": "^1.0.42",
     "framer-motion": "^12.18.1",
     "i18next": "^25.2.1",
@@ -28,6 +29,7 @@
     "react-icons": "^5.5.0",
     "react-intersection-observer": "^9.16.0",
     "react-vertical-timeline-component": "^3.5.3",
+    "stripe": "^22.6.2",
     "swiper": "^11.2.8"
   },
   "devDependencies": {

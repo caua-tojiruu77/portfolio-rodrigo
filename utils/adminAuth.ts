@@ -2,6 +2,16 @@ import crypto from "node:crypto";
 
 export const ADMIN_SESSION_COOKIE = "admin_session";
 
+export function validateEventAccessToken(candidate?: string) {
+  const configuredToken = process.env.EVENT_ACCESS_TOKEN || "";
+  if (!candidate || !configuredToken || candidate.length !== configuredToken.length) return false;
+
+  return crypto.timingSafeEqual(
+    Buffer.from(candidate),
+    Buffer.from(configuredToken),
+  );
+}
+
 export function getAdminCredentials() {
   return {
     username: process.env.ADMIN_USERNAME || "admin",

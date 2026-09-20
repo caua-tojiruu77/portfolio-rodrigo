@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { createWorkshopRegistration } from "@/utils/workshopStore";
+import { createWorkshopRegistration, updateWorkshopRegistration } from "@/utils/workshopStore";
 import { getWorkshopById } from "@/utils/workshops";
+import { sendWorkshopCashReservationEmail } from "@/utils/workshopEmail";
 
 export async function POST(
   req: Request,
@@ -11,8 +12,9 @@ export async function POST(
   const name = String(body.participantName || body.name || '').trim();
   const email = String(body.email || '').trim();
   const phone = String(body.phone || '').trim();
+  const paymentMethod = String(body.paymentMethod || '').trim();
 
-  if (!name || !email || !phone) {
+  if (!name || !email || !phone || !['paypal', 'stripe', 'cash'].includes(paymentMethod)) {
     return NextResponse.json({ ok: false, error: 'Name, email, and phone are required.' }, { status: 400 });
   }
 
@@ -32,17 +34,46 @@ export async function POST(
       participantName: name,
       email,
       phone,
-      status: 'pending',
-      reservationExpiresAt: Date.now() + 15 * 60 * 1000,
+      paymentMethod,
+      status: paymentMethod === 'cash' ? 'reserved_cash' : 'pending',
+      reservationExpiresAt: paymentMethod === 'cash'
+        ? Date.now() + 48 * 60 * 60 * 1000
+        : Date.now() + 15 * 60 * 1000,
       currency: workshop.currency || 'EUR',
       amount: Number(workshop.amount || 0),
     });
+
+    if (paymentMethod === "cash") {
+      try {
+        const emailResult = await sendWorkshopCashReservationEmail({
+          participantName: registration.participantName,
+          email: registration.email,
+          workshopName: workshop.translations.en.name,
+          workshopDate: workshop.translations.en.date,
+          workshopTime: workshop.translations.en.date,
+          workshopLocation: workshop.translations.en.location,
+          registrationCode: registration.publicCode,
+        });
+
+        if (!emailResult.skipped) {
+          await updateWorkshopRegistration({
+            registrationId: registration.id,
+            workshopId: registration.workshopId,
+            patch: { reservationEmailSentAt: Date.now() },
+          });
+        }
+      } catch {
+        // The reservation remains valid if SMTP is temporarily unavailable.
+      }
+    }
 
     return NextResponse.json({
       ok: true,
       registration,
       reservationExpiresAt: registration.reservationExpiresAt,
-      message: 'Temporary reservation created. Continue to payment to confirm your seat.',
+      message: paymentMethod === 'cash'
+        ? 'In-person payment reservation created.'
+        : 'Temporary reservation created. Continue to online payment to confirm your seat.',
     });
   } catch (error: any) {
     const message = error?.message || 'The workshop is currently full or unavailable.';

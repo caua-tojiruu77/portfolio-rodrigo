@@ -1,7 +1,14 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { markAttendance } from "@/utils/workshopStore";
+import { ADMIN_SESSION_COOKIE, validateAdminSession, validateEventAccessToken } from "@/utils/adminAuth";
 
 export async function POST(req: Request) {
+  const cookieStore = await cookies();
+  if (!validateAdminSession(cookieStore.get(ADMIN_SESSION_COOKIE)?.value) && !validateEventAccessToken(req.headers.get("x-event-access-token") || undefined)) {
+    return NextResponse.json({ ok: false, error: "Unauthorized." }, { status: 401 });
+  }
+
   try {
     const contentType = req.headers.get("content-type") || "";
     let body: any = {};

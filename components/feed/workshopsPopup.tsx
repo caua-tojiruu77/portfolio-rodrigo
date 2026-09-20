@@ -4,14 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ArrowRight, X } from "lucide-react";
-import { createPolyglot } from "@/utils/polyglot";
-import { useLanguage } from "@/context/languageContext";
 import { enabledWorkshops, getWorkshopContent } from "@/utils/workshops";
 
 export default function WorkshopsPopup() {
   const [isOpen, setIsOpen] = useState(false);
-  const { language } = useLanguage();
-  const polyglot = createPolyglot(language);
 
   useEffect(() => {
     if (!enabledWorkshops.length) {
@@ -30,14 +26,14 @@ export default function WorkshopsPopup() {
   }
 
   const featuredWorkshop = enabledWorkshops[0];
-  const content = getWorkshopContent(featuredWorkshop, language);
+  const content = getWorkshopContent(featuredWorkshop, "en");
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#050123]/80 p-0 backdrop-blur-sm">
       <div className="relative w-[min(92vw,920px)] max-h-[90vh] overflow-y-auto rounded-[1.5rem] border-0 bg-transparent shadow-none md:rounded-[2rem] md:border md:border-white/10 md:bg-[#120d2d] md:shadow-[0_30px_90px_rgba(0,0,0,0.5)]">
         <div className="relative w-full overflow-hidden bg-[#120d2d]">
           <button
-            aria-label={polyglot.t("workshops.popup.close")}
+            aria-label="Close"
             onClick={handleClose}
             className="absolute right-3 top-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/30 text-white transition hover:bg-black/50"
           >
@@ -61,7 +57,7 @@ export default function WorkshopsPopup() {
               onClick={handleClose}
               className="rounded-full border border-white/15 bg-black/20 px-4 py-2.5 text-sm font-medium text-white backdrop-blur-sm transition hover:border-brand-200 hover:text-brand-200 sm:px-5 sm:py-3"
             >
-              {polyglot.t("workshops.popup.close")}
+              Close
             </button>
 
             <Link
@@ -69,7 +65,7 @@ export default function WorkshopsPopup() {
               onClick={handleClose}
               className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-200 px-4 py-2.5 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d] sm:px-5 sm:py-3"
             >
-              {polyglot.t("workshops.popup.action")}
+              See workshops
               <ArrowRight size={16} />
             </Link>
           </div>
@@ -77,13 +73,13 @@ export default function WorkshopsPopup() {
 
         <div className="space-y-5 bg-[#120d2d] px-4 pb-5 pt-5 sm:px-6 sm:pb-6 md:px-8 md:pb-8">
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-brand-200">
-            {polyglot.t("workshops.popup.eyebrow")}
+            New workshops
           </p>
           <h2 className="text-2xl font-bold text-white sm:text-3xl md:text-4xl">
-            {polyglot.t("workshops.popup.title")}
+            Discover new movement and performance experiences
           </h2>
           <p className="text-sm leading-7 text-gray-300 sm:text-base">
-            {polyglot.t("workshops.popup.description")}
+            Explore the available opportunities and sign up for the next dance, technique and body expression sessions.
           </p>
         </div>
       </div>

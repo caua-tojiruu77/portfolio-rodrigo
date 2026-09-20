@@ -2,7 +2,11 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 
 const DEFAULT_CAPACITY = 12;
+const PAYPAL_CAPACITY = 6;
+const CASH_CAPACITY = 6;
 const DEFAULT_RESERVATION_MINUTES = 15;
+const CASH_DEPOSIT_AMOUNT = 5;
+const PUBLIC_CODE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 
 function resolveStoragePath() {
   return process.env.WORKSHOP_STORAGE_PATH || path.join(process.cwd(), 'data', 'workshop-store.json');
@@ -24,8 +28,23 @@ async function readStore(filePath = resolveStoragePath()) {
 
   try {
     const parsed = JSON.parse(raw || '{"registrations":[]}');
+    const sourceRegistrations = Array.isArray(parsed.registrations) ? parsed.registrations : [];
+    const usedCodes = new Set(sourceRegistrations.map((entry) => entry.publicCode).filter(Boolean));
+    let changed = false;
+    const registrations = sourceRegistrations.map((entry) => {
+      if (entry.publicCode) return entry;
+      const publicCode = generatePublicRegistrationCode(usedCodes);
+      usedCodes.add(publicCode);
+      changed = true;
+      return { ...entry, publicCode };
+    });
+
+    if (changed) {
+      await fs.writeFile(filePath, JSON.stringify({ registrations }, null, 2), 'utf8');
+    }
+
     return {
-      registrations: Array.isArray(parsed.registrations) ? parsed.registrations : [],
+      registrations,
     };
   } catch (error) {
     return { registrations: [] };
@@ -66,20 +85,39 @@ function generateRegistrationId() {
   return `ws-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function generatePublicRegistrationCode(usedCodes = new Set()) {
+  let code = '';
+  do {
+    code = Array.from({ length: 6 }, () => PUBLIC_CODE_ALPHABET[Math.floor(Math.random() * PUBLIC_CODE_ALPHABET.length)]).join('');
+  } while (usedCodes.has(code));
+  return code;
+}
+
 function normalizeRegistration(registration) {
   return {
     id: registration.id || generateRegistrationId(),
+    publicCode: registration.publicCode || generatePublicRegistrationCode(),
     workshopId: registration.workshopId,
     participantName: String(registration.participantName || '').trim(),
     email: String(registration.email || '').trim(),
     phone: String(registration.phone || '').trim(),
     status: registration.status || 'pending',
+    paymentMethod: registration.paymentMethod || (registration.status === 'reserved_cash' ? 'cash' : 'paypal'),
+    cashPaymentStatus: registration.cashPaymentStatus || (registration.status === 'reserved_cash' ? 'pending' : null),
+    depositAmount: Number(registration.depositAmount || 0),
+    depositStatus: registration.depositStatus || null,
     reservationExpiresAt: registration.reservationExpiresAt || null,
     createdAt: registration.createdAt || Date.now(),
     updatedAt: registration.updatedAt || Date.now(),
     paymentApprovedAt: registration.paymentApprovedAt || null,
+    reservationEmailSentAt: registration.reservationEmailSentAt || null,
+    confirmationEmailSentAt: registration.confirmationEmailSentAt || null,
+    cashPaymentEmailSentAt: registration.cashPaymentEmailSentAt || null,
+    depositEmailSentAt: registration.depositEmailSentAt || null,
     paypalOrderId: registration.paypalOrderId || null,
     paypalCaptureId: registration.paypalCaptureId || null,
+    stripeSessionId: registration.stripeSessionId || null,
+    stripePaymentIntentId: registration.stripePaymentIntentId || null,
     transactionId: registration.transactionId || null,
     attendanceStatus: registration.attendanceStatus || null,
     attendeeCheckInAt: registration.attendeeCheckInAt || null,
@@ -94,7 +132,7 @@ async function expirePendingReservations(filePath = resolveStoragePath()) {
     let changed = false;
 
     for (const registration of store.registrations) {
-      const isPending = registration.status === 'pending';
+      const isPending = registration.status === 'pending' || registration.status === 'reserved_cash';
       const expired = Number(registration.reservationExpiresAt || 0) <= Date.now();
 
       if (isPending && expired) {
@@ -116,15 +154,24 @@ async function expirePendingReservations(filePath = resolveStoragePath()) {
 async function getWorkshopMetrics(workshopId, filePath = resolveStoragePath()) {
   const store = await readStore(filePath);
   const workshopRegistrations = store.registrations.filter((entry) => entry.workshopId === workshopId);
-  const confirmedCount = workshopRegistrations.filter((entry) => entry.status === 'paid').length;
+  const paypalConfirmedCount = workshopRegistrations.filter((entry) => entry.status === 'paid' && ['paypal', 'stripe'].includes(entry.paymentMethod)).length;
   const pendingCount = workshopRegistrations.filter((entry) => entry.status === 'pending' && Number(entry.reservationExpiresAt || 0) > Date.now()).length;
+  const cashReservedCount = workshopRegistrations.filter((entry) => ['reserved_cash', 'cash_paid'].includes(entry.status) && (entry.status === 'cash_paid' || Number(entry.reservationExpiresAt || 0) > Date.now())).length;
   const expiredCount = workshopRegistrations.filter((entry) => entry.status === 'expired').length;
-  const filledSlots = confirmedCount + pendingCount;
+  const confirmedCount = paypalConfirmedCount + workshopRegistrations.filter((entry) => entry.status === 'cash_paid').length;
+  const filledSlots = paypalConfirmedCount + pendingCount + cashReservedCount;
   const availableSlots = Math.max(DEFAULT_CAPACITY - filledSlots, 0);
 
   return {
     workshopId,
     capacity: DEFAULT_CAPACITY,
+    paypalCapacity: PAYPAL_CAPACITY,
+    cashCapacity: CASH_CAPACITY,
+    paypalConfirmedCount,
+    paypalPendingCount: pendingCount,
+    paypalAvailableSlots: Math.max(PAYPAL_CAPACITY - paypalConfirmedCount - pendingCount, 0),
+    cashReservedCount,
+    cashAvailableSlots: Math.max(CASH_CAPACITY - cashReservedCount, 0),
     confirmedCount,
     pendingCount,
     expiredCount,
@@ -140,6 +187,7 @@ async function createWorkshopRegistration({
   email,
   phone,
   status = 'pending',
+  paymentMethod,
   reservationExpiresAt,
   currency = 'EUR',
   amount = 0,
@@ -156,23 +204,40 @@ async function createWorkshopRegistration({
     }
 
     const activeRegistrations = store.registrations.filter((entry) => entry.workshopId === normalizedWorkshopId && entry.status !== 'cancelled' && entry.status !== 'expired');
-    const confirmedCount = activeRegistrations.filter((entry) => entry.status === 'paid').length;
-    const pendingCount = activeRegistrations.filter((entry) => entry.status === 'pending' && Number(entry.reservationExpiresAt || 0) > Date.now()).length;
+    const paypalConfirmedCount = activeRegistrations.filter((entry) => entry.status === 'paid' && ['paypal', 'stripe'].includes(entry.paymentMethod)).length;
+    const paypalPendingCount = activeRegistrations.filter((entry) => entry.status === 'pending' && Number(entry.reservationExpiresAt || 0) > Date.now()).length;
+    const cashReservedCount = activeRegistrations.filter((entry) => ['reserved_cash', 'cash_paid'].includes(entry.status) && (entry.status === 'cash_paid' || Number(entry.reservationExpiresAt || 0) > Date.now())).length;
 
-    const isReservationAttempt = status === 'pending';
-    const shouldBlockNewRegistration = isReservationAttempt || status === 'paid';
+    const selectedPaymentMethod = paymentMethod || (status === 'reserved_cash' ? 'cash' : 'paypal');
+    const isCashReservation = status === 'reserved_cash' || selectedPaymentMethod === 'cash';
+    const isReservationAttempt = status === 'pending' || isCashReservation;
+    const shouldBlockNewRegistration = isReservationAttempt || status === 'paid' || status === 'cash_paid';
 
-    if (shouldBlockNewRegistration && confirmedCount + pendingCount >= DEFAULT_CAPACITY) {
+    if (shouldBlockNewRegistration && paypalConfirmedCount + paypalPendingCount + cashReservedCount >= DEFAULT_CAPACITY) {
       throw new Error('This workshop is full and cannot accept new registrations.');
     }
 
+    if (isCashReservation && cashReservedCount >= CASH_CAPACITY) {
+      throw new Error('The six in-person payment reservations are already full.');
+    }
+
+    if (!isCashReservation && (status === 'pending' || status === 'paid') && paypalConfirmedCount + paypalPendingCount >= PAYPAL_CAPACITY) {
+      throw new Error('The six PayPal reservations are already full.');
+    }
+
+    const usedCodes = new Set(store.registrations.map((entry) => entry.publicCode).filter(Boolean));
     const registration = normalizeRegistration({
       id: generateRegistrationId(),
+      publicCode: generatePublicRegistrationCode(usedCodes),
       workshopId: normalizedWorkshopId,
       participantName: normalizedName,
       email: normalizedEmail,
       phone: normalizedPhone,
       status,
+      paymentMethod: selectedPaymentMethod,
+      cashPaymentStatus: isCashReservation ? 'pending' : null,
+      depositAmount: isCashReservation ? CASH_DEPOSIT_AMOUNT : 0,
+      depositStatus: isCashReservation ? 'pending' : null,
       reservationExpiresAt: reservationExpiresAt || (status === 'pending' ? Date.now() + DEFAULT_RESERVATION_MINUTES * 60 * 1000 : null),
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -214,12 +279,18 @@ async function updateWorkshopRegistration({
   });
 }
 
+/**
+ * @param {{registrationId?: string, workshopId?: string, paypalOrderId?: string|null, paypalCaptureId?: string|null, transactionId?: string|null, paymentProvider?: 'paypal'|'stripe', stripeSessionId?: string|null, stripePaymentIntentId?: string|null}} options
+ */
 async function confirmWorkshopRegistration({
   registrationId,
   workshopId,
   paypalOrderId,
   paypalCaptureId,
   transactionId,
+  paymentProvider = 'paypal',
+  stripeSessionId = undefined,
+  stripePaymentIntentId = undefined,
 }, filePath = resolveStoragePath()) {
   return withStoreLock(filePath, async () => {
     const store = await readStore(filePath);
@@ -238,8 +309,12 @@ async function confirmWorkshopRegistration({
       return registration;
     }
 
+    if (!['paypal', 'stripe'].includes(paymentProvider) || registration.paymentMethod !== paymentProvider || registration.status !== 'pending') {
+      throw new Error('Only pending online registrations can be confirmed by payment.');
+    }
+
     const currentMetrics = await getWorkshopMetrics(registration.workshopId, filePath);
-    if (currentMetrics.confirmedCount + currentMetrics.pendingCount >= DEFAULT_CAPACITY) {
+    if (currentMetrics.paypalConfirmedCount >= PAYPAL_CAPACITY) {
       const hasAnyPaidSeat = registration.status === 'paid';
       if (!hasAnyPaidSeat) {
         throw new Error('Workshop capacity is full. The reservation cannot be confirmed.');
@@ -247,14 +322,77 @@ async function confirmWorkshopRegistration({
     }
 
     registration.status = 'paid';
+    registration.paymentMethod = paymentProvider;
     registration.paypalOrderId = paypalOrderId || registration.paypalOrderId;
     registration.paypalCaptureId = paypalCaptureId || registration.paypalCaptureId;
     registration.transactionId = transactionId || registration.transactionId || paypalCaptureId || paypalOrderId;
+    registration.stripeSessionId = stripeSessionId || registration.stripeSessionId;
+    registration.stripePaymentIntentId = stripePaymentIntentId || registration.stripePaymentIntentId;
     registration.paymentApprovedAt = Date.now();
     registration.confirmedAt = Date.now();
     registration.reservationExpiresAt = null;
     registration.updatedAt = Date.now();
 
+    await writeStore(store, filePath);
+    return registration;
+  });
+}
+
+async function markCashPayment({ registrationId, cashPaymentStatus }, filePath = resolveStoragePath()) {
+  return withStoreLock(filePath, async () => {
+    const store = await readStore(filePath);
+    const registration = store.registrations.find((entry) => entry.id === registrationId);
+
+    if (!registration || registration.paymentMethod !== 'cash' || !['reserved_cash', 'cash_paid'].includes(registration.status)) {
+      throw new Error('Cash reservation could not be found.');
+    }
+
+    if (!['pending', 'paid'].includes(cashPaymentStatus)) {
+      throw new Error('Cash payment status must be pending or paid.');
+    }
+
+    registration.cashPaymentStatus = cashPaymentStatus;
+    registration.status = cashPaymentStatus === 'paid' ? 'cash_paid' : 'reserved_cash';
+    registration.paymentApprovedAt = cashPaymentStatus === 'paid' ? Date.now() : null;
+    registration.updatedAt = Date.now();
+    await writeStore(store, filePath);
+    return registration;
+  });
+}
+
+async function confirmCashDeposit({ registrationId, stripeSessionId, stripePaymentIntentId }, filePath = resolveStoragePath()) {
+  return withStoreLock(filePath, async () => {
+    const store = await readStore(filePath);
+    const registration = store.registrations.find((entry) => entry.id === registrationId);
+
+    if (!registration || registration.paymentMethod !== 'cash' || registration.status !== 'reserved_cash') {
+      throw new Error('Cash reservation could not be found.');
+    }
+
+    if (registration.depositStatus === 'paid') return registration;
+
+    registration.depositAmount = registration.depositAmount || CASH_DEPOSIT_AMOUNT;
+    registration.depositStatus = 'paid';
+    registration.stripeSessionId = stripeSessionId || registration.stripeSessionId;
+    registration.stripePaymentIntentId = stripePaymentIntentId || registration.stripePaymentIntentId;
+    registration.updatedAt = Date.now();
+    await writeStore(store, filePath);
+    return registration;
+  });
+}
+
+async function cancelWorkshopRegistration({ registrationId }, filePath = resolveStoragePath()) {
+  return withStoreLock(filePath, async () => {
+    const store = await readStore(filePath);
+    const registration = store.registrations.find((entry) => entry.id === registrationId);
+
+    if (!registration) {
+      throw new Error('Registration could not be found.');
+    }
+
+    registration.status = 'cancelled';
+    registration.reservationExpiresAt = null;
+    registration.updatedAt = Date.now();
     await writeStore(store, filePath);
     return registration;
   });
@@ -287,6 +425,12 @@ async function listWorkshopRegistrations(filePath = resolveStoragePath()) {
   return [...store.registrations].sort((a, b) => Number(b.createdAt) - Number(a.createdAt));
 }
 
+async function listActiveWorkshopRegistrations(filePath = resolveStoragePath()) {
+  await expirePendingReservations(filePath);
+  const registrations = await listWorkshopRegistrations(filePath);
+  return registrations.filter((entry) => !['cancelled', 'expired'].includes(entry.status));
+}
+
 async function getWorkshopRegistrationById(registrationId, filePath = resolveStoragePath()) {
   const store = await readStore(filePath);
   return store.registrations.find((entry) => entry.id === registrationId) || null;
@@ -295,16 +439,24 @@ async function getWorkshopRegistrationById(registrationId, filePath = resolveSto
 module.exports = {
   DEFAULT_CAPACITY,
   DEFAULT_RESERVATION_MINUTES,
+  PAYPAL_CAPACITY,
+  CASH_CAPACITY,
+  CASH_DEPOSIT_AMOUNT,
   expirePendingReservations,
   getWorkshopMetrics,
   createWorkshopRegistration,
   updateWorkshopRegistration,
   confirmWorkshopRegistration,
+  markCashPayment,
+  confirmCashDeposit,
+  cancelWorkshopRegistration,
   markAttendance,
   listWorkshopRegistrations,
+  listActiveWorkshopRegistrations,
   getWorkshopRegistrationById,
   readStore,
   writeStore,
   generateRegistrationId,
+  generatePublicRegistrationCode,
   resolveStoragePath,
 };

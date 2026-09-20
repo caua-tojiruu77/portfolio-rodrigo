@@ -30,8 +30,8 @@ export const workshops: Workshop[] = [
     image: "/img/workshopo-d.png",
     registrationUrl: "/contact?subject=Handstand%20Workshop%20Beginners",
     visible: true,
-    price: "€80",
-    amount: 80,
+    price: "€25",
+    amount: 25,
     currency: "EUR",
     translations: {
       en: {
@@ -42,7 +42,7 @@ export const workshops: Workshop[] = [
         location: "Studio Rodrigo Tavella",
         level: "Beginner",
         duration: "1h 30m per session",
-        price: "€80",
+        price: "€25",
         button: "Enroll now",
       },
       it: {
@@ -53,7 +53,7 @@ export const workshops: Workshop[] = [
         location: "Studio Rodrigo Tavella",
         level: "Principiante",
         duration: "1h 30m per sessione",
-        price: "€80",
+        price: "€25",
         button: "Iscriviti",
       },
       de: {
@@ -64,7 +64,7 @@ export const workshops: Workshop[] = [
         location: "Studio Rodrigo Tavella",
         level: "Anfänger",
         duration: "1 Std. 30 Min. pro Einheit",
-        price: "€80",
+        price: "€25",
         button: "Jetzt anmelden",
       },
     },
@@ -74,8 +74,8 @@ export const workshops: Workshop[] = [
     image: "/img/workshopo-d.png",
     registrationUrl: "/contact?subject=Handstand%20Workshop%20Intermediate%20Advanced",
     visible: true,
-    price: "€100",
-    amount: 100,
+    price: "€25",
+    amount: 25,
     currency: "EUR",
     translations: {
       en: {
@@ -86,7 +86,7 @@ export const workshops: Workshop[] = [
         location: "Studio Rodrigo Tavella",
         level: "Intermediate / Advanced",
         duration: "1h 30m per session",
-        price: "€100",
+        price: "€25",
         button: "Enroll now",
       },
       it: {
@@ -97,7 +97,7 @@ export const workshops: Workshop[] = [
         location: "Studio Rodrigo Tavella",
         level: "Intermedio / Avanzato",
         duration: "1h 30m per sessione",
-        price: "€100",
+        price: "€25",
         button: "Iscriviti",
       },
       de: {
@@ -108,7 +108,7 @@ export const workshops: Workshop[] = [
         location: "Studio Rodrigo Tavella",
         level: "Mittel / Fortgeschritten",
         duration: "1 Std. 30 Min. pro Einheit",
-        price: "€100",
+        price: "€25",
         button: "Jetzt anmelden",
       },
     },

@@ -18,6 +18,7 @@ export type ImageLibrary = {
   type: "image";
   path: string;
   items: ImageItem[];
+  comingSoon?: boolean;
   description?: Translations;
   cover?: string; // optional local cover image (path under /public)
 };
@@ -87,6 +88,10 @@ export const galleryLibraries: Record<string, GalleryLibrary> = {
       "18.webp",
       "19.webp",
       "20.webp",
+      "23.webp",
+      "24.webp",
+      "25.webp",
+      "26.webp",
     ],
     description: { en: "A selection of dance photos showing stage work and movement.", it: "Selezione di foto di danza che mostrano performance e movimento.", de: "Eine Auswahl an Tanzfotos, die Bühnenarbeit und Bewegung zeigen." },
   },
@@ -107,7 +112,11 @@ export const galleryLibraries: Record<string, GalleryLibrary> = {
       "4.webp",
       "10.webp",
       "11.webp",
+      "48.webp",
+      "38.webp",
+      "37.webp",
       "14.webp",
+      "36.webp",
       "15.webp",
       "16.webp",
       "17.webp",
@@ -126,6 +135,17 @@ export const galleryLibraries: Record<string, GalleryLibrary> = {
       "31.webp",
       "32.webp",
       "34.webp",
+      "40.webp",
+      "43.webp",
+      "46.webp",
+      "49.webp",
+      "41.webp",
+      "39.webp",
+      "44.webp",
+      "47.webp",
+      "45.webp",
+      "42.webp",
+      "35.webp",
     ],
     description: { en: "Artistic portraits and creative shots.", it: "Ritratti artistici e scatti creativi.", de: "Künstlerische Porträts und kreative Aufnahmen." },
   },
@@ -218,6 +238,7 @@ export const galleryLibraries: Record<string, GalleryLibrary> = {
   youtube: {
     title: { en: "YouTube", it: "YouTube", de: "YouTube" },
     type: "video",
+    cover: "/img/gallery/fotos-youtube/capa-yt.png",
     items: [
       "https://www.youtube.com/embed/pDB1ngvz_4Q?si=0jJiGxOOnmRHVKzn",
       "https://www.youtube.com/embed/DAf2vscAHiY",
