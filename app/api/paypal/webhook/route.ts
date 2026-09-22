@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { confirmWorkshopRegistration, getWorkshopRegistrationById, listWorkshopRegistrations, updateWorkshopRegistration } from "@/utils/workshopStore";
+import { confirmCashDeposit, confirmWorkshopRegistration, getWorkshopRegistrationById, listWorkshopRegistrations, updateWorkshopRegistration } from "@/utils/workshopStore";
 import { getWorkshopById } from "@/utils/workshops";
-import { sendWorkshopConfirmationEmail } from "@/utils/workshopEmail";
+import { sendWorkshopCashDepositConfirmationEmail, sendWorkshopConfirmationEmail } from "@/utils/workshopEmail";
 
 const PAYPAL_WEBHOOK_ID = process.env.PAYPAL_WEBHOOK_ID || "";
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || "";
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     const orderIdFromCapture = event.resource?.supplementary_data?.related_ids?.order_id;
     const registrations = referenceId ? [] : await listWorkshopRegistrations();
     const orderRegistration = orderIdFromCapture
-      ? registrations.find((entry) => entry.paypalOrderId === orderIdFromCapture)
+      ? registrations.find((entry: { paypalOrderId?: string | null }) => entry.paypalOrderId === orderIdFromCapture)
       : null;
     const resolvedReferenceId = referenceId || orderRegistration?.id;
     if (!resolvedReferenceId) {
@@ -94,7 +94,41 @@ export async function POST(req: Request) {
     }
 
     const transactionId = event.resource?.id || event.resource?.purchase_units?.[0]?.payments?.captures?.[0]?.id;
-    const orderId = event.resource?.id || event.resource?.purchase_units?.[0]?.payments?.captures?.[0]?.parent_payment;
+    const orderId = orderIdFromCapture || event.resource?.purchase_units?.[0]?.payments?.captures?.[0]?.parent_payment;
+
+    const isCashDeposit = registration.paymentMethod === "cash"
+      && registration.status === "reserved_cash"
+      && registration.depositStatus !== "paid";
+
+    if (isCashDeposit) {
+      const confirmedDeposit = await confirmCashDeposit({
+        registrationId: registration.id,
+        paypalOrderId: orderId,
+        paypalCaptureId: transactionId,
+        transactionId,
+      });
+
+      if (!confirmedDeposit.depositEmailSentAt) {
+        const emailResult = await sendWorkshopCashDepositConfirmationEmail({
+          participantName: confirmedDeposit.participantName,
+          email: confirmedDeposit.email,
+          workshopName: workshop.translations.en.name,
+          workshopDate: workshop.translations.en.date,
+          workshopTime: workshop.translations.en.date,
+          workshopLocation: workshop.translations.en.location,
+          registrationCode: confirmedDeposit.publicCode,
+        });
+        if (!emailResult.skipped) {
+          await updateWorkshopRegistration({
+            registrationId: confirmedDeposit.id,
+            workshopId: confirmedDeposit.workshopId,
+            patch: { depositEmailSentAt: Date.now() },
+          });
+        }
+      }
+
+      return NextResponse.json({ ok: true, confirmed: confirmedDeposit, deposit: true });
+    }
 
     const confirmed = await confirmWorkshopRegistration({
       registrationId: registration.id,

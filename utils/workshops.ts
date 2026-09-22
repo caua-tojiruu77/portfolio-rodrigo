@@ -24,7 +24,7 @@ export type Workshop = {
   };
 };
 
-export const workshops: Workshop[] = [
+const workshopTemplates: Workshop[] = [
   {
     id: "handstand-beginners",
     image: "/img/workshopo-d.png",
@@ -113,6 +113,122 @@ export const workshops: Workshop[] = [
       },
     },
   },
+];
+
+type WorkshopSchedule = {
+  en: string;
+  it: string;
+  de: string;
+};
+
+type WorkshopLevel = {
+  name: WorkshopSchedule;
+  level: WorkshopSchedule;
+};
+
+const createScheduledWorkshop = (
+  template: Workshop,
+  id: string,
+  registrationUrl: string,
+  schedule: WorkshopSchedule,
+  workshopLevel: WorkshopLevel,
+): Workshop => ({
+  ...template,
+  id,
+  registrationUrl,
+  translations: {
+    en: {
+      ...template.translations.en,
+      name: workshopLevel.name.en,
+      date: schedule.en,
+      level: workshopLevel.level.en,
+    },
+    it: {
+      ...template.translations.it,
+      name: workshopLevel.name.it,
+      date: schedule.it,
+      level: workshopLevel.level.it,
+    },
+    de: {
+      ...template.translations.de,
+      name: workshopLevel.name.de,
+      date: schedule.de,
+      level: workshopLevel.level.de,
+    },
+  },
+});
+
+const beginners: WorkshopLevel = {
+  name: {
+    en: "HANDSTAND WORKSHOP – BEGINNERS",
+    it: "HANDSTAND WORKSHOP – PRINCIPIANTI",
+    de: "HANDSTAND WORKSHOP – ANFÄNGER",
+  },
+  level: { en: "Beginners", it: "Principianti", de: "Anfänger" },
+};
+
+const advanced: WorkshopLevel = {
+  name: {
+    en: "HANDSTAND WORKSHOP – ADVANCED",
+    it: "HANDSTAND WORKSHOP – AVANZATO",
+    de: "HANDSTAND WORKSHOP – FORTGESCHRITTEN",
+  },
+  level: { en: "Advanced", it: "Avanzato", de: "Fortgeschritten" },
+};
+
+const october21: WorkshopSchedule = {
+  en: "October 21 · 18:00–19:30",
+  it: "21 ottobre · 18:00–19:30",
+  de: "21. Oktober · 18:00–19:30",
+};
+
+const october21Advanced: WorkshopSchedule = {
+  en: "October 21 · 19:30–21:00",
+  it: "21 ottobre · 19:30–21:00",
+  de: "21. Oktober · 19:30–21:00",
+};
+
+const october28: WorkshopSchedule = {
+  en: "October 28 · 18:00–19:30",
+  it: "28 ottobre · 18:00–19:30",
+  de: "28. Oktober · 18:00–19:30",
+};
+
+const october28Advanced: WorkshopSchedule = {
+  en: "October 28 · 19:30–21:00",
+  it: "28 ottobre · 19:30–21:00",
+  de: "28. Oktober · 19:30–21:00",
+};
+
+export const workshops: Workshop[] = [
+  createScheduledWorkshop(
+    workshopTemplates[0],
+    "handstand-beginners",
+    "/contact?subject=Handstand%20Workshop%20Beginners%20October%2021",
+    october21,
+    beginners,
+  ),
+  createScheduledWorkshop(
+    workshopTemplates[1],
+    "handstand-intermediate-advanced",
+    "/contact?subject=Handstand%20Workshop%20Advanced%20October%2021",
+    october21Advanced,
+    advanced,
+  ),
+  createScheduledWorkshop(
+    workshopTemplates[0],
+    "handstand-beginners-28",
+    "/contact?subject=Handstand%20Workshop%20Beginners%20October%2028",
+    october28,
+    beginners,
+  ),
+  createScheduledWorkshop(
+    workshopTemplates[1],
+    "handstand-advanced-28",
+    "/contact?subject=Handstand%20Workshop%20Advanced%20October%2028",
+    october28Advanced,
+    advanced,
+  ),
 ];
 
 export const getWorkshopContent = (

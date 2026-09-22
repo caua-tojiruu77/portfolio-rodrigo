@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { ArrowRight, CalendarDays, Clock3, MapPin, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ArrowRight, CalendarDays, CircleCheck, Clock3, MapPin, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { enabledWorkshops, getWorkshopContent, type Workshop } from "@/utils/workshops";
 
 type RegistrationState = {
@@ -14,7 +14,7 @@ type RegistrationState = {
   phone: string;
   reservationExpiresAt: number;
   status: string;
-  paymentMethod: "paypal" | "stripe" | "cash";
+  paymentMethod: "paypal" | "cash";
   cashPaymentStatus?: string | null;
   depositStatus?: "pending" | "paid" | null;
   depositAmount?: number;
@@ -22,10 +22,13 @@ type RegistrationState = {
 
 export default function WorkshopsFeed() {
   const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
-  const [formData, setFormData] = useState({ participantName: "", email: "", phone: "", paymentMethod: "paypal" as "paypal" | "stripe" | "cash" });
+  const [formData, setFormData] = useState({ participantName: "", email: "", phone: "", paymentMethod: "paypal" as "paypal" | "cash" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [reservation, setReservation] = useState<RegistrationState | null>(null);
   const [error, setError] = useState("");
+  const [paymentMessage, setPaymentMessage] = useState("");
+  const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
+  const handledPayPalOrder = useRef<string | null>(null);
 
   const [liveMetrics, setLiveMetrics] = useState<Record<string, {
     availableSlots: number;
@@ -37,26 +40,78 @@ export default function WorkshopsFeed() {
     ? liveMetrics[selectedWorkshop.id] || { paypalAvailableSlots: 6, cashAvailableSlots: 6 }
     : { paypalAvailableSlots: 6, cashAvailableSlots: 6 };
 
+  const refreshLiveMetrics = useCallback(async () => {
+    const response = await fetch("/api/workshops", { cache: "no-store" });
+    if (!response.ok) return;
+
+    const data = await response.json();
+    const nextState = Object.fromEntries(
+      (data.workshops || []).map((workshop: any) => [workshop.id, {
+        availableSlots: workshop.availableSlots,
+        isFull: workshop.isFull,
+        paypalAvailableSlots: workshop.paypalAvailableSlots,
+        cashAvailableSlots: workshop.cashAvailableSlots,
+      }]),
+    );
+
+    setLiveMetrics(nextState);
+  }, []);
+
   useEffect(() => {
-    const loadMetrics = async () => {
-      const response = await fetch("/api/workshops");
-      if (!response.ok) return;
+    void refreshLiveMetrics();
+    const refreshInterval = window.setInterval(() => void refreshLiveMetrics(), 10_000);
+    return () => window.clearInterval(refreshInterval);
+  }, [refreshLiveMetrics]);
 
-      const data = await response.json();
-      const nextState = Object.fromEntries(
-        (data.workshops || []).map((workshop: any) => [workshop.id, {
-          availableSlots: workshop.availableSlots,
-          isFull: workshop.isFull,
-          paypalAvailableSlots: workshop.paypalAvailableSlots,
-          cashAvailableSlots: workshop.cashAvailableSlots,
-        }]),
-      );
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const paymentResult = params.get("payment");
+    const orderId = params.get("token");
 
-      setLiveMetrics(nextState);
+    if (!paymentResult) return;
+
+    window.history.replaceState({}, "", window.location.pathname);
+
+    if (paymentResult === "cancelled") {
+      setError("Payment was cancelled. Your reservation has not been confirmed.");
+      return;
+    }
+
+    if (paymentResult !== "success" || !orderId || handledPayPalOrder.current === orderId) {
+      if (!orderId) setError("PayPal did not return a payment identifier. Please contact us before trying again.");
+      return;
+    }
+
+    handledPayPalOrder.current = orderId;
+    setIsConfirmingPayment(true);
+
+    const capturePayment = async () => {
+      try {
+        const response = await fetch("/api/paypal/capture", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId }),
+        });
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "We could not confirm the PayPal payment. Please contact us before paying again.");
+        }
+
+        sessionStorage.removeItem("workshopRegistration");
+        void refreshLiveMetrics();
+        setPaymentMessage(data.deposit
+          ? "Your €10 reservation fee was received. Your place is reserved and the remaining €15 is due on the workshop day."
+          : "Payment confirmed. Your workshop place is reserved.");
+      } catch (paymentError) {
+        setError(paymentError instanceof Error ? paymentError.message : "We could not confirm the PayPal payment.");
+      } finally {
+        setIsConfirmingPayment(false);
+      }
     };
 
-    void loadMetrics();
-  }, []);
+    void capturePayment();
+  }, [refreshLiveMetrics]);
 
   if (!enabledWorkshops.length) {
     return null;
@@ -101,6 +156,7 @@ export default function WorkshopsFeed() {
       }
 
       setReservation(data.registration);
+      void refreshLiveMetrics();
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Unable to reserve a place.");
     } finally {
@@ -111,10 +167,7 @@ export default function WorkshopsFeed() {
   const handleContinueToPayment = async () => {
     if (!selectedWorkshop || !reservation) return;
 
-    const endpoint = reservation.paymentMethod === "stripe"
-      ? "/api/stripe/create-checkout-session"
-      : "/api/paypal/create-order";
-    const response = await fetch(endpoint, {
+    const response = await fetch("/api/paypal/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -126,15 +179,6 @@ export default function WorkshopsFeed() {
     const data = await response.json();
     if (!response.ok || !data.ok) {
       setError(data.error || "Unable to start payment.");
-      return;
-    }
-
-    if (reservation.paymentMethod === "stripe") {
-      if (!data.checkoutUrl) {
-        setError("The card checkout URL was not returned.");
-        return;
-      }
-      window.location.href = data.checkoutUrl;
       return;
     }
 
@@ -151,7 +195,43 @@ export default function WorkshopsFeed() {
 
   return (
     <section className="text-white">
+      {isConfirmingPayment && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#050123]/85 p-4 backdrop-blur-sm" role="status" aria-live="polite">
+          <div className="w-full max-w-md rounded-3xl border border-brand-200/40 bg-[#0d0a24] p-8 text-center shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
+            <div className="mx-auto h-12 w-12 animate-spin rounded-full border-4 border-brand-200/25 border-t-brand-200" aria-hidden="true" />
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-brand-200">Please wait</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">Confirming your payment</h2>
+            <p className="mt-3 text-sm leading-6 text-gray-300">We are securely confirming your PayPal payment and reserving your workshop place.</p>
+          </div>
+        </div>
+      )}
+      {paymentMessage && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#050123]/85 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="payment-confirmation-title">
+          <div className="relative w-full max-w-md rounded-3xl border border-emerald-400/50 bg-[#0d0a24] p-7 text-center shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
+            <button
+              type="button"
+              aria-label="Close payment confirmation"
+              onClick={() => setPaymentMessage("")}
+              className="absolute right-4 top-4 rounded-full border border-white/10 p-2 text-white transition hover:bg-white/10"
+            >
+              <X size={18} />
+            </button>
+            <CircleCheck size={50} className="mx-auto text-emerald-300" aria-hidden="true" />
+            <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Payment successful</p>
+            <h2 id="payment-confirmation-title" className="mt-3 text-2xl font-semibold text-white">Your place is confirmed</h2>
+            <p className="mt-4 text-sm leading-6 text-gray-200">{paymentMessage}</p>
+            <button
+              type="button"
+              onClick={() => setPaymentMessage("")}
+              className="mt-6 w-full rounded-full bg-emerald-300 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-emerald-200"
+            >
+              Great, thank you
+            </button>
+          </div>
+        </div>
+      )}
       <div className="row w-full px-5 lg:px-0">
+        {error && !selectedWorkshop && <p className="mb-6 rounded-2xl border border-red-400/50 bg-red-400/10 px-4 py-3 text-sm text-red-100">{error}</p>}
         <div className="mb-10 text-center lg:text-left">
           <p className="mb-3 text-sm font-semibold uppercase tracking-[0.25em] text-brand-200">
             Workshops
@@ -279,17 +359,6 @@ export default function WorkshopsFeed() {
                     <input
                       type="radio"
                       name="paymentMethod"
-                      value="stripe"
-                      checked={formData.paymentMethod === "stripe"}
-                      onChange={() => setFormData({ ...formData, paymentMethod: "stripe" })}
-                      disabled={selectedSlotInfo.paypalAvailableSlots === 0}
-                    />
-                    <span><strong className="text-white">Pay by card</strong><br />Credit or debit card · {selectedSlotInfo.paypalAvailableSlots} available</span>
-                  </label>
-                  <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 text-sm text-gray-200">
-                    <input
-                      type="radio"
-                      name="paymentMethod"
                       value="cash"
                       checked={formData.paymentMethod === "cash"}
                       onChange={() => setFormData({ ...formData, paymentMethod: "cash" })}
@@ -350,32 +419,40 @@ export default function WorkshopsFeed() {
 
                 {reservation.paymentMethod === "cash" && reservation.depositStatus !== "paid" ? (
                   <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-100">
-                    <p className="font-semibold">Pay on the day · €5 deposit required</p>
-                    <p className="mt-2">Your place is temporarily reserved. Pay the €5 deposit now to confirm it. The remaining balance is paid in cash at the workshop.</p>
+                    <p className="font-semibold">Reserve your place · €10 confirmation fee</p>
+                    <p className="mt-2">To secure your place, please pay a €10 reservation fee via PayPal. It helps us hold places fairly in case of no-shows and is deducted from the €25 workshop fee. If your plans change, please let us know at least 48 hours before the workshop to request a refund. The remaining €15 is due on the workshop day.</p>
                     <button
                       type="button"
                       onClick={async () => {
-                        const response = await fetch("/api/stripe/create-cash-deposit-session", {
+                        const response = await fetch("/api/paypal/create-order", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify({ workshopId: selectedWorkshop.id, registrationId: reservation.id }),
                         });
                         const data = await response.json();
-                        if (!response.ok || !data.ok || !data.checkoutUrl) {
+                        if (!response.ok || !data.ok || !data.approvalUrl) {
                           setError(data.error || "Unable to start deposit payment.");
                           return;
                         }
-                        window.location.href = data.checkoutUrl;
+                        sessionStorage.setItem("workshopRegistration", JSON.stringify({
+                          workshopId: selectedWorkshop.id,
+                          registrationId: reservation.id,
+                          orderId: data.orderId,
+                          amount: 10,
+                          currency: selectedWorkshop.currency,
+                          paymentType: "cash_deposit",
+                        }));
+                        window.location.href = data.approvalUrl;
                       }}
                       className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d]"
                     >
-                      Pay €5 deposit by card
+                      Pay €10 reservation fee with PayPal
                     </button>
                   </div>
                 ) : reservation.paymentMethod === "cash" ? (
                   <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-100">
-                    <p className="font-semibold">Place confirmed · balance payable in cash</p>
-                    <p className="mt-2">Your €5 deposit was received. Pay the remaining balance in cash at the workshop.</p>
+                    <p className="font-semibold">Place confirmed</p>
+                    <p className="mt-2">Your €10 reservation fee was received and deducted from the workshop price. It helps us hold places fairly in case of no-shows. If your plans change, please let us know at least 48 hours before the workshop to request a refund. The remaining €15 is due on the workshop day.</p>
                   </div>
                 ) : (
                   <button
@@ -383,7 +460,7 @@ export default function WorkshopsFeed() {
                     onClick={handleContinueToPayment}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d]"
                   >
-                    {reservation.paymentMethod === "stripe" ? "Continue to card checkout" : "Continue to PayPal"}
+                    Continue to PayPal
                     <ArrowRight size={16} />
                   </button>
                 )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 type Registration = {
   id: string;
@@ -10,7 +11,7 @@ type Registration = {
   email: string;
   phone: string;
   status: string;
-  paymentMethod?: "paypal" | "stripe" | "cash" | null;
+  paymentMethod?: "paypal" | "cash" | null;
   cashPaymentStatus?: string | null;
   depositStatus?: string | null;
   depositAmount?: number;
@@ -56,6 +57,12 @@ function formatStatus(status: string) {
   }[status] || status;
 }
 
+function formatAttendanceStatus(status: Registration["attendanceStatus"]) {
+  if (status === "present") return "Present";
+  if (status === "absent") return "Absent";
+  return "Pending";
+}
+
 export default function AdminWorkshopsPanel({
   initialMetrics,
   initialRegistrations,
@@ -71,6 +78,7 @@ export default function AdminWorkshopsPanel({
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [selectedWorkshopId, setSelectedWorkshopId] = useState<string | null>(null);
 
   const refreshMetrics = async () => {
     const response = await fetch("/api/workshops", { cache: "no-store" });
@@ -123,6 +131,62 @@ export default function AdminWorkshopsPanel({
     }
   };
 
+  const updateAttendance = async (registrationId: string, attendanceStatus: "pending" | "present" | "absent") => {
+    await processAction(
+      registrationId,
+      "/api/admin/workshops/attendance",
+      { attendanceStatus },
+      `Attendance updated: ${attendanceStatus}.`,
+    );
+  };
+
+  const filteredRegistrations = registrations.filter((registration) => {
+    if (selectedWorkshopId && registration.workshopId !== selectedWorkshopId) return false;
+    const query = search.trim().toLowerCase();
+    if (!query) return true;
+    return [registration.publicCode, registration.participantName, registration.email]
+      .some((value) => value.toLowerCase().includes(query));
+  });
+
+  const renderAttendanceSelect = (registration: Registration, isBusy: boolean) => (
+    <div className="relative min-w-40">
+      <label className="sr-only" htmlFor={`attendance-${registration.id}`}>Attendance status for {registration.participantName}</label>
+      <select
+        id={`attendance-${registration.id}`}
+        value={registration.attendanceStatus || "pending"}
+        disabled={isBusy}
+        onChange={(event) => void updateAttendance(registration.id, event.target.value as "pending" | "present" | "absent")}
+        className={`w-full appearance-none rounded-full border py-2 pl-4 pr-10 text-sm font-semibold text-black shadow-sm outline-none transition focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+          registration.attendanceStatus === "present"
+            ? "border-emerald-400 bg-emerald-300 focus:ring-emerald-300/50"
+            : registration.attendanceStatus === "absent"
+              ? "border-red-400 bg-red-300 focus:ring-red-300/50"
+              : "border-amber-400 bg-amber-300 focus:ring-amber-300/50"
+        }`}
+      >
+        <option value="pending">{formatAttendanceStatus(null)}</option>
+        <option value="present">Present</option>
+        <option value="absent">Absent</option>
+      </select>
+      <ChevronDown size={17} aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-black" />
+    </div>
+  );
+
+  const renderActions = (registration: Registration, isBusy: boolean) => (
+    <div className="flex flex-wrap gap-2">
+      {registration.paymentMethod === "cash" && registration.status === "reserved_cash" && registration.depositStatus === "paid" && (
+        <button type="button" disabled={isBusy} onClick={() => processAction(registration.id, "/api/admin/workshops/payment", { cashPaymentStatus: "paid" }, "Cash payment marked as received.")} className="min-w-28 whitespace-nowrap rounded-full border border-amber-400 bg-amber-300 px-4 py-2 text-xs font-semibold text-black transition hover:bg-amber-200 disabled:opacity-50">
+          {isBusy ? "Updating..." : "Mark paid"}
+        </button>
+      )}
+      {registration.status !== "cancelled" && registration.status !== "expired" && (
+        <button type="button" disabled={isBusy} onClick={() => processAction(registration.id, "/api/admin/workshops/cancel", {}, "Reservation cancelled and seat released.")} className="rounded-full border border-red-400 bg-red-300 px-3 py-2 text-xs font-semibold leading-4 text-black transition hover:bg-red-200 disabled:opacity-50">
+          {isBusy ? "Updating..." : "Cancel"}
+        </button>
+      )}
+    </div>
+  );
+
   return (
     <>
       {message && <p className="mb-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{message}</p>}
@@ -138,20 +202,68 @@ export default function AdminWorkshopsPanel({
         />
       </label>
 
-      <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <span className="text-sm text-gray-300">Showing:</span>
+        <button
+          type="button"
+          onClick={() => setSelectedWorkshopId(null)}
+          className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${selectedWorkshopId === null ? "border-brand-200 bg-brand-200 text-[#050123]" : "border-white/15 bg-white/5 text-white hover:border-brand-200"}`}
+        >
+          All workshops
+        </button>
+      </div>
+
+      <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {metrics.map((workshop) => (
-          <div key={workshop.id} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <button
+            type="button"
+            key={workshop.id}
+            onClick={() => setSelectedWorkshopId(workshop.id)}
+            aria-pressed={selectedWorkshopId === workshop.id}
+            className={`rounded-2xl border p-5 text-left transition focus:outline-none focus:ring-2 focus:ring-brand-200 ${selectedWorkshopId === workshop.id ? "border-brand-200 bg-brand-200/15 shadow-[0_0_0_1px_rgba(255,215,11,0.25)]" : "border-white/10 bg-white/5 hover:border-brand-200/60 hover:bg-white/10"}`}
+          >
             <p className="text-xs uppercase tracking-[0.18em] text-brand-200">{workshop.id}</p>
             <h2 className="mt-2 text-xl font-semibold text-white">{workshop.name}</h2>
             <p className="mt-3 text-sm text-gray-200">Capacity: {workshop.capacity}</p>
             <p className="text-sm text-gray-200">PayPal: {workshop.paypalConfirmedCount + workshop.paypalPendingCount}/{workshop.paypalCapacity}</p>
             <p className="text-sm text-gray-200">Pay on the day: {workshop.cashReservedCount}/{workshop.cashCapacity}</p>
             <p className="text-sm text-gray-200">Available: {workshop.availableSlots}</p>
-          </div>
+            <p className="mt-4 text-xs font-semibold uppercase tracking-[0.14em] text-brand-200">View registrations →</p>
+          </button>
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+      <div className="space-y-3 md:hidden">
+        {filteredRegistrations.map((registration) => {
+          const isBusy = busyId === registration.id;
+          return (
+            <article key={registration.id} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-mono text-sm font-semibold text-brand-200">{registration.publicCode}</p>
+                  <h2 className="mt-1 break-words text-lg font-semibold text-white">{registration.participantName}</h2>
+                  <p className="mt-1 break-all text-sm text-gray-300">{registration.email}</p>
+                  <p className="text-sm text-gray-300">{registration.phone}</p>
+                </div>
+                <span className="shrink-0 rounded-full border border-white/15 px-2 py-1 text-xs text-gray-200">{registration.paymentMethod === "cash" ? "Pay on day" : "PayPal"}</span>
+              </div>
+              <div className="mt-4 grid gap-3 border-t border-white/10 pt-4 text-sm">
+                <p><span className="text-gray-400">Workshop:</span> <span className="break-words text-gray-100">{registration.workshopId}</span></p>
+                <p><span className="text-gray-400">Payment:</span> {formatStatus(registration.status)}</p>
+                {registration.paymentMethod === "cash" && <p className="text-xs text-gray-400">PayPal deposit: €{registration.depositAmount || 10} ({registration.depositStatus || "pending"}) · €15 due in cash</p>}
+                <div>
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400">Attendance</p>
+                  {renderAttendanceSelect(registration, isBusy)}
+                </div>
+                {renderActions(registration, isBusy)}
+              </div>
+            </article>
+          );
+        })}
+        {!filteredRegistrations.length && <p className="rounded-2xl border border-white/10 p-4 text-sm text-gray-300">No registrations found.</p>}
+      </div>
+
+      <div className="hidden overflow-hidden rounded-2xl border border-white/10 bg-white/5 md:block">
         <div className="overflow-x-auto">
           <table className="min-w-full text-left text-sm text-gray-200">
             <thead className="bg-white/5 text-gray-100">
@@ -164,16 +276,12 @@ export default function AdminWorkshopsPanel({
                 <th className="px-4 py-3">Payment</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">PayPal</th>
+                <th className="px-4 py-3">Attendance</th>
                 <th className="px-4 py-3">Ações</th>
               </tr>
             </thead>
             <tbody>
-              {registrations.filter((registration) => {
-                const query = search.trim().toLowerCase();
-                if (!query) return true;
-                return [registration.publicCode, registration.participantName, registration.email]
-                  .some((value) => value.toLowerCase().includes(query));
-              }).map((registration) => {
+              {filteredRegistrations.map((registration) => {
                 const isBusy = busyId === registration.id;
                 const paymentReference = registration.transactionId || registration.paypalOrderId || registration.paypalCaptureId || "—";
 
@@ -184,52 +292,18 @@ export default function AdminWorkshopsPanel({
                     <td className="px-4 py-3">{registration.participantName}</td>
                     <td className="px-4 py-3">{registration.email}</td>
                     <td className="px-4 py-3">{registration.phone}</td>
-                    <td className="px-4 py-3">{registration.paymentMethod === "cash" ? "Pay on the day" : registration.paymentMethod === "stripe" ? "Paid by card" : "Paid via PayPal"}</td>
+                    <td className="px-4 py-3">{registration.paymentMethod === "cash" ? "Pay on the day" : "Paid via PayPal"}</td>
                     <td className="px-4 py-3">
                       <span>{formatStatus(registration.status)}</span>
-                      {registration.paymentMethod === "cash" && <span className="block text-xs text-gray-400">Deposit: {registration.depositStatus || "pending"}</span>}
+                      {registration.paymentMethod === "cash" && <span className="block text-xs text-gray-400">PayPal deposit: €{registration.depositAmount || 10} ({registration.depositStatus || "pending"}) · €15 due in cash</span>}
                       <span className="block text-xs text-gray-400">Reservation: {formatOptionalDate(registration.reservationExpiresAt)}</span>
                     </td>
                     <td className="px-4 py-3">{paymentReference}</td>
                     <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-2">
-                        {registration.paymentMethod === "cash" && registration.status === "reserved_cash" && (
-                          <button
-                            type="button"
-                            disabled={isBusy}
-                            onClick={() => processAction(registration.id, "/api/admin/workshops/payment", { cashPaymentStatus: "paid" }, "Cash payment marked as received.")}
-                            className="rounded-full border border-brand-200/60 bg-brand-200/10 px-2 py-1 text-xs text-brand-100 disabled:opacity-50"
-                          >
-                            {isBusy ? "Updating..." : "Mark paid"}
-                          </button>
-                        )}
-                        {registration.status !== "cancelled" && registration.status !== "expired" && (
-                          <button
-                            type="button"
-                            disabled={isBusy}
-                            onClick={() => processAction(registration.id, "/api/admin/workshops/cancel", {}, "Reservation cancelled and seat released.")}
-                            className="rounded-full border border-orange-500/60 bg-orange-500/10 px-2 py-1 text-xs text-orange-200 disabled:opacity-50"
-                          >
-                            {isBusy ? "Updating..." : "Cancel reservation"}
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          disabled={isBusy}
-                          onClick={() => processAction(registration.id, "/api/admin/workshops/attendance", { attendanceStatus: "present" }, "Attendance marked as present.")}
-                          className="rounded-full border border-emerald-500/60 bg-emerald-500/10 px-2 py-1 text-xs text-emerald-200 disabled:opacity-50"
-                        >
-                          Present
-                        </button>
-                        <button
-                          type="button"
-                          disabled={isBusy}
-                          onClick={() => processAction(registration.id, "/api/admin/workshops/attendance", { attendanceStatus: "absent" }, "Attendance marked as absent.")}
-                          className="rounded-full border border-red-500/60 bg-red-500/10 px-2 py-1 text-xs text-red-200 disabled:opacity-50"
-                        >
-                          Absent
-                        </button>
-                      </div>
+                      {renderAttendanceSelect(registration, isBusy)}
+                    </td>
+                    <td className="px-4 py-3">
+                      {renderActions(registration, isBusy)}
                     </td>
                   </tr>
                 );

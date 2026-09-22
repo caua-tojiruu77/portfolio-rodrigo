@@ -25,11 +25,14 @@ export async function POST(req: Request) {
     const registrationId = String(body.registrationId || "").trim();
     const attendanceStatus = String(body.attendanceStatus || "").trim();
 
-    if (!registrationId || !["present", "absent"].includes(attendanceStatus)) {
-      return NextResponse.json({ ok: false, error: "Registration ID and valid attendance status are required." }, { status: 400 });
+    if (!registrationId || !["pending", "present", "absent"].includes(attendanceStatus)) {
+      return NextResponse.json({ ok: false, error: "Registration ID and a valid attendance status are required." }, { status: 400 });
     }
 
-    const updated = await markAttendance({ registrationId, attendanceStatus });
+    const updated = await markAttendance({
+      registrationId,
+      attendanceStatus: attendanceStatus === "pending" ? null : attendanceStatus,
+    });
     return NextResponse.json({ ok: true, registration: updated });
   } catch (error: any) {
     return NextResponse.json({ ok: false, error: error?.message || "Unable to update attendance." }, { status: 500 });

@@ -19,7 +19,7 @@ async function sendWorkshopEmail({
   workshopLocation,
   registrationCode,
   paymentMethod = "paypal",
-}: WorkshopEmailData & { paymentMethod?: "paypal" | "stripe" | "cash" | "cash_deposit" }) {
+}: WorkshopEmailData & { paymentMethod?: "paypal" | "cash" | "cash_deposit" | "cash_paid" }) {
   const smtpHost = process.env.SMTP_HOST;
   const smtpPort = process.env.SMTP_PORT;
   const smtpUser = process.env.SMTP_USER;
@@ -39,33 +39,34 @@ async function sendWorkshopEmail({
 
   const isCash = paymentMethod === "cash";
   const isCashDeposit = paymentMethod === "cash_deposit";
+  const isCashPaid = paymentMethod === "cash_paid";
   const text = [
     `Hello ${participantName},`,
     "",
-    isCashDeposit ? `Your place at the workshop ${workshopName} is confirmed.` : isCash ? `Your place at the workshop ${workshopName} has been reserved.` : `Your registration for the workshop ${workshopName} has been confirmed.`,
+    isCashDeposit || isCashPaid ? `Your place at the workshop ${workshopName} is confirmed.` : isCash ? `Your place at the workshop ${workshopName} has been reserved.` : `Your registration for the workshop ${workshopName} has been confirmed.`,
     `Registration Code: ${registrationCode}`,
     workshopDate ? `Date: ${workshopDate}` : "",
     workshopTime ? `Time: ${workshopTime}` : "",
     workshopLocation ? `Location: ${workshopLocation}` : "",
-    isCashDeposit ? "Payment: €5 deposit received by card. The remaining balance is due in cash on the workshop day." : isCash ? "Payment: a €5 reservation deposit is required by card; the remaining balance is due in cash on the workshop day." : `Payment: confirmed via ${paymentMethod === "stripe" ? "card/Stripe" : "PayPal"}.`,
+    isCashDeposit ? "Payment: we received your €10 PayPal reservation fee. It is deducted from the workshop price and helps us hold places fairly in case of no-shows. If your plans change, please let us know at least 48 hours before the workshop to request a refund. The remaining €15 is due on the workshop day." : isCashPaid ? "Payment: the remaining €15 was received on the workshop day." : isCash ? "Payment: a €10 PayPal reservation fee is required to confirm your place. It is deducted from the workshop price and helps us hold places fairly in case of no-shows. If your plans change, please let us know at least 48 hours before the workshop to request a refund. The remaining €15 is due on the workshop day." : "Payment: confirmed via PayPal.",
     "Please present this Registration Code on the day of the workshop.",
   ].filter(Boolean).join("\n");
 
   await transporter.sendMail({
     from: fromEmail,
     to: email,
-    subject: isCashDeposit ? `Workshop place confirmed - ${workshopName}` : isCash ? `Workshop reservation - ${workshopName}` : `Workshop registration confirmed - ${workshopName}`,
+    subject: isCashDeposit || isCashPaid ? `Workshop place confirmed - ${workshopName}` : isCash ? `Workshop reservation - ${workshopName}` : `Workshop registration confirmed - ${workshopName}`,
     text,
     html: `
       <div style="font-family:Arial,sans-serif; color:#111; line-height:1.6;">
-        <h2>${isCashDeposit ? "Workshop place confirmed" : isCash ? "Workshop reservation" : "Workshop registration confirmed"}</h2>
+        <h2>${isCashDeposit || isCashPaid ? "Workshop place confirmed" : isCash ? "Workshop reservation" : "Workshop registration confirmed"}</h2>
         <p>Hello <strong>${participantName}</strong>,</p>
-        <p>${isCashDeposit ? `Your place at <strong>${workshopName}</strong> is confirmed.` : isCash ? `Your place at <strong>${workshopName}</strong> has been reserved.` : `Your registration for <strong>${workshopName}</strong> has been confirmed.`}</p>
+        <p>${isCashDeposit || isCashPaid ? `Your place at <strong>${workshopName}</strong> is confirmed.` : isCash ? `Your place at <strong>${workshopName}</strong> has been reserved.` : `Your registration for <strong>${workshopName}</strong> has been confirmed.`}</p>
         <p><strong>Registration Code:</strong> ${registrationCode}</p>
         ${workshopDate ? `<p><strong>Date:</strong> ${workshopDate}</p>` : ""}
         ${workshopTime ? `<p><strong>Time:</strong> ${workshopTime}</p>` : ""}
         ${workshopLocation ? `<p><strong>Location:</strong> ${workshopLocation}</p>` : ""}
-        <p><strong>Status:</strong> ${isCashDeposit ? "€5 deposit received; remaining balance payable in cash on the workshop day." : isCash ? "reservation created; a €5 deposit is required to confirm the place." : `payment confirmed via ${paymentMethod === "stripe" ? "card/Stripe" : "PayPal"}.`}</p>
+        <p><strong>Status:</strong> ${isCashDeposit ? "€10 PayPal reservation fee received and deducted from the workshop price; remaining €15 due on the workshop day. The reservation fee helps us hold places fairly in case of no-shows. Please let us know at least 48 hours before the workshop to request a refund." : isCashPaid ? "remaining €15 received on the workshop day." : isCash ? "reservation created; a €10 PayPal reservation fee is required to confirm the place. Please let us know at least 48 hours before the workshop to request a refund if your plans change." : "payment confirmed via PayPal."}</p>
         <p>Please present this Registration Code on the day of the workshop.</p>
       </div>
     `,
@@ -74,7 +75,7 @@ async function sendWorkshopEmail({
   return { ok: true, skipped: false };
 }
 
-export function sendWorkshopConfirmationEmail(data: WorkshopEmailData & { paymentMethod?: "paypal" | "stripe" }) {
+export function sendWorkshopConfirmationEmail(data: WorkshopEmailData & { paymentMethod?: "paypal" }) {
   return sendWorkshopEmail({ ...data, paymentMethod: data.paymentMethod || "paypal" });
 }
 
@@ -84,6 +85,10 @@ export function sendWorkshopCashReservationEmail(data: WorkshopEmailData) {
 
 export function sendWorkshopCashDepositConfirmationEmail(data: WorkshopEmailData) {
   return sendWorkshopEmail({ ...data, paymentMethod: "cash_deposit" });
+}
+
+export function sendWorkshopCashBalancePaymentEmail(data: WorkshopEmailData) {
+  return sendWorkshopEmail({ ...data, paymentMethod: "cash_paid" });
 }
 
 export async function sendWorkshopCancellationEmail(data: WorkshopEmailData) {

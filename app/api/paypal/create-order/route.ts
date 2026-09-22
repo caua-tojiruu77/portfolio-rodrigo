@@ -53,9 +53,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Reservation could not be found." }, { status: 404 });
     }
 
-    if (existingRegistration.paymentMethod !== "paypal" || existingRegistration.status !== "pending") {
-      return NextResponse.json({ ok: false, error: "Only pending PayPal reservations can start checkout." }, { status: 409 });
+    const isCashDeposit = existingRegistration.paymentMethod === "cash"
+      && existingRegistration.status === "reserved_cash"
+      && existingRegistration.depositStatus !== "paid";
+    const isOnlinePayment = existingRegistration.paymentMethod === "paypal"
+      && existingRegistration.status === "pending";
+
+    if (!isOnlinePayment && !isCashDeposit) {
+      return NextResponse.json({ ok: false, error: "This reservation is not waiting for a PayPal payment." }, { status: 409 });
     }
+
+    const paymentAmount = isCashDeposit ? 10 : Number(workshop.amount || 0);
 
     const accessToken = await getPayPalAccessToken();
     const orderData = {
@@ -64,9 +72,11 @@ export async function POST(req: Request) {
         reference_id: registrationId,
         amount: {
           currency_code: workshop.currency || "EUR",
-          value: String(workshop.amount || 0),
+          value: String(paymentAmount),
         },
-        description: `Workshop registration - ${workshop.translations.it.name}`,
+        description: isCashDeposit
+          ? `Reservation deposit - ${workshop.translations.it.name}`
+          : `Workshop registration - ${workshop.translations.it.name}`,
       }],
       application_context: {
         brand_name: "Rodrigo Tavella Workshops",
@@ -98,7 +108,7 @@ export async function POST(req: Request) {
       workshopId: workshop.id,
       patch: {
         paypalOrderId: data.id,
-        status: "pending",
+        status: existingRegistration.status,
       },
     });
 

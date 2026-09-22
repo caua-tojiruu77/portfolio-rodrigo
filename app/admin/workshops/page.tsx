@@ -25,8 +25,8 @@ export default async function AdminWorkshopsPage() {
   );
 
   return (
-    <main className="row px-5 pb-16 pt-10 text-white lg:px-0">
-          <h1 className="mb-6 text-3xl font-bold text-white">Workshop Administration</h1>
+    <main className="w-full px-4 pb-16 pt-10 text-white sm:px-6 xl:px-10">
+      <h1 className="mb-6 text-3xl font-bold text-white">Workshop Administration</h1>
 
       <AdminWorkshopsPanel initialMetrics={metrics} initialRegistrations={registrations} />
     </main>

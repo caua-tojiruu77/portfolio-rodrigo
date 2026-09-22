@@ -1,12 +1,21 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const database = require('./workshopDatabase');
 
 const DEFAULT_CAPACITY = 12;
 const PAYPAL_CAPACITY = 6;
 const CASH_CAPACITY = 6;
 const DEFAULT_RESERVATION_MINUTES = 15;
-const CASH_DEPOSIT_AMOUNT = 5;
+const CASH_DEPOSIT_AMOUNT = 10;
+const CASH_REMAINDER_AMOUNT = 15;
+const CASH_RESERVATION_TOTAL_AMOUNT = CASH_DEPOSIT_AMOUNT + CASH_REMAINDER_AMOUNT;
 const PUBLIC_CODE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
+
+// An explicit local storage path is used by development tests. Production and
+// normal local operation use Postgres whenever DATABASE_URL is configured.
+function useDatabase() {
+  return database.isDatabaseConfigured() && !process.env.WORKSHOP_STORAGE_PATH;
+}
 
 function resolveStoragePath() {
   return process.env.WORKSHOP_STORAGE_PATH || path.join(process.cwd(), 'data', 'workshop-store.json');
@@ -116,8 +125,6 @@ function normalizeRegistration(registration) {
     depositEmailSentAt: registration.depositEmailSentAt || null,
     paypalOrderId: registration.paypalOrderId || null,
     paypalCaptureId: registration.paypalCaptureId || null,
-    stripeSessionId: registration.stripeSessionId || null,
-    stripePaymentIntentId: registration.stripePaymentIntentId || null,
     transactionId: registration.transactionId || null,
     attendanceStatus: registration.attendanceStatus || null,
     attendeeCheckInAt: registration.attendeeCheckInAt || null,
@@ -154,7 +161,7 @@ async function expirePendingReservations(filePath = resolveStoragePath()) {
 async function getWorkshopMetrics(workshopId, filePath = resolveStoragePath()) {
   const store = await readStore(filePath);
   const workshopRegistrations = store.registrations.filter((entry) => entry.workshopId === workshopId);
-  const paypalConfirmedCount = workshopRegistrations.filter((entry) => entry.status === 'paid' && ['paypal', 'stripe'].includes(entry.paymentMethod)).length;
+  const paypalConfirmedCount = workshopRegistrations.filter((entry) => entry.status === 'paid' && entry.paymentMethod === 'paypal').length;
   const pendingCount = workshopRegistrations.filter((entry) => entry.status === 'pending' && Number(entry.reservationExpiresAt || 0) > Date.now()).length;
   const cashReservedCount = workshopRegistrations.filter((entry) => ['reserved_cash', 'cash_paid'].includes(entry.status) && (entry.status === 'cash_paid' || Number(entry.reservationExpiresAt || 0) > Date.now())).length;
   const expiredCount = workshopRegistrations.filter((entry) => entry.status === 'expired').length;
@@ -204,7 +211,7 @@ async function createWorkshopRegistration({
     }
 
     const activeRegistrations = store.registrations.filter((entry) => entry.workshopId === normalizedWorkshopId && entry.status !== 'cancelled' && entry.status !== 'expired');
-    const paypalConfirmedCount = activeRegistrations.filter((entry) => entry.status === 'paid' && ['paypal', 'stripe'].includes(entry.paymentMethod)).length;
+    const paypalConfirmedCount = activeRegistrations.filter((entry) => entry.status === 'paid' && entry.paymentMethod === 'paypal').length;
     const paypalPendingCount = activeRegistrations.filter((entry) => entry.status === 'pending' && Number(entry.reservationExpiresAt || 0) > Date.now()).length;
     const cashReservedCount = activeRegistrations.filter((entry) => ['reserved_cash', 'cash_paid'].includes(entry.status) && (entry.status === 'cash_paid' || Number(entry.reservationExpiresAt || 0) > Date.now())).length;
 
@@ -242,7 +249,7 @@ async function createWorkshopRegistration({
       createdAt: Date.now(),
       updatedAt: Date.now(),
       currency,
-      amount,
+      amount: isCashReservation ? CASH_RESERVATION_TOTAL_AMOUNT : amount,
     });
 
     store.registrations.push(registration);
@@ -280,7 +287,7 @@ async function updateWorkshopRegistration({
 }
 
 /**
- * @param {{registrationId?: string, workshopId?: string, paypalOrderId?: string|null, paypalCaptureId?: string|null, transactionId?: string|null, paymentProvider?: 'paypal'|'stripe', stripeSessionId?: string|null, stripePaymentIntentId?: string|null}} options
+ * @param {{registrationId?: string, workshopId?: string, paypalOrderId?: string|null, paypalCaptureId?: string|null, transactionId?: string|null}} options
  */
 async function confirmWorkshopRegistration({
   registrationId,
@@ -288,9 +295,6 @@ async function confirmWorkshopRegistration({
   paypalOrderId,
   paypalCaptureId,
   transactionId,
-  paymentProvider = 'paypal',
-  stripeSessionId = undefined,
-  stripePaymentIntentId = undefined,
 }, filePath = resolveStoragePath()) {
   return withStoreLock(filePath, async () => {
     const store = await readStore(filePath);
@@ -309,7 +313,7 @@ async function confirmWorkshopRegistration({
       return registration;
     }
 
-    if (!['paypal', 'stripe'].includes(paymentProvider) || registration.paymentMethod !== paymentProvider || registration.status !== 'pending') {
+    if (registration.paymentMethod !== 'paypal' || registration.status !== 'pending') {
       throw new Error('Only pending online registrations can be confirmed by payment.');
     }
 
@@ -322,12 +326,10 @@ async function confirmWorkshopRegistration({
     }
 
     registration.status = 'paid';
-    registration.paymentMethod = paymentProvider;
+    registration.paymentMethod = 'paypal';
     registration.paypalOrderId = paypalOrderId || registration.paypalOrderId;
     registration.paypalCaptureId = paypalCaptureId || registration.paypalCaptureId;
     registration.transactionId = transactionId || registration.transactionId || paypalCaptureId || paypalOrderId;
-    registration.stripeSessionId = stripeSessionId || registration.stripeSessionId;
-    registration.stripePaymentIntentId = stripePaymentIntentId || registration.stripePaymentIntentId;
     registration.paymentApprovedAt = Date.now();
     registration.confirmedAt = Date.now();
     registration.reservationExpiresAt = null;
@@ -351,16 +353,22 @@ async function markCashPayment({ registrationId, cashPaymentStatus }, filePath =
       throw new Error('Cash payment status must be pending or paid.');
     }
 
+    if (cashPaymentStatus === 'paid' && registration.depositStatus !== 'paid') {
+      throw new Error('The €10 PayPal deposit must be confirmed before recording the cash balance.');
+    }
+
     registration.cashPaymentStatus = cashPaymentStatus;
     registration.status = cashPaymentStatus === 'paid' ? 'cash_paid' : 'reserved_cash';
     registration.paymentApprovedAt = cashPaymentStatus === 'paid' ? Date.now() : null;
+    registration.attendanceStatus = cashPaymentStatus === 'paid' ? 'present' : registration.attendanceStatus;
+    registration.attendeeCheckInAt = cashPaymentStatus === 'paid' ? Date.now() : registration.attendeeCheckInAt;
     registration.updatedAt = Date.now();
     await writeStore(store, filePath);
     return registration;
   });
 }
 
-async function confirmCashDeposit({ registrationId, stripeSessionId, stripePaymentIntentId }, filePath = resolveStoragePath()) {
+async function confirmCashDeposit({ registrationId, paypalOrderId, paypalCaptureId, transactionId }, filePath = resolveStoragePath()) {
   return withStoreLock(filePath, async () => {
     const store = await readStore(filePath);
     const registration = store.registrations.find((entry) => entry.id === registrationId);
@@ -371,10 +379,12 @@ async function confirmCashDeposit({ registrationId, stripeSessionId, stripePayme
 
     if (registration.depositStatus === 'paid') return registration;
 
-    registration.depositAmount = registration.depositAmount || CASH_DEPOSIT_AMOUNT;
+    registration.amount = CASH_RESERVATION_TOTAL_AMOUNT;
+    registration.depositAmount = CASH_DEPOSIT_AMOUNT;
     registration.depositStatus = 'paid';
-    registration.stripeSessionId = stripeSessionId || registration.stripeSessionId;
-    registration.stripePaymentIntentId = stripePaymentIntentId || registration.stripePaymentIntentId;
+    registration.paypalOrderId = paypalOrderId || registration.paypalOrderId;
+    registration.paypalCaptureId = paypalCaptureId || registration.paypalCaptureId;
+    registration.transactionId = transactionId || registration.transactionId || paypalCaptureId || paypalOrderId;
     registration.updatedAt = Date.now();
     await writeStore(store, filePath);
     return registration;
@@ -407,8 +417,8 @@ async function markAttendance({ registrationId, attendanceStatus }, filePath = r
       throw new Error('Registration could not be found.');
     }
 
-    if (!['present', 'absent'].includes(attendanceStatus)) {
-      throw new Error('Attendance status must be present or absent.');
+    if (attendanceStatus !== null && !['present', 'absent'].includes(attendanceStatus)) {
+      throw new Error('Attendance status must be pending, present, or absent.');
     }
 
     registration.attendanceStatus = attendanceStatus;
@@ -442,18 +452,20 @@ module.exports = {
   PAYPAL_CAPACITY,
   CASH_CAPACITY,
   CASH_DEPOSIT_AMOUNT,
-  expirePendingReservations,
-  getWorkshopMetrics,
-  createWorkshopRegistration,
-  updateWorkshopRegistration,
-  confirmWorkshopRegistration,
-  markCashPayment,
-  confirmCashDeposit,
-  cancelWorkshopRegistration,
-  markAttendance,
-  listWorkshopRegistrations,
-  listActiveWorkshopRegistrations,
-  getWorkshopRegistrationById,
+  CASH_REMAINDER_AMOUNT,
+  CASH_RESERVATION_TOTAL_AMOUNT,
+  expirePendingReservations: (...args) => useDatabase() ? database.expireAll() : expirePendingReservations(...args),
+  getWorkshopMetrics: (...args) => useDatabase() ? database.metrics(...args) : getWorkshopMetrics(...args),
+  createWorkshopRegistration: (...args) => useDatabase() ? database.create(...args) : createWorkshopRegistration(...args),
+  updateWorkshopRegistration: (...args) => useDatabase() ? database.update(...args) : updateWorkshopRegistration(...args),
+  confirmWorkshopRegistration: (...args) => useDatabase() ? database.confirm(...args) : confirmWorkshopRegistration(...args),
+  markCashPayment: (...args) => useDatabase() ? database.cashPayment(...args) : markCashPayment(...args),
+  confirmCashDeposit: (...args) => useDatabase() ? database.confirmDeposit(...args) : confirmCashDeposit(...args),
+  cancelWorkshopRegistration: (...args) => useDatabase() ? database.cancel(...args) : cancelWorkshopRegistration(...args),
+  markAttendance: (...args) => useDatabase() ? database.attendance(...args) : markAttendance(...args),
+  listWorkshopRegistrations: (...args) => useDatabase() ? database.list(...args) : listWorkshopRegistrations(...args),
+  listActiveWorkshopRegistrations: (...args) => useDatabase() ? database.listActive(...args) : listActiveWorkshopRegistrations(...args),
+  getWorkshopRegistrationById: (...args) => useDatabase() ? database.byId(...args) : getWorkshopRegistrationById(...args),
   readStore,
   writeStore,
   generateRegistrationId,

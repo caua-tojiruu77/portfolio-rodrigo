@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { confirmWorkshopRegistration, getWorkshopRegistrationById, updateWorkshopRegistration } from "@/utils/workshopStore";
+import { confirmCashDeposit, confirmWorkshopRegistration, getWorkshopRegistrationById, updateWorkshopRegistration } from "@/utils/workshopStore";
 import { getWorkshopById } from "@/utils/workshops";
-import { sendWorkshopConfirmationEmail } from "@/utils/workshopEmail";
+import { sendWorkshopCashDepositConfirmationEmail, sendWorkshopConfirmationEmail } from "@/utils/workshopEmail";
 
 const PAYPAL_MODE = process.env.PAYPAL_MODE || process.env.NEXT_PUBLIC_PAYPAL_MODE || "sandbox";
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID || "";
@@ -66,10 +66,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ ok: false, error: "Registration not found after payment capture." }, { status: 404 });
     }
 
-    if (registration.paymentMethod !== "paypal" || registration.status !== "pending") {
-      return NextResponse.json({ ok: false, error: "This registration is not an active PayPal reservation." }, { status: 409 });
-    }
-
     const workshop = getWorkshopById(registration.workshopId);
     if (!workshop) {
       return NextResponse.json({ ok: false, error: "Workshop associated with the registration no longer exists." }, { status: 404 });
@@ -77,6 +73,55 @@ export async function POST(req: Request) {
 
     if (status !== "COMPLETED") {
       return NextResponse.json({ ok: false, error: "PayPal payment was not completed." }, { status: 402 });
+    }
+
+    const isCashDeposit = registration.paymentMethod === "cash"
+      && registration.status === "reserved_cash"
+      && registration.depositStatus !== "paid";
+
+    if (isCashDeposit) {
+      const confirmedDeposit = await confirmCashDeposit({
+        registrationId,
+        paypalOrderId: orderId,
+        paypalCaptureId: transactionId,
+        transactionId,
+      });
+
+      if (!confirmedDeposit.depositEmailSentAt) {
+        try {
+          const emailResult = await sendWorkshopCashDepositConfirmationEmail({
+            participantName: confirmedDeposit.participantName,
+            email: confirmedDeposit.email,
+            workshopName: workshop.translations.en.name,
+            workshopDate: workshop.translations.en.date,
+            workshopTime: workshop.translations.en.date,
+            workshopLocation: workshop.translations.en.location,
+            registrationCode: confirmedDeposit.publicCode,
+          });
+
+          if (!emailResult.skipped) {
+            await updateWorkshopRegistration({
+              registrationId: confirmedDeposit.id,
+              workshopId: confirmedDeposit.workshopId,
+              patch: { depositEmailSentAt: Date.now() },
+            });
+          }
+        } catch {
+          // The deposit remains confirmed if SMTP is temporarily unavailable.
+        }
+      }
+
+      return NextResponse.json({
+        ok: true,
+        mode: PAYPAL_MODE,
+        registration: confirmedDeposit,
+        deposit: true,
+        workshopName: workshop.translations.en.name,
+      });
+    }
+
+    if (registration.paymentMethod !== "paypal" || registration.status !== "pending") {
+      return NextResponse.json({ ok: false, error: "This registration is not an active PayPal reservation." }, { status: 409 });
     }
 
     const confirmedRegistration = await confirmWorkshopRegistration({

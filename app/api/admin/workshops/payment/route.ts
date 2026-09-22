@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { markCashPayment } from "@/utils/workshopStore";
 import { updateWorkshopRegistration } from "@/utils/workshopStore";
 import { getWorkshopById } from "@/utils/workshops";
-import { sendWorkshopConfirmationEmail } from "@/utils/workshopEmail";
+import { sendWorkshopCashBalancePaymentEmail } from "@/utils/workshopEmail";
 import { ADMIN_SESSION_COOKIE, validateAdminSession, validateEventAccessToken } from "@/utils/adminAuth";
 
 export async function POST(req: Request) {
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       const workshop = getWorkshopById(registration.workshopId);
       if (workshop) {
         try {
-          const emailResult = await sendWorkshopConfirmationEmail({
+          const emailResult = await sendWorkshopCashBalancePaymentEmail({
             participantName: registration.participantName,
             email: registration.email,
             workshopName: workshop.translations.en.name,

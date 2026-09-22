@@ -14,7 +14,7 @@ export async function POST(
   const phone = String(body.phone || '').trim();
   const paymentMethod = String(body.paymentMethod || '').trim();
 
-  if (!name || !email || !phone || !['paypal', 'stripe', 'cash'].includes(paymentMethod)) {
+  if (!name || !email || !phone || !['paypal', 'cash'].includes(paymentMethod)) {
     return NextResponse.json({ ok: false, error: 'Name, email, and phone are required.' }, { status: 400 });
   }
 

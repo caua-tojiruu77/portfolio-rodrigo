@@ -164,8 +164,11 @@ test('it records cash payment and releases a cancelled in-person reservation', a
     reservationExpiresAt: Date.now() + 60_000,
   }, file);
 
+  await confirmCashDeposit({ registrationId: registration.id, paypalOrderId: 'order_cash', paypalCaptureId: 'capture_cash' }, file);
   const paid = await markCashPayment({ registrationId: registration.id, cashPaymentStatus: 'paid' }, file);
   assert.equal(paid.status, 'cash_paid');
+  assert.equal(paid.attendanceStatus, 'present');
+  assert.ok(paid.attendeeCheckInAt);
   assert.equal((await getWorkshopMetrics('handstand-beginners', file)).cashReservedCount, 1);
 
   await cancelWorkshopRegistration({ registrationId: registration.id }, file);
@@ -218,7 +221,7 @@ test('it assigns unique six-character public codes without replacing internal ID
   assert.match(first.id, /^ws-/);
 });
 
-test('Stripe online payments share the six online seats with PayPal', async () => {
+test('PayPal online payments use the six online seats', async () => {
   const { file } = await createTempStore();
   for (let i = 0; i < 5; i += 1) {
     await createWorkshopRegistration({
@@ -227,7 +230,7 @@ test('Stripe online payments share the six online seats with PayPal', async () =
       email: `online${i + 1}@example.com`,
       phone: `+1888${i}`,
       status: 'paid',
-      paymentMethod: i === 0 ? 'stripe' : 'paypal',
+      paymentMethod: 'paypal',
     }, file);
   }
 
@@ -248,10 +251,13 @@ test('cash reservation requires a deposit and stays reserved after the deposit i
     reservationExpiresAt: Date.now() + 60_000,
   }, file);
 
-  assert.equal(registration.depositAmount, 5);
+  assert.equal(registration.depositAmount, 10);
+  assert.equal(registration.amount, 25);
   assert.equal(registration.depositStatus, 'pending');
-  const confirmed = await confirmCashDeposit({ registrationId: registration.id, stripeSessionId: 'cs_test', stripePaymentIntentId: 'pi_test' }, file);
+  const confirmed = await confirmCashDeposit({ registrationId: registration.id, paypalOrderId: 'order_test', paypalCaptureId: 'capture_test' }, file);
   assert.equal(confirmed.status, 'reserved_cash');
   assert.equal(confirmed.depositStatus, 'paid');
+  assert.equal(confirmed.paypalOrderId, 'order_test');
+  assert.equal(confirmed.paypalCaptureId, 'capture_test');
   assert.equal((await getWorkshopMetrics('handstand-beginners', file)).cashReservedCount, 1);
 });
