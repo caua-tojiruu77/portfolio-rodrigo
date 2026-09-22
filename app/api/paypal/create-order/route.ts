@@ -24,7 +24,13 @@ async function getPayPalAccessToken() {
   });
 
   if (!response.ok) {
-    const error = new Error("PayPal Sandbox authentication failed. Check the Sandbox client ID, secret and API base URL.");
+    const details = await response.json().catch(() => ({}));
+    const providerMessage = [details?.name, details?.error, details?.error_description, details?.message]
+      .filter(Boolean)
+      .join(" — ");
+    const error = new Error(
+      `PayPal authentication failed (${response.status})${providerMessage ? `: ${providerMessage}` : ""}. Check the Live client ID, secret and API base URL.`,
+    );
     error.name = "PayPalAuthenticationError";
     throw error;
   }
