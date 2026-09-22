@@ -395,6 +395,10 @@ export default function WorkshopsFeed() {
 
                 {error && <p className="rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>}
 
+                <p className="rounded-xl border border-amber-300/40 bg-amber-300/10 px-3 py-3 text-sm leading-6 text-amber-100">
+                  Cancellation and refund policy: cancel at least 48 hours before the workshop to be eligible for a refund. Cancellations made later are not eligible for a refund.
+                </p>
+
                 <button
                   type="submit"
                   disabled={isSubmitting}

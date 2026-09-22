@@ -176,7 +176,7 @@ export default function AdminWorkshopsPanel({
     <div className="flex flex-wrap gap-2">
       {registration.paymentMethod === "cash" && registration.status === "reserved_cash" && registration.depositStatus === "paid" && (
         <button type="button" disabled={isBusy} onClick={() => processAction(registration.id, "/api/admin/workshops/payment", { cashPaymentStatus: "paid" }, "Cash payment marked as received.")} className="min-w-28 whitespace-nowrap rounded-full border border-amber-400 bg-amber-300 px-4 py-2 text-xs font-semibold text-black transition hover:bg-amber-200 disabled:opacity-50">
-          {isBusy ? "Updating..." : "Mark paid"}
+          {isBusy ? "Updating..." : "Mark as Paid"}
         </button>
       )}
       {registration.status !== "cancelled" && registration.status !== "expired" && (

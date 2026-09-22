@@ -113,7 +113,7 @@ export async function sendWorkshopCancellationEmail(data: WorkshopEmailData) {
     from: fromEmail,
     to: data.email,
     subject: `Workshop registration cancelled - ${data.workshopName}`,
-    text: `Hello ${data.participantName},\n\nRegistration ${data.registrationCode} for ${data.workshopName} has been cancelled.`,
+    text: `Hello ${data.participantName},\n\nRegistration ${data.registrationCode} for ${data.workshopName} has been cancelled. Cancellations made at least 48 hours before the workshop are eligible for a refund.`,
   });
 
   return { ok: true, skipped: false };
