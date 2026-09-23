@@ -32,9 +32,9 @@ export async function POST(req: Request) {
           const emailResult = await sendWorkshopCashBalancePaymentEmail({
             participantName: registration.participantName,
             email: registration.email,
+            phone: registration.phone,
             workshopName: workshop.translations.en.name,
             workshopDate: workshop.translations.en.date,
-            workshopTime: workshop.translations.en.date,
             workshopLocation: workshop.translations.en.location,
             registrationCode: registration.publicCode,
           });

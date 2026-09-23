@@ -12,13 +12,27 @@ type RegistrationState = {
   participantName: string;
   email: string;
   phone: string;
-  reservationExpiresAt: number;
+  reservationExpiresAt: number | null;
   status: string;
   paymentMethod: "paypal" | "cash";
   cashPaymentStatus?: string | null;
   depositStatus?: "pending" | "paid" | null;
   depositAmount?: number;
 };
+
+function formatReservationDeadline(timestamp: number | null) {
+  if (!timestamp) return "—";
+
+  const deadline = new Date(timestamp);
+  const now = new Date();
+  const sameLocalDay = deadline.getFullYear() === now.getFullYear()
+    && deadline.getMonth() === now.getMonth()
+    && deadline.getDate() === now.getDate();
+
+  return sameLocalDay
+    ? deadline.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+    : deadline.toLocaleString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
 
 export default function WorkshopsFeed() {
   const [selectedWorkshop, setSelectedWorkshop] = useState<Workshop | null>(null);
@@ -99,6 +113,7 @@ export default function WorkshopsFeed() {
         }
 
         sessionStorage.removeItem("workshopRegistration");
+        setReservation(data.registration);
         void refreshLiveMetrics();
         setPaymentMessage(data.deposit
           ? "Your €10 reservation fee was received. Your place is reserved and the remaining €15 is due on the workshop day."
@@ -396,7 +411,7 @@ export default function WorkshopsFeed() {
                 {error && <p className="rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>}
 
                 <p className="rounded-xl border border-amber-300/40 bg-amber-300/10 px-3 py-3 text-sm leading-6 text-amber-100">
-                  Cancellation and refund policy: cancel at least 48 hours before the workshop to be eligible for a refund. Cancellations made later are not eligible for a refund.
+                  Cancellation and refund policy: cancel at least 48 hours before the workshop to be eligible for a refund. Cancellations made later are not eligible for a refund. To request a cancellation or refund, contact Rodrigo through the website using any of the available contact options.
                 </p>
 
                 <button
@@ -417,7 +432,11 @@ export default function WorkshopsFeed() {
                     <li><span className="font-medium text-white">Email:</span> {reservation.email}</li>
                     <li><span className="font-medium text-white">Phone:</span> {reservation.phone}</li>
                     <li><span className="font-medium text-white">Registration Code:</span> {reservation.publicCode}</li>
-                    <li><span className="font-medium text-white">Reservation expires:</span> {reservation.reservationExpiresAt ? new Date(reservation.reservationExpiresAt).toLocaleString("en-GB") : "No expiration"}</li>
+                    {reservation.status === "pending" || (reservation.paymentMethod === "cash" && reservation.depositStatus !== "paid") ? (
+                      <li><span className="font-medium text-white">Unpaid reservation deadline ({reservation.paymentMethod === "paypal" ? "15-minute hold" : "48-hour hold"}):</span> {formatReservationDeadline(reservation.reservationExpiresAt)}</li>
+                    ) : (
+                      <li><span className="font-medium text-white">Place:</span> secured after payment</li>
+                    )}
                   </ul>
                 </div>
 

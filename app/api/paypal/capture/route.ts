@@ -92,9 +92,9 @@ export async function POST(req: Request) {
           const emailResult = await sendWorkshopCashDepositConfirmationEmail({
             participantName: confirmedDeposit.participantName,
             email: confirmedDeposit.email,
+            phone: confirmedDeposit.phone,
             workshopName: workshop.translations.en.name,
             workshopDate: workshop.translations.en.date,
-            workshopTime: workshop.translations.en.date,
             workshopLocation: workshop.translations.en.location,
             registrationCode: confirmedDeposit.publicCode,
           });
@@ -137,9 +137,9 @@ export async function POST(req: Request) {
         const emailResult = await sendWorkshopConfirmationEmail({
           participantName: confirmedRegistration.participantName,
           email: confirmedRegistration.email,
+          phone: confirmedRegistration.phone,
           workshopName: workshop.translations.en.name,
           workshopDate: workshop.translations.en.date,
-          workshopTime: workshop.translations.en.date,
           workshopLocation: workshop.translations.en.location,
           registrationCode: confirmedRegistration.publicCode,
         });

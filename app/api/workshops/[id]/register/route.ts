@@ -48,9 +48,9 @@ export async function POST(
         const emailResult = await sendWorkshopCashReservationEmail({
           participantName: registration.participantName,
           email: registration.email,
+          phone: registration.phone,
           workshopName: workshop.translations.en.name,
           workshopDate: workshop.translations.en.date,
-          workshopTime: workshop.translations.en.date,
           workshopLocation: workshop.translations.en.location,
           registrationCode: registration.publicCode,
         });

@@ -139,7 +139,16 @@ async function expirePendingReservations(filePath = resolveStoragePath()) {
     let changed = false;
 
     for (const registration of store.registrations) {
-      const isPending = registration.status === 'pending' || registration.status === 'reserved_cash';
+      if (registration.status === 'expired' && registration.paymentMethod === 'cash' && registration.depositStatus === 'paid') {
+        registration.status = 'reserved_cash';
+        registration.reservationExpiresAt = null;
+        registration.updatedAt = Date.now();
+        changed = true;
+        continue;
+      }
+
+      const isPending = registration.status === 'pending'
+        || (registration.status === 'reserved_cash' && registration.depositStatus !== 'paid');
       const expired = Number(registration.reservationExpiresAt || 0) <= Date.now();
 
       if (isPending && expired) {
@@ -163,7 +172,7 @@ async function getWorkshopMetrics(workshopId, filePath = resolveStoragePath()) {
   const workshopRegistrations = store.registrations.filter((entry) => entry.workshopId === workshopId);
   const paypalConfirmedCount = workshopRegistrations.filter((entry) => entry.status === 'paid' && entry.paymentMethod === 'paypal').length;
   const pendingCount = workshopRegistrations.filter((entry) => entry.status === 'pending' && Number(entry.reservationExpiresAt || 0) > Date.now()).length;
-  const cashReservedCount = workshopRegistrations.filter((entry) => ['reserved_cash', 'cash_paid'].includes(entry.status) && (entry.status === 'cash_paid' || Number(entry.reservationExpiresAt || 0) > Date.now())).length;
+  const cashReservedCount = workshopRegistrations.filter((entry) => ['reserved_cash', 'cash_paid'].includes(entry.status) && (entry.status === 'cash_paid' || entry.depositStatus === 'paid' || Number(entry.reservationExpiresAt || 0) > Date.now())).length;
   const expiredCount = workshopRegistrations.filter((entry) => entry.status === 'expired').length;
   const confirmedCount = paypalConfirmedCount + workshopRegistrations.filter((entry) => entry.status === 'cash_paid').length;
   const filledSlots = paypalConfirmedCount + pendingCount + cashReservedCount;
@@ -213,7 +222,7 @@ async function createWorkshopRegistration({
     const activeRegistrations = store.registrations.filter((entry) => entry.workshopId === normalizedWorkshopId && entry.status !== 'cancelled' && entry.status !== 'expired');
     const paypalConfirmedCount = activeRegistrations.filter((entry) => entry.status === 'paid' && entry.paymentMethod === 'paypal').length;
     const paypalPendingCount = activeRegistrations.filter((entry) => entry.status === 'pending' && Number(entry.reservationExpiresAt || 0) > Date.now()).length;
-    const cashReservedCount = activeRegistrations.filter((entry) => ['reserved_cash', 'cash_paid'].includes(entry.status) && (entry.status === 'cash_paid' || Number(entry.reservationExpiresAt || 0) > Date.now())).length;
+    const cashReservedCount = activeRegistrations.filter((entry) => ['reserved_cash', 'cash_paid'].includes(entry.status) && (entry.status === 'cash_paid' || entry.depositStatus === 'paid' || Number(entry.reservationExpiresAt || 0) > Date.now())).length;
 
     const selectedPaymentMethod = paymentMethod || (status === 'reserved_cash' ? 'cash' : 'paypal');
     const isCashReservation = status === 'reserved_cash' || selectedPaymentMethod === 'cash';
@@ -382,6 +391,7 @@ async function confirmCashDeposit({ registrationId, paypalOrderId, paypalCapture
     registration.amount = CASH_RESERVATION_TOTAL_AMOUNT;
     registration.depositAmount = CASH_DEPOSIT_AMOUNT;
     registration.depositStatus = 'paid';
+    registration.reservationExpiresAt = null;
     registration.paypalOrderId = paypalOrderId || registration.paypalOrderId;
     registration.paypalCaptureId = paypalCaptureId || registration.paypalCaptureId;
     registration.transactionId = transactionId || registration.transactionId || paypalCaptureId || paypalOrderId;
