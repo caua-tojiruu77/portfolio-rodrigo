@@ -29,8 +29,8 @@ export default function WorkshopsPopup() {
   const content = getWorkshopContent(featuredWorkshop, "en");
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#050123]/80 p-0 backdrop-blur-sm">
-      <div className="relative w-[min(92vw,920px)] max-h-[90vh] overflow-y-auto rounded-[1.5rem] border-0 bg-transparent shadow-none md:rounded-[2rem] md:border md:border-white/10 md:bg-[#120d2d] md:shadow-[0_30px_90px_rgba(0,0,0,0.5)]">
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#050123]/80 p-4 backdrop-blur-sm">
+      <div className="relative w-[min(92vw,calc(100dvh-19rem),920px)] overflow-hidden rounded-[1.5rem] border-0 bg-transparent shadow-none md:rounded-[2rem] md:border md:border-white/10 md:bg-[#120d2d] md:shadow-[0_30px_90px_rgba(0,0,0,0.5)]">
         <div className="relative w-full overflow-hidden bg-[#120d2d]">
           <button
             aria-label="Close"

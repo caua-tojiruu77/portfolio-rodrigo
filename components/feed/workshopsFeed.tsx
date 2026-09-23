@@ -190,9 +190,24 @@ export default function WorkshopsFeed() {
     if (!needsPayPal || !selectedWorkshop || !reservation || !paypalButtonContainer.current) return;
 
     let cancelled = false;
+    let sdkLoadTimeout: number | null = null;
     const container = paypalButtonContainer.current;
     container.replaceChildren();
     setPaypalSdkState("loading");
+
+    const failPayPalSdk = (message: string) => {
+      if (cancelled) return;
+      if (sdkLoadTimeout) window.clearTimeout(sdkLoadTimeout);
+      setError(message);
+      setPaypalSdkState("failed");
+    };
+
+    // Covers configuration fetches as well as the external PayPal script, so
+    // a network failure can never leave the checkout loading indefinitely.
+    sdkLoadTimeout = window.setTimeout(
+      () => failPayPalSdk("PayPal checkout is taking too long to load. Please use the button below or try again shortly."),
+      8_000,
+    );
 
     const clearAppSwitchUrl = () => {
       if (new URLSearchParams(window.location.search).get("paypal_app_switch") === "1") {
@@ -201,11 +216,19 @@ export default function WorkshopsFeed() {
     };
 
     const renderButtons = () => {
-      if (cancelled || !window.paypal) return;
+      if (cancelled) return;
+      if (!window.paypal) {
+        failPayPalSdk("PayPal checkout could not be loaded. Please use the button below or try again shortly.");
+        return;
+      }
+      if (sdkLoadTimeout) window.clearTimeout(sdkLoadTimeout);
 
       const buttons = window.paypal.Buttons({
         appSwitchWhenAvailable: true,
-        style: { layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 48 },
+        // Render only the PayPal wallet button. Card, Pay Later and other
+        // funding choices are intentionally not offered in this checkout.
+        fundingSource: "paypal",
+        style: { layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 52 },
         createOrder: async () => {
           const response = await fetch("/api/paypal/create-order", {
             method: "POST",
@@ -272,17 +295,20 @@ export default function WorkshopsFeed() {
 
       paypalButtons.current = buttons;
       if (buttons.isEligible && !buttons.isEligible()) {
-        setPaypalSdkState("failed");
+        failPayPalSdk("PayPal checkout is not available for this device or account.");
         return;
       }
 
       const isReturningFromAppSwitch = new URLSearchParams(window.location.search).get("paypal_app_switch") === "1";
       if (isReturningFromAppSwitch && buttons.resume) {
-        Promise.resolve(buttons.resume()).catch(() => setPaypalSdkState("failed"));
+        Promise.resolve(buttons.resume())
+          .then(() => setPaypalSdkState("ready"))
+          .catch(() => failPayPalSdk("PayPal checkout could not be resumed. Please try again."));
       } else {
-        Promise.resolve(buttons.render(container)).catch(() => setPaypalSdkState("failed"));
+        Promise.resolve(buttons.render(container))
+          .then(() => setPaypalSdkState("ready"))
+          .catch(() => failPayPalSdk("PayPal checkout could not be loaded. Please use the button below or try again shortly."));
       }
-      setPaypalSdkState("ready");
     };
 
     const loadSdk = async () => {
@@ -299,11 +325,11 @@ export default function WorkshopsFeed() {
         }
 
         const script = document.createElement("script");
-        script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(config.clientId)}&currency=EUR&intent=capture&components=buttons`;
+        script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(config.clientId)}&currency=EUR&intent=capture&components=buttons&disable-funding=card,credit,paylater,venmo`;
         script.async = true;
         script.dataset.workshopPaypalSdk = "true";
         script.onload = renderButtons;
-        script.onerror = () => setPaypalSdkState("failed");
+        script.onerror = () => failPayPalSdk("PayPal checkout could not be loaded. Please use the button below or try again shortly.");
         document.head.appendChild(script);
       } catch (sdkError) {
         setError(sdkError instanceof Error ? sdkError.message : "PayPal checkout could not be loaded.");
@@ -314,6 +340,7 @@ export default function WorkshopsFeed() {
     void loadSdk();
     return () => {
       cancelled = true;
+      if (sdkLoadTimeout) window.clearTimeout(sdkLoadTimeout);
       paypalButtons.current?.close?.();
       paypalButtons.current = null;
     };
@@ -615,6 +642,7 @@ export default function WorkshopsFeed() {
               </form>
             ) : (
               <div className="space-y-5">
+                {error && <p className="rounded-xl border border-red-500/50 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>}
                 <div className="rounded-2xl border border-brand-200/50 bg-brand-200/10 p-4 text-sm text-white">
                   <p className="font-semibold text-brand-200">Registration summary</p>
                   <ul className="mt-3 space-y-2 text-gray-200">
@@ -631,13 +659,19 @@ export default function WorkshopsFeed() {
                   </ul>
                 </div>
 
+                {reservation.paymentMethod === "paypal" && (
+                  <p className="rounded-xl border border-amber-300/40 bg-amber-300/10 px-3 py-3 text-sm leading-6 text-amber-100">
+                    Cancellation and refund policy: cancel at least 48 hours before the workshop to be eligible for a refund. Cancellations made later are not eligible for a refund. To request a cancellation or refund, contact Rodrigo through the website using any of the available contact options.
+                  </p>
+                )}
+
                 {reservation.paymentMethod === "cash" && reservation.depositStatus !== "paid" ? (
                   <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-100">
-                    <div ref={paypalButtonContainer} />
-                    {paypalSdkState === "loading" && <p className="mt-4 text-center">Loading secure PayPal checkout...</p>}
                     <p className="font-semibold">Reserve your place · €10 confirmation fee</p>
                     <p className="mt-2">To secure your place, please pay a €10 reservation fee via PayPal. It helps us hold places fairly in case of no-shows and is deducted from the €25 workshop fee. If your plans change, please let us know at least 48 hours before the workshop to request a refund. The remaining €15 is due on the workshop day.</p>
-                    <button
+                    <div ref={paypalButtonContainer} className="mt-4" />
+                    {paypalSdkState === "loading" && <p className="mt-4 text-center">Loading secure PayPal checkout...</p>}
+                    {paypalSdkState === "failed" && <button
                       type="button"
                       onClick={async () => {
                         const response = await fetch("/api/paypal/create-order", {
@@ -660,10 +694,10 @@ export default function WorkshopsFeed() {
                         }));
                         window.location.href = data.approvalUrl;
                       }}
-                      className={`mt-4 inline-flex w-full items-center justify-center rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d] ${paypalSdkState === "ready" ? "hidden" : ""}`}
+                      className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d]"
                     >
                       Pay €10 reservation fee with PayPal
-                    </button>
+                    </button>}
                   </div>
                 ) : reservation.paymentMethod === "cash" ? (
                   <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-100">
@@ -674,14 +708,14 @@ export default function WorkshopsFeed() {
                   <div>
                     <div ref={paypalButtonContainer} />
                     {paypalSdkState === "loading" && <p className="py-3 text-center text-sm text-gray-300">Loading secure PayPal checkout...</p>}
-                  <button
+                  {paypalSdkState === "failed" && <button
                     type="button"
                     onClick={handleContinueToPayment}
-                    className={`inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d] ${paypalSdkState === "ready" ? "hidden" : ""}`}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d]"
                   >
                     Continue to PayPal
                     <ArrowRight size={16} />
-                  </button>
+                  </button>}
                   </div>
                 )}
               </div>
