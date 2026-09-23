@@ -20,6 +20,21 @@ type RegistrationState = {
   depositAmount?: number;
 };
 
+type PayPalButtonsInstance = {
+  render: (container: HTMLElement) => Promise<void> | void;
+  close?: () => void;
+  isEligible?: () => boolean;
+  resume?: () => Promise<void> | void;
+};
+
+declare global {
+  interface Window {
+    paypal?: {
+      Buttons: (options: Record<string, unknown>) => PayPalButtonsInstance;
+    };
+  }
+}
+
 function formatReservationDeadline(timestamp: number | null) {
   if (!timestamp) return "—";
 
@@ -42,7 +57,11 @@ export default function WorkshopsFeed() {
   const [error, setError] = useState("");
   const [paymentMessage, setPaymentMessage] = useState("");
   const [isConfirmingPayment, setIsConfirmingPayment] = useState(false);
+  const [paypalSdkState, setPaypalSdkState] = useState<"idle" | "loading" | "ready" | "failed">("idle");
   const handledPayPalOrder = useRef<string | null>(null);
+  const isRefreshingMetrics = useRef(false);
+  const paypalButtonContainer = useRef<HTMLDivElement | null>(null);
+  const paypalButtons = useRef<PayPalButtonsInstance | null>(null);
 
   const [liveMetrics, setLiveMetrics] = useState<Record<string, {
     availableSlots: number;
@@ -55,20 +74,35 @@ export default function WorkshopsFeed() {
     : { paypalAvailableSlots: 6, cashAvailableSlots: 6 };
 
   const refreshLiveMetrics = useCallback(async () => {
-    const response = await fetch("/api/workshops", { cache: "no-store" });
-    if (!response.ok) return;
+    if (isRefreshingMetrics.current) return;
+    isRefreshingMetrics.current = true;
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 8_000);
 
-    const data = await response.json();
-    const nextState = Object.fromEntries(
-      (data.workshops || []).map((workshop: any) => [workshop.id, {
-        availableSlots: workshop.availableSlots,
-        isFull: workshop.isFull,
-        paypalAvailableSlots: workshop.paypalAvailableSlots,
-        cashAvailableSlots: workshop.cashAvailableSlots,
-      }]),
-    );
+    try {
+      const response = await fetch("/api/workshops", {
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      if (!response.ok) return;
 
-    setLiveMetrics(nextState);
+      const data = await response.json();
+      const nextState = Object.fromEntries(
+        (data.workshops || []).map((workshop: any) => [workshop.id, {
+          availableSlots: workshop.availableSlots,
+          isFull: workshop.isFull,
+          paypalAvailableSlots: workshop.paypalAvailableSlots,
+          cashAvailableSlots: workshop.cashAvailableSlots,
+        }]),
+      );
+
+      setLiveMetrics(nextState);
+    } catch {
+      // Keep the last known availability and retry on the next refresh interval.
+    } finally {
+      window.clearTimeout(timeoutId);
+      isRefreshingMetrics.current = false;
+    }
   }, []);
 
   useEffect(() => {
@@ -127,6 +161,163 @@ export default function WorkshopsFeed() {
 
     void capturePayment();
   }, [refreshLiveMetrics]);
+
+  // App Switch can return in a new browser tab. Restore the in-progress
+  // checkout from session storage so the PayPal SDK can resume it there.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("paypal_app_switch") !== "1") return;
+
+    try {
+      const saved = JSON.parse(sessionStorage.getItem("workshopRegistration") || "{}");
+      const workshop = enabledWorkshops.find((entry) => entry.id === saved.workshopId);
+      if (workshop && saved.registration?.id === params.get("registration_id")) {
+        setSelectedWorkshop(workshop);
+        setReservation(saved.registration);
+      }
+    } catch {
+      setError("We could not resume the PayPal checkout. Please try again.");
+    }
+  }, []);
+
+  useEffect(() => {
+    const needsPayPal = Boolean(
+      selectedWorkshop
+      && reservation
+      && ((reservation.paymentMethod === "paypal" && reservation.status === "pending")
+        || (reservation.paymentMethod === "cash" && reservation.depositStatus !== "paid")),
+    );
+    if (!needsPayPal || !selectedWorkshop || !reservation || !paypalButtonContainer.current) return;
+
+    let cancelled = false;
+    const container = paypalButtonContainer.current;
+    container.replaceChildren();
+    setPaypalSdkState("loading");
+
+    const clearAppSwitchUrl = () => {
+      if (new URLSearchParams(window.location.search).get("paypal_app_switch") === "1") {
+        window.history.replaceState({}, "", window.location.pathname);
+      }
+    };
+
+    const renderButtons = () => {
+      if (cancelled || !window.paypal) return;
+
+      const buttons = window.paypal.Buttons({
+        appSwitchWhenAvailable: true,
+        style: { layout: "vertical", color: "gold", shape: "pill", label: "paypal", height: 48 },
+        createOrder: async () => {
+          const response = await fetch("/api/paypal/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              workshopId: selectedWorkshop.id,
+              registrationId: reservation.id,
+              appSwitch: true,
+            }),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.ok || !data.orderId) {
+            throw new Error(data.error || "Unable to start PayPal checkout.");
+          }
+
+          sessionStorage.setItem("workshopRegistration", JSON.stringify({
+            workshopId: selectedWorkshop.id,
+            registrationId: reservation.id,
+            orderId: data.orderId,
+            amount: reservation.paymentMethod === "cash" ? 10 : selectedWorkshop.amount,
+            currency: selectedWorkshop.currency,
+            registration: reservation,
+          }));
+          return data.orderId;
+        },
+        onApprove: async (data: { orderID?: string }) => {
+          if (!data.orderID) {
+            setError("PayPal did not return a payment identifier.");
+            return;
+          }
+
+          setIsConfirmingPayment(true);
+          try {
+            const response = await fetch("/api/paypal/capture", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ orderId: data.orderID }),
+            });
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok || !result.ok) throw new Error(result.error || "We could not confirm the PayPal payment.");
+
+            sessionStorage.removeItem("workshopRegistration");
+            setReservation(result.registration);
+            void refreshLiveMetrics();
+            setPaymentMessage(result.deposit
+              ? "Your â‚¬10 reservation fee was received. Your place is reserved and the remaining â‚¬15 is due on the workshop day."
+              : "Payment confirmed. Your workshop place is reserved.");
+            clearAppSwitchUrl();
+          } catch (paymentError) {
+            setError(paymentError instanceof Error ? paymentError.message : "We could not confirm the PayPal payment.");
+          } finally {
+            setIsConfirmingPayment(false);
+          }
+        },
+        onCancel: () => {
+          clearAppSwitchUrl();
+          setError("Payment was cancelled. Your reservation has not been confirmed.");
+        },
+        onError: (paymentError: unknown) => {
+          const message = paymentError instanceof Error ? paymentError.message : "PayPal checkout could not be started.";
+          setError(message);
+        },
+      });
+
+      paypalButtons.current = buttons;
+      if (buttons.isEligible && !buttons.isEligible()) {
+        setPaypalSdkState("failed");
+        return;
+      }
+
+      const isReturningFromAppSwitch = new URLSearchParams(window.location.search).get("paypal_app_switch") === "1";
+      if (isReturningFromAppSwitch && buttons.resume) {
+        Promise.resolve(buttons.resume()).catch(() => setPaypalSdkState("failed"));
+      } else {
+        Promise.resolve(buttons.render(container)).catch(() => setPaypalSdkState("failed"));
+      }
+      setPaypalSdkState("ready");
+    };
+
+    const loadSdk = async () => {
+      try {
+        if (window.paypal) {
+          renderButtons();
+          return;
+        }
+
+        const configResponse = await fetch("/api/paypal/client-config", { cache: "no-store" });
+        const config = await configResponse.json().catch(() => ({}));
+        if (!configResponse.ok || !config.ok || !config.clientId) {
+          throw new Error(config.error || "PayPal checkout is not configured.");
+        }
+
+        const script = document.createElement("script");
+        script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(config.clientId)}&currency=EUR&intent=capture&components=buttons`;
+        script.async = true;
+        script.dataset.workshopPaypalSdk = "true";
+        script.onload = renderButtons;
+        script.onerror = () => setPaypalSdkState("failed");
+        document.head.appendChild(script);
+      } catch (sdkError) {
+        setError(sdkError instanceof Error ? sdkError.message : "PayPal checkout could not be loaded.");
+        setPaypalSdkState("failed");
+      }
+    };
+
+    void loadSdk();
+    return () => {
+      cancelled = true;
+      paypalButtons.current?.close?.();
+      paypalButtons.current = null;
+    };
+  }, [reservation, selectedWorkshop, refreshLiveMetrics]);
 
   if (!enabledWorkshops.length) {
     return null;
@@ -294,7 +485,7 @@ export default function WorkshopsFeed() {
                     </li>
                     <li className="flex items-center gap-3">
                       <MapPin size={16} className="text-brand-200" />
-                      <span>{content.location}</span>
+                      <span className="whitespace-pre-line">{content.location}</span>
                     </li>
                     <li className="flex items-center gap-3">
                       <Clock3 size={16} className="text-brand-200" />
@@ -442,6 +633,8 @@ export default function WorkshopsFeed() {
 
                 {reservation.paymentMethod === "cash" && reservation.depositStatus !== "paid" ? (
                   <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+                    <div ref={paypalButtonContainer} />
+                    {paypalSdkState === "loading" && <p className="mt-4 text-center">Loading secure PayPal checkout...</p>}
                     <p className="font-semibold">Reserve your place · €10 confirmation fee</p>
                     <p className="mt-2">To secure your place, please pay a €10 reservation fee via PayPal. It helps us hold places fairly in case of no-shows and is deducted from the €25 workshop fee. If your plans change, please let us know at least 48 hours before the workshop to request a refund. The remaining €15 is due on the workshop day.</p>
                     <button
@@ -467,7 +660,7 @@ export default function WorkshopsFeed() {
                         }));
                         window.location.href = data.approvalUrl;
                       }}
-                      className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d]"
+                      className={`mt-4 inline-flex w-full items-center justify-center rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d] ${paypalSdkState === "ready" ? "hidden" : ""}`}
                     >
                       Pay €10 reservation fee with PayPal
                     </button>
@@ -478,14 +671,18 @@ export default function WorkshopsFeed() {
                     <p className="mt-2">Your €10 reservation fee was received and deducted from the workshop price. It helps us hold places fairly in case of no-shows. If your plans change, please let us know at least 48 hours before the workshop to request a refund. The remaining €15 is due on the workshop day.</p>
                   </div>
                 ) : (
+                  <div>
+                    <div ref={paypalButtonContainer} />
+                    {paypalSdkState === "loading" && <p className="py-3 text-center text-sm text-gray-300">Loading secure PayPal checkout...</p>}
                   <button
                     type="button"
                     onClick={handleContinueToPayment}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d]"
+                    className={`inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d] ${paypalSdkState === "ready" ? "hidden" : ""}`}
                   >
                     Continue to PayPal
                     <ArrowRight size={16} />
                   </button>
+                  </div>
                 )}
               </div>
             )}

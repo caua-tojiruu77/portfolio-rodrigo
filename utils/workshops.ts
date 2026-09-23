@@ -39,7 +39,7 @@ const workshopTemplates: Workshop[] = [
         description:
           "This workshop is designed for anyone who wants to discover and build a strong foundation in handstands. We will work on body alignment, balance, shoulder strength, hand positioning and the fundamentals of safely entering and exiting a handstand. You will learn practical exercises and progressions to help you feel more confident upside down. No previous handstand experience is required — just curiosity and the motivation to try! 🤸‍♂️",
         date: "October 21 & 28 · 18:00–19:30 / 19:30–21:00",
-        location: "Studio Rodrigo Tavella",
+        location: "Yoga-Vidya-Dortmund-Studios\nReinoldistraße 8, 44135 Dortmund",
         level: "Beginner",
         duration: "1h 30m per session",
         price: "€25",
@@ -50,7 +50,7 @@ const workshopTemplates: Workshop[] = [
         description:
           "Questo workshop è pensato per chi vuole scoprire e costruire una solida base nel lavoro del handstand. Lavoreremo su allineamento del corpo, equilibrio, forza delle spalle, posizione delle mani e sui fondamenti per entrare e uscire in sicurezza dal capovolgimento. Imparerai esercizi pratici e progressioni per sentirti più sicuro a testa in giù. Nessuna esperienza precedente è richiesta — basta curiosità e voglia di provare! 🤸‍♂️",
         date: "21 e 28 ottobre · 18:00–19:30 / 19:30–21:00",
-        location: "Studio Rodrigo Tavella",
+        location: "Yoga-Vidya-Dortmund-Studios\nReinoldistraße 8, 44135 Dortmund",
         level: "Principiante",
         duration: "1h 30m per sessione",
         price: "€25",
@@ -61,7 +61,7 @@ const workshopTemplates: Workshop[] = [
         description:
           "Dieser Workshop ist für alle geeignet, die die Grundlagen des Handstands entdecken und aufbauen möchten. Wir arbeiten an Körperausrichtung, Gleichgewicht, Schulterkraft, Handposition und den Grundlagen für einen sicheren Einstieg und Ausstieg in den Handstand. Du lernst praktische Übungen und Progressionen, mit denen du dich sicherer im Kopfstand fühlst. Vorkenntnisse sind nicht erforderlich — nur Neugierde und der Wille, es auszuprobieren! 🤸‍♂️",
         date: "21. und 28. Oktober · 18:00–19:30 / 19:30–21:00",
-        location: "Studio Rodrigo Tavella",
+        location: "Yoga-Vidya-Dortmund-Studios\nReinoldistraße 8, 44135 Dortmund",
         level: "Anfänger",
         duration: "1 Std. 30 Min. pro Einheit",
         price: "€25",
@@ -83,7 +83,7 @@ const workshopTemplates: Workshop[] = [
         description:
           "For participants who already have experience with handstands and want to take their skills to the next level. We will focus on improving balance, strength, control and body lines, while exploring more challenging handstand variations, transitions and creative movement. The workshop will also include exercises to develop endurance, technique and greater freedom in hand balancing. A chance to refine your technique, challenge yourself and explore new possibilities upside down. ✨",
         date: "October 21 & 28 · 18:00–19:30 / 19:30–21:00",
-        location: "Studio Rodrigo Tavella",
+        location: "Yoga-Vidya-Dortmund-Studios\nReinoldistraße 8, 44135 Dortmund",
         level: "Intermediate / Advanced",
         duration: "1h 30m per session",
         price: "€25",
@@ -94,7 +94,7 @@ const workshopTemplates: Workshop[] = [
         description:
           "Per chi ha già esperienza con gli handstand e vuole portare le proprie capacità a un livello superiore. Ci concentreremo sul miglioramento dell’equilibrio, della forza, del controllo e delle linee del corpo, esplorando varianti più impegnative, transizioni e movimento creativo. Il workshop includerà anche esercizi per sviluppare resistenza, tecnica e maggiore libertà nel bilanciamento a testa in giù. Un’occasione per perfezionare la tecnica, sfidare sé stessi ed esplorare nuove possibilità a testa in su. ✨",
         date: "21 e 28 ottobre · 18:00–19:30 / 19:30–21:00",
-        location: "Studio Rodrigo Tavella",
+        location: "Yoga-Vidya-Dortmund-Studios\nReinoldistraße 8, 44135 Dortmund",
         level: "Intermedio / Avanzato",
         duration: "1h 30m per sessione",
         price: "€25",
@@ -105,7 +105,7 @@ const workshopTemplates: Workshop[] = [
         description:
           "Für Teilnehmende, die bereits Erfahrung mit dem Handstand haben und ihre Fähigkeiten auf das nächste Level bringen möchten. Wir konzentrieren uns auf Verbesserung von Balance, Kraft, Kontrolle und Körperlinien und erkunden anspruchsvollere Variationen, Übergänge und kreative Bewegungen. Der Workshop enthält zudem Übungen zur Entwicklung von Ausdauer, Technik und mehr Freiheit im Handbalance. Eine Chance, deine Technik zu verfeinern, dich selbst herauszufordern und neue Möglichkeiten im Kopfstand zu entdecken. ✨",
         date: "21. und 28. Oktober · 18:00–19:30 / 19:30–21:00",
-        location: "Studio Rodrigo Tavella",
+        location: "Yoga-Vidya-Dortmund-Studios\nReinoldistraße 8, 44135 Dortmund",
         level: "Mittel / Fortgeschritten",
         duration: "1 Std. 30 Min. pro Einheit",
         price: "€25",

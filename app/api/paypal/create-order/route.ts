@@ -44,6 +44,7 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => ({}));
     const workshopId = String(body.workshopId || "").trim();
     const registrationId = String(body.registrationId || "").trim();
+    const useAppSwitch = body.appSwitch === true;
 
     if (!workshopId || !registrationId) {
       return NextResponse.json({ ok: false, error: "Workshop and registration identifiers are required." }, { status: 400 });
@@ -72,7 +73,9 @@ export async function POST(req: Request) {
     const paymentAmount = isCashDeposit ? 10 : Number(workshop.amount || 0);
 
     const accessToken = await getPayPalAccessToken();
-    const orderData = {
+    const appUrl = process.env.APP_URL || "http://localhost:3000";
+    const appSwitchReturnUrl = `${appUrl}/workshops?paypal_app_switch=1&registration_id=${encodeURIComponent(registrationId)}`;
+    const orderData: Record<string, any> = {
       intent: "CAPTURE",
       purchase_units: [{
         reference_id: registrationId,
@@ -84,14 +87,31 @@ export async function POST(req: Request) {
           ? `Reservation deposit - ${workshop.translations.it.name}`
           : `Workshop registration - ${workshop.translations.it.name}`,
       }],
-      application_context: {
+    };
+
+    if (useAppSwitch) {
+      orderData.payment_source = {
+        paypal: {
+          experience_context: {
+            brand_name: "Rodrigo Tavella Workshops",
+            user_action: "PAY_NOW",
+            shipping_preference: "NO_SHIPPING",
+            // App Switch requires matching return/cancel URLs with a session identifier.
+            return_url: appSwitchReturnUrl,
+            cancel_url: appSwitchReturnUrl,
+            app_switch_preference: { launch_paypal_app: true },
+          },
+        },
+      };
+    } else {
+      orderData.application_context = {
         brand_name: "Rodrigo Tavella Workshops",
         landing_page: "NO_PREFERENCE",
         user_action: "PAY_NOW",
-        return_url: `${process.env.APP_URL || "http://localhost:3000"}/workshops?payment=success`,
-        cancel_url: `${process.env.APP_URL || "http://localhost:3000"}/workshops?payment=cancelled`,
-      },
-    };
+        return_url: `${appUrl}/workshops?payment=success`,
+        cancel_url: `${appUrl}/workshops?payment=cancelled`,
+      };
+    }
 
     const response = await fetch(`${PAYPAL_API_BASE_URL}/v2/checkout/orders`, {
       method: "POST",

@@ -11,9 +11,10 @@ const CASH_REMAINDER_AMOUNT = 15;
 const CASH_RESERVATION_TOTAL_AMOUNT = CASH_DEPOSIT_AMOUNT + CASH_REMAINDER_AMOUNT;
 const PUBLIC_CODE_ALPHABET = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 
-// An explicit local storage path is used by development tests. Production and
-// normal local operation use Postgres whenever DATABASE_URL is configured.
+// WORKSHOP_USE_DATABASE=false keeps local purchase tests out of the configured
+// Postgres database while preserving the existing production default.
 function useDatabase() {
+  if (process.env.WORKSHOP_USE_DATABASE?.toLowerCase() === 'false') return false;
   return database.isDatabaseConfigured() && !process.env.WORKSHOP_STORAGE_PATH;
 }
 
