@@ -39,9 +39,10 @@ async function sendWorkshopEmail({
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
   const fromEmail = process.env.FROM_EMAIL || smtpUser;
-  const notificationEmail = String(
-    process.env.WORKSHOP_NOTIFICATION_EMAIL || process.env.TO_EMAIL || "",
-  ).trim();
+  // This is the owner notification for a new workshop registration. It must
+  // not depend on a legacy TO_EMAIL or a developer mailbox configured in an
+  // environment variable.
+  const notificationEmail = "rodrigo.tavella@gmail.com";
 
   if (!smtpHost || !smtpPort || !smtpUser || !smtpPass || !fromEmail) {
     return { ok: true, skipped: true };

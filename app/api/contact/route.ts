@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { createPolyglot } from "@/utils/polyglot";
 
-const CONTACT_RECIPIENT = process.env.TO_EMAIL || "rodrigo.tavella@gmail.com";
+// Contact messages are always delivered to the workshop owner. Keeping this
+// independent from SMTP credentials prevents a previous deploy's TO_EMAIL
+// setting from redirecting messages to a developer mailbox.
+const CONTACT_RECIPIENT = "rodrigo.tavella@gmail.com";
 
 export async function POST(req: Request) {
   try {
