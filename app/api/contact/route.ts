@@ -9,7 +9,7 @@ const CONTACT_RECIPIENT = "rodrigo.tavella@gmail.com";
 export async function POST(req: Request) {
   try {
     const body = await req.json().catch(() => ({}));
-    const p = createPolyglot(body.language || "it");
+    const p = createPolyglot(body.language || "en");
     const isValidEmail = (email: unknown): email is string =>
       typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -32,18 +32,18 @@ export async function POST(req: Request) {
       });
 
       const labels = {
-        nome: p.t("contact.nome"),
-        sobrenome: p.t("contact.sobrenome"),
-        telefone: p.t("contact.telefone"),
-        email: p.t("contact.email"),
-        mensagem: p.t("contact.mensagem"),
+        nome: "First name",
+        sobrenome: "Last name",
+        telefone: "Phone number",
+        email: "Email",
+        mensagem: "Message",
       };
       const nome = String(body.nome || "");
       const sobrenome = String(body.sobrenome || "");
       const telefone = String(body.telefone || "");
       const email = isValidEmail(body.email) ? body.email : "";
       const mensagem = String(body.mensagem || "");
-      const subject = "Interesse eu seu trabalho";
+      const subject = "New message from your website";
       const text = `${labels.nome}: ${nome}\n${labels.sobrenome}: ${sobrenome}\n${labels.telefone}: ${telefone}\n${labels.email}: ${email}\n\n${labels.mensagem}:\n${mensagem}`;
       const escapeHtml = (value: string) => value.replace(/[&<>"']/g, (character) => ({
         "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
         replyTo: email || undefined,
         subject,
         text,
-        html: `<div style="font-family:Arial,sans-serif;color:#111;line-height:1.4"><h2>${escapeHtml(subject)}</h2><p><strong>${escapeHtml(labels.nome)}:</strong> ${escapeHtml(nome)}</p><p><strong>${escapeHtml(labels.sobrenome)}:</strong> ${escapeHtml(sobrenome)}</p><p><strong>${escapeHtml(labels.telefone)}:</strong> ${escapeHtml(telefone)}</p><p><strong>${escapeHtml(labels.email)}:</strong> ${escapeHtml(email)}</p><p><strong>${escapeHtml(labels.mensagem)}:</strong></p><p style="white-space:pre-wrap">${escapeHtml(mensagem)}</p><p>Enviado do formulário do site</p></div>`,
+        html: `<div style="font-family:Arial,sans-serif;color:#111;line-height:1.4"><h2>${escapeHtml(subject)}</h2><p><strong>${escapeHtml(labels.nome)}:</strong> ${escapeHtml(nome)}</p><p><strong>${escapeHtml(labels.sobrenome)}:</strong> ${escapeHtml(sobrenome)}</p><p><strong>${escapeHtml(labels.telefone)}:</strong> ${escapeHtml(telefone)}</p><p><strong>${escapeHtml(labels.email)}:</strong> ${escapeHtml(email)}</p><p><strong>${escapeHtml(labels.mensagem)}:</strong></p><p style="white-space:pre-wrap">${escapeHtml(mensagem)}</p><p>Sent from the website contact form</p></div>`,
       });
       return NextResponse.json({ ok: true, message: p.t("success") });
     }

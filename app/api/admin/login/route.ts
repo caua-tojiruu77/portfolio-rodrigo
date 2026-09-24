@@ -8,7 +8,7 @@ export async function POST(req: Request) {
     const password = String(body.password || "");
 
     if (!verifyAdminLogin(username, password)) {
-      return NextResponse.json({ ok: false, error: "Credenciais inválidas." }, { status: 401 });
+      return NextResponse.json({ ok: false, error: "Invalid username or password." }, { status: 401 });
     }
 
     const response = NextResponse.json({ ok: true });
@@ -24,6 +24,6 @@ export async function POST(req: Request) {
 
     return response;
   } catch (error: any) {
-    return NextResponse.json({ ok: false, error: error?.message || "Erro ao autenticar." }, { status: 500 });
+    return NextResponse.json({ ok: false, error: error?.message || "Unable to log in." }, { status: 500 });
   }
 }

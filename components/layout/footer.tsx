@@ -1,6 +1,5 @@
 "use client";
 
-import { Phone } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -10,7 +9,6 @@ import {
   FaTelegram,
   FaYoutube,
 } from "react-icons/fa";
-import { FaMapLocation, FaPhoneVolume } from "react-icons/fa6";
 import { IoMdMail } from "react-icons/io";
 import { createPolyglot } from "@/utils/polyglot";
 import { useLanguage } from "@/context/languageContext";
@@ -82,15 +80,15 @@ const Footer = () => {
                 </div>
               </div>
 
-              {/* Coluna 3: Contato e E-mail */}
+              {/* Coluna 3: Telefone */}
               <div>
                 <h2 className="text-xl text-white mb-4 font-bold">CONTACT</h2>
                 <ul className="space-y-2">
                   <li>
-                    <Link href="/contact" className="flex items-center text-white transition duration-300 hover:text-brand-200">
-                      <Phone size={iconSize} className="mr-2" />
-                      {polyglot.t("contact.enter")}
-                    </Link>
+                    <a href="tel:+4915234679241" className="flex items-center text-white transition duration-300 hover:text-brand-200">
+                      <span className="mr-2" aria-hidden="true">☎</span>
+                      +49 1523 4679241
+                    </a>
                   </li>
                 </ul>
               </div>

@@ -24,14 +24,14 @@ export default function AdminLoginPage() {
 
       const data = await response.json();
       if (!response.ok || !data.ok) {
-        setError(data.error || "Credenciais inválidas.");
+        setError(data.error || "Invalid username or password.");
         return;
       }
 
       router.push("/admin/workshops");
       router.refresh();
     } catch {
-      setError("Não foi possível conectar. Tente novamente.");
+      setError("Unable to connect. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -41,11 +41,11 @@ export default function AdminLoginPage() {
     <main className="row flex min-h-[70vh] items-center justify-center px-5 py-20 text-white lg:px-0">
       <form onSubmit={handleSubmit} className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.35)]">
         <p className="mb-3 text-xs uppercase tracking-[0.2em] text-brand-200">Admin</p>
-        <h1 className="mb-6 text-3xl font-bold text-white">Login do painel</h1>
+        <h1 className="mb-6 text-3xl font-bold text-white">Log in to the dashboard</h1>
 
         <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm text-gray-200">Usuário</label>
+            <label className="mb-2 block text-sm text-gray-200">Username</label>
             <input
               value={username}
               onChange={(event) => setUsername(event.target.value)}
@@ -54,7 +54,7 @@ export default function AdminLoginPage() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm text-gray-200">Senha</label>
+            <label className="mb-2 block text-sm text-gray-200">Password</label>
             <input
               type="password"
               value={password}
@@ -72,7 +72,7 @@ export default function AdminLoginPage() {
                 <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
             )}
-            <span>{loading ? "Entrando..." : "Entrar"}</span>
+            <span>{loading ? "Logging in..." : "Log in"}</span>
           </button>
         </div>
       </form>
