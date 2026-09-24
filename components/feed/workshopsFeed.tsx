@@ -274,7 +274,7 @@ export default function WorkshopsFeed() {
             setReservation(result.registration);
             void refreshLiveMetrics();
             setPaymentMessage(result.deposit
-              ? "Your â‚¬10 reservation fee was received. Your place is reserved and the remaining â‚¬15 is due on the workshop day."
+              ? "Your €10 reservation fee was received. Your place is reserved and the remaining €15 is due on the workshop day."
               : "Payment confirmed. Your workshop place is reserved.");
             clearAppSwitchUrl();
           } catch (paymentError) {

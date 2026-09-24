@@ -34,6 +34,7 @@ function mapRow(row) {
     paymentApprovedAt: row.payment_approved_at ? Number(row.payment_approved_at) : null,
     reservationEmailSentAt: row.reservation_email_sent_at ? Number(row.reservation_email_sent_at) : null,
     confirmationEmailSentAt: row.confirmation_email_sent_at ? Number(row.confirmation_email_sent_at) : null,
+    adminNotificationEmailSentAt: row.admin_notification_email_sent_at ? Number(row.admin_notification_email_sent_at) : null,
     cashPaymentEmailSentAt: row.cash_payment_email_sent_at ? Number(row.cash_payment_email_sent_at) : null,
     depositEmailSentAt: row.deposit_email_sent_at ? Number(row.deposit_email_sent_at) : null,
     paypalOrderId: row.paypal_order_id, paypalCaptureId: row.paypal_capture_id, transactionId: row.transaction_id,
@@ -95,7 +96,7 @@ async function create(input) {
   });
 }
 
-const patchColumns = { publicCode: 'public_code', status: 'status', paymentMethod: 'payment_method', cashPaymentStatus: 'cash_payment_status', depositAmount: 'deposit_amount', depositStatus: 'deposit_status', reservationExpiresAt: 'reservation_expires_at', paymentApprovedAt: 'payment_approved_at', reservationEmailSentAt: 'reservation_email_sent_at', confirmationEmailSentAt: 'confirmation_email_sent_at', cashPaymentEmailSentAt: 'cash_payment_email_sent_at', depositEmailSentAt: 'deposit_email_sent_at', paypalOrderId: 'paypal_order_id', paypalCaptureId: 'paypal_capture_id', transactionId: 'transaction_id', attendanceStatus: 'attendance_status', attendeeCheckInAt: 'attendee_check_in_at', amount: 'amount' };
+const patchColumns = { publicCode: 'public_code', status: 'status', paymentMethod: 'payment_method', cashPaymentStatus: 'cash_payment_status', depositAmount: 'deposit_amount', depositStatus: 'deposit_status', reservationExpiresAt: 'reservation_expires_at', paymentApprovedAt: 'payment_approved_at', reservationEmailSentAt: 'reservation_email_sent_at', confirmationEmailSentAt: 'confirmation_email_sent_at', adminNotificationEmailSentAt: 'admin_notification_email_sent_at', cashPaymentEmailSentAt: 'cash_payment_email_sent_at', depositEmailSentAt: 'deposit_email_sent_at', paypalOrderId: 'paypal_order_id', paypalCaptureId: 'paypal_capture_id', transactionId: 'transaction_id', attendanceStatus: 'attendance_status', attendeeCheckInAt: 'attendee_check_in_at', amount: 'amount' };
 async function update({ registrationId, workshopId, patch }) {
   const entries = Object.entries(patch || {}).filter(([key]) => patchColumns[key]); if (!entries.length) throw new Error('No valid registration fields were provided.');
   const values = entries.map(([, value]) => value); const assignments = entries.map(([key], index) => `${patchColumns[key]} = $${index + 1}`); values.push(Date.now()); assignments.push(`updated_at = $${values.length}`);

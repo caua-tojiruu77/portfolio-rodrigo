@@ -138,7 +138,7 @@ export async function POST(req: Request) {
       transactionId,
     });
 
-    if (!confirmed.confirmationEmailSentAt) {
+    if (!confirmed.confirmationEmailSentAt || !confirmed.adminNotificationEmailSentAt) {
       const emailResult = await sendWorkshopConfirmationEmail({
         participantName: confirmed.participantName,
         email: confirmed.email,
@@ -147,12 +147,20 @@ export async function POST(req: Request) {
         workshopDate: workshop.translations.en.date,
         workshopLocation: workshop.translations.en.location,
         registrationCode: confirmed.publicCode,
+        amount: confirmed.amount,
+        currency: confirmed.currency,
+        purchaseDate: confirmed.paymentApprovedAt || Date.now(),
+        sendCustomer: !confirmed.confirmationEmailSentAt,
+        sendAdmin: !confirmed.adminNotificationEmailSentAt,
       });
-      if (!emailResult.skipped) {
+      if (emailResult.customerSent || emailResult.adminSent) {
         await updateWorkshopRegistration({
           registrationId: confirmed.id,
           workshopId: confirmed.workshopId,
-          patch: { confirmationEmailSentAt: Date.now() },
+          patch: {
+            ...(emailResult.customerSent ? { confirmationEmailSentAt: Date.now() } : {}),
+            ...(emailResult.adminSent ? { adminNotificationEmailSentAt: Date.now() } : {}),
+          },
         });
       }
     }

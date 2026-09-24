@@ -9,6 +9,9 @@ type WorkshopEmailData = {
   workshopTime?: string;
   workshopLocation?: string;
   registrationCode: string;
+  amount?: number;
+  currency?: string;
+  purchaseDate?: number;
 };
 
 function escapeHtml(value: string) {
@@ -31,9 +34,14 @@ async function sendWorkshopEmail({
   workshopTime,
   workshopLocation,
   registrationCode,
+  amount,
+  currency = "EUR",
+  purchaseDate = Date.now(),
   paymentMethod = "paypal",
   notifyAdmin = true,
-}: WorkshopEmailData & { paymentMethod?: "paypal" | "cash" | "cash_deposit" | "cash_paid"; notifyAdmin?: boolean }) {
+  sendCustomer = true,
+  sendAdmin = true,
+}: WorkshopEmailData & { paymentMethod?: "paypal" | "cash" | "cash_deposit" | "cash_paid"; notifyAdmin?: boolean; sendCustomer?: boolean; sendAdmin?: boolean }) {
   const smtpHost = process.env.SMTP_HOST;
   const smtpPort = process.env.SMTP_PORT;
   const smtpUser = process.env.SMTP_USER;
@@ -45,7 +53,7 @@ async function sendWorkshopEmail({
   const notificationEmail = "rodrigo.tavella@gmail.com";
 
   if (!smtpHost || !smtpPort || !smtpUser || !smtpPass || !fromEmail) {
-    return { ok: true, skipped: true };
+    return { ok: true, skipped: true, customerSent: false, adminSent: false };
   }
 
   const transporter = nodemailer.createTransport({
@@ -72,12 +80,15 @@ async function sendWorkshopEmail({
     "💃 🩰 Keep moving. Keep shining! ✨",
   ].filter(Boolean).join("\n");
 
-  await transporter.sendMail({
-    from: fromEmail,
-    to: email,
-    subject: isCashDeposit || isCashPaid ? `Workshop place confirmed - ${workshopName}` : isCash ? `Workshop reservation - ${workshopName}` : `Workshop registration confirmed - ${workshopName}`,
-    text,
-    html: `
+  let customerSent = false;
+  let adminSent = false;
+  if (sendCustomer) try {
+    await transporter.sendMail({
+      from: fromEmail,
+      to: email,
+      subject: isCashDeposit || isCashPaid ? `Workshop place confirmed - ${workshopName}` : isCash ? `Workshop reservation - ${workshopName}` : `Workshop registration confirmed - ${workshopName}`,
+      text,
+      html: `
       <div style="font-family:Arial,sans-serif; color:#111; line-height:1.6;">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse; background:#17133b; border-radius:16px; color:#fff;">
           <tr><td style="padding:28px 24px; text-align:center; background:#211b52; border-radius:16px 16px 0 0;">
@@ -98,10 +109,14 @@ async function sendWorkshopEmail({
           <tr><td style="padding:16px 24px; text-align:center; color:#f4d35e; border-top:1px solid #4a437b;">Keep moving. Keep shining. ✨⭐🩰</td></tr>
         </table>
       </div>
-    `,
-  });
+      `,
+    });
+    customerSent = true;
+  } catch (error) {
+    console.error("Workshop customer confirmation email could not be sent:", error);
+  }
 
-  if (notificationEmail && notifyAdmin) {
+  if (notificationEmail && notifyAdmin && sendAdmin) {
     // Admin notices are separate and contain only the new registration details.
     try {
       await transporter.sendMail({
@@ -115,26 +130,29 @@ async function sendWorkshopEmail({
           `Email: ${email}`,
           phone ? `Phone: ${phone}` : "",
           `Registration code: ${registrationCode}`,
+          `Purchase/reservation date: ${new Date(purchaseDate).toISOString()}`,
+          amount !== undefined ? `Amount: ${new Intl.NumberFormat("en", { style: "currency", currency }).format(amount)}` : "",
         ].filter(Boolean).join("\n"),
-        html: `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#17133b"><h2>New workshop registration</h2><p><strong>Workshop:</strong> ${escapeHtml(workshopName)}</p><p><strong>Name:</strong> ${escapeHtml(participantName)}</p><p><strong>Email:</strong> ${escapeHtml(email)}</p>${phone ? `<p><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ""}<p><strong>Registration code:</strong> ${escapeHtml(registrationCode)}</p></div>`,
+        html: `<div style="font-family:Arial,sans-serif;line-height:1.6;color:#17133b"><h2>New workshop registration</h2><p><strong>Workshop:</strong> ${escapeHtml(workshopName)}</p><p><strong>Name:</strong> ${escapeHtml(participantName)}</p><p><strong>Email:</strong> ${escapeHtml(email)}</p>${phone ? `<p><strong>Phone:</strong> ${escapeHtml(phone)}</p>` : ""}<p><strong>Registration code:</strong> ${escapeHtml(registrationCode)}</p><p><strong>Purchase/reservation date:</strong> ${escapeHtml(new Date(purchaseDate).toLocaleString("en-GB", { timeZone: "Europe/Berlin" }))}</p>${amount !== undefined ? `<p><strong>Amount:</strong> ${escapeHtml(new Intl.NumberFormat("en", { style: "currency", currency }).format(amount))}</p>` : ""}</div>`,
       });
+      adminSent = true;
     } catch (error) {
-      console.error("Workshop registration notification email could not be sent.");
+      console.error("Workshop registration notification email could not be sent:", error);
     }
   }
 
-  return { ok: true, skipped: false };
+  return { ok: true, skipped: false, customerSent, adminSent };
 }
 
-export function sendWorkshopConfirmationEmail(data: WorkshopEmailData & { paymentMethod?: "paypal" }) {
+export function sendWorkshopConfirmationEmail(data: WorkshopEmailData & { paymentMethod?: "paypal"; sendCustomer?: boolean; sendAdmin?: boolean }) {
   return sendWorkshopEmail({ ...data, paymentMethod: data.paymentMethod || "paypal" });
 }
 
-export function sendWorkshopCashReservationEmail(data: WorkshopEmailData) {
+export function sendWorkshopCashReservationEmail(data: WorkshopEmailData & { sendCustomer?: boolean; sendAdmin?: boolean }) {
   return sendWorkshopEmail({ ...data, paymentMethod: "cash" });
 }
 
-export function sendWorkshopCashDepositConfirmationEmail(data: WorkshopEmailData) {
+export function sendWorkshopCashDepositConfirmationEmail(data: WorkshopEmailData & { sendCustomer?: boolean; sendAdmin?: boolean }) {
   return sendWorkshopEmail({ ...data, paymentMethod: "cash_deposit", notifyAdmin: false });
 }
 

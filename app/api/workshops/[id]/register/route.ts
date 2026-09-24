@@ -53,13 +53,21 @@ export async function POST(
           workshopDate: workshop.translations.en.date,
           workshopLocation: workshop.translations.en.location,
           registrationCode: registration.publicCode,
+          // A cash reservation does not collect money yet; don't report the
+          // workshop's full price as an amount already paid.
+          amount: undefined,
+          currency: registration.currency,
+          purchaseDate: registration.createdAt,
         });
 
-        if (!emailResult.skipped) {
+        if (emailResult.customerSent || emailResult.adminSent) {
           await updateWorkshopRegistration({
             registrationId: registration.id,
             workshopId: registration.workshopId,
-            patch: { reservationEmailSentAt: Date.now() },
+            patch: {
+              ...(emailResult.customerSent ? { reservationEmailSentAt: Date.now() } : {}),
+              ...(emailResult.adminSent ? { adminNotificationEmailSentAt: Date.now() } : {}),
+            },
           });
         }
       } catch {

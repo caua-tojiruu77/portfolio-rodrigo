@@ -122,6 +122,7 @@ function normalizeRegistration(registration) {
     paymentApprovedAt: registration.paymentApprovedAt || null,
     reservationEmailSentAt: registration.reservationEmailSentAt || null,
     confirmationEmailSentAt: registration.confirmationEmailSentAt || null,
+    adminNotificationEmailSentAt: registration.adminNotificationEmailSentAt || null,
     cashPaymentEmailSentAt: registration.cashPaymentEmailSentAt || null,
     depositEmailSentAt: registration.depositEmailSentAt || null,
     paypalOrderId: registration.paypalOrderId || null,

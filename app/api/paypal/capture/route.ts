@@ -97,6 +97,9 @@ export async function POST(req: Request) {
             workshopDate: workshop.translations.en.date,
             workshopLocation: workshop.translations.en.location,
             registrationCode: confirmedDeposit.publicCode,
+            amount: confirmedDeposit.depositAmount,
+            currency: confirmedDeposit.currency,
+            purchaseDate: confirmedDeposit.paymentApprovedAt || Date.now(),
           });
 
           if (!emailResult.skipped) {
@@ -132,7 +135,7 @@ export async function POST(req: Request) {
       transactionId,
     });
 
-    if (!confirmedRegistration.confirmationEmailSentAt) {
+    if (!confirmedRegistration.confirmationEmailSentAt || !confirmedRegistration.adminNotificationEmailSentAt) {
       try {
         const emailResult = await sendWorkshopConfirmationEmail({
           participantName: confirmedRegistration.participantName,
@@ -142,13 +145,21 @@ export async function POST(req: Request) {
           workshopDate: workshop.translations.en.date,
           workshopLocation: workshop.translations.en.location,
           registrationCode: confirmedRegistration.publicCode,
+          amount: confirmedRegistration.amount,
+          currency: confirmedRegistration.currency,
+          purchaseDate: confirmedRegistration.paymentApprovedAt || Date.now(),
+          sendCustomer: !confirmedRegistration.confirmationEmailSentAt,
+          sendAdmin: !confirmedRegistration.adminNotificationEmailSentAt,
         });
 
-        if (!emailResult.skipped) {
+        if (emailResult.customerSent || emailResult.adminSent) {
           await updateWorkshopRegistration({
             registrationId: confirmedRegistration.id,
             workshopId: confirmedRegistration.workshopId,
-            patch: { confirmationEmailSentAt: Date.now() },
+            patch: {
+              ...(emailResult.customerSent ? { confirmationEmailSentAt: Date.now() } : {}),
+              ...(emailResult.adminSent ? { adminNotificationEmailSentAt: Date.now() } : {}),
+            },
           });
         }
       } catch {
