@@ -678,7 +678,7 @@ export default function WorkshopsFeed() {
                     <li><span className="font-medium text-white">Phone:</span> {reservation.phone}</li>
                     <li><span className="font-medium text-white">Registration Code:</span> {reservation.publicCode}</li>
                     {reservation.status === "pending" || (reservation.paymentMethod === "cash" && reservation.depositStatus !== "paid") ? (
-                      <li><span className="font-medium text-white">Unpaid reservation deadline ({reservation.paymentMethod === "paypal" ? "15-minute hold" : "48-hour hold"}):</span> {formatReservationDeadline(reservation.reservationExpiresAt)}</li>
+                      <li><span className="font-medium text-white">Unpaid reservation deadline (15-minute hold):</span> {formatReservationDeadline(reservation.reservationExpiresAt)}</li>
                     ) : (
                       <li><span className="font-medium text-white">Place:</span> secured after payment</li>
                     )}

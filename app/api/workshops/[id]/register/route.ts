@@ -35,9 +35,7 @@ export async function POST(
       phone,
       paymentMethod,
       status: paymentMethod === 'cash' ? 'reserved_cash' : 'pending',
-      reservationExpiresAt: paymentMethod === 'cash'
-        ? Date.now() + 48 * 60 * 60 * 1000
-        : Date.now() + 15 * 60 * 1000,
+      reservationExpiresAt: Date.now() + 15 * 60 * 1000,
       currency: workshop.currency || 'EUR',
       amount: Number(workshop.amount || 0),
     });

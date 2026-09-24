@@ -256,7 +256,7 @@ async function createWorkshopRegistration({
       cashPaymentStatus: isCashReservation ? 'pending' : null,
       depositAmount: isCashReservation ? CASH_DEPOSIT_AMOUNT : 0,
       depositStatus: isCashReservation ? 'pending' : null,
-      reservationExpiresAt: reservationExpiresAt || (status === 'pending' ? Date.now() + DEFAULT_RESERVATION_MINUTES * 60 * 1000 : null),
+      reservationExpiresAt: reservationExpiresAt || (status === 'pending' || isCashReservation ? Date.now() + DEFAULT_RESERVATION_MINUTES * 60 * 1000 : null),
       createdAt: Date.now(),
       updatedAt: Date.now(),
       currency,
