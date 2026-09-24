@@ -1201,6 +1201,35 @@
       "attendeeCheckInAt": null,
       "currency": "EUR",
       "amount": 25
+    },
+    {
+      "id": "ws-1790212625474-oq466j11",
+      "publicCode": "HN4ZS4",
+      "workshopId": "live-payment-test-1-eur",
+      "participantName": "Caua Henrique Tavella Cassia",
+      "email": "cauatavellaprofissional@gmail.com",
+      "phone": "19971265295",
+      "status": "reserved_cash",
+      "paymentMethod": "cash",
+      "cashPaymentStatus": "pending",
+      "depositAmount": 10,
+      "depositStatus": "pending",
+      "reservationExpiresAt": 1790385425466,
+      "createdAt": 1790212625474,
+      "updatedAt": 1790212631129,
+      "paymentApprovedAt": null,
+      "reservationEmailSentAt": null,
+      "confirmationEmailSentAt": null,
+      "adminNotificationEmailSentAt": null,
+      "cashPaymentEmailSentAt": null,
+      "depositEmailSentAt": null,
+      "paypalOrderId": "26664152EP807770E",
+      "paypalCaptureId": null,
+      "transactionId": null,
+      "attendanceStatus": null,
+      "attendeeCheckInAt": null,
+      "currency": "EUR",
+      "amount": 25
     }
   ]
 }

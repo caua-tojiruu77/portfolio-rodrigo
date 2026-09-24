@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { ChevronDown } from "lucide-react";
 
 type Registration = {
@@ -79,6 +79,32 @@ export default function AdminWorkshopsPanel({
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<string | null>(null);
+  const [previewEmail, setPreviewEmail] = useState("");
+  const [previewWorkshopId, setPreviewWorkshopId] = useState(initialMetrics[0]?.id || "");
+  const [isPreviewSending, setIsPreviewSending] = useState(false);
+  const [previewMessage, setPreviewMessage] = useState("");
+  const [previewError, setPreviewError] = useState("");
+
+  const sendEmailPreview = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsPreviewSending(true);
+    setPreviewMessage("");
+    setPreviewError("");
+    try {
+      const response = await fetch("/api/admin/workshops/email-preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: previewEmail, workshopId: previewWorkshopId }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.error || "Unable to send the preview email.");
+      setPreviewMessage(data.message || "Preview email sent.");
+    } catch (previewRequestError) {
+      setPreviewError(previewRequestError instanceof Error ? previewRequestError.message : "Unable to send the preview email.");
+    } finally {
+      setIsPreviewSending(false);
+    }
+  };
 
   const refreshMetrics = async () => {
     const response = await fetch("/api/workshops", { cache: "no-store" });
@@ -191,6 +217,44 @@ export default function AdminWorkshopsPanel({
     <>
       {message && <p className="mb-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{message}</p>}
       {error && <p className="mb-4 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</p>}
+
+      <form onSubmit={sendEmailPreview} className="mb-8 rounded-2xl border border-brand-200/30 bg-white/5 p-5">
+        <h2 className="text-lg font-semibold text-white">Preview the workshop ticket email</h2>
+        <p className="mt-1 text-sm text-gray-300">Sends a clearly marked preview to your address. It does not create a reservation, charge a payment, or notify the administrator.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
+          <label className="block">
+            <span className="mb-2 block text-sm text-gray-300">Your email address</span>
+            <input
+              type="email"
+              value={previewEmail}
+              onChange={(event) => setPreviewEmail(event.target.value)}
+              placeholder="you@example.com"
+              required
+              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none placeholder:text-gray-500 focus:border-brand-200"
+            />
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-sm text-gray-300">Workshop cover</span>
+            <select
+              value={previewWorkshopId}
+              onChange={(event) => setPreviewWorkshopId(event.target.value)}
+              required
+              className="w-full rounded-xl border border-white/10 bg-[#0d0a24] px-4 py-3 text-white outline-none focus:border-brand-200"
+            >
+              {metrics.map((workshop) => <option key={workshop.id} value={workshop.id}>{workshop.name}</option>)}
+            </select>
+          </label>
+          <button
+            type="submit"
+            disabled={isPreviewSending || !previewWorkshopId}
+            className="self-end rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] transition hover:bg-[#f3d54d] disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {isPreviewSending ? "Sending…" : "Send preview"}
+          </button>
+        </div>
+        {previewMessage && <p role="status" className="mt-3 text-sm text-emerald-200">{previewMessage}</p>}
+        {previewError && <p role="alert" className="mt-3 text-sm text-red-200">{previewError}</p>}
+      </form>
 
       <label className="mb-4 block">
         <span className="mb-2 block text-sm text-gray-300">Search by registration code, name or email</span>

@@ -154,7 +154,7 @@ async function expirePendingReservations(filePath = resolveStoragePath()) {
       const expired = Number(registration.reservationExpiresAt || 0) <= Date.now();
 
       if (isPending && expired) {
-        registration.status = 'expired';
+        registration.status = 'cancelled';
         registration.updatedAt = Date.now();
         registration.reservationExpiresAt = null;
         changed = true;
@@ -393,6 +393,7 @@ async function confirmCashDeposit({ registrationId, paypalOrderId, paypalCapture
     registration.amount = CASH_RESERVATION_TOTAL_AMOUNT;
     registration.depositAmount = CASH_DEPOSIT_AMOUNT;
     registration.depositStatus = 'paid';
+    registration.paymentApprovedAt = Date.now();
     registration.reservationExpiresAt = null;
     registration.paypalOrderId = paypalOrderId || registration.paypalOrderId;
     registration.paypalCaptureId = paypalCaptureId || registration.paypalCaptureId;

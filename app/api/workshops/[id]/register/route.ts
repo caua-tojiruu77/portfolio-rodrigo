@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { createWorkshopRegistration, updateWorkshopRegistration } from "@/utils/workshopStore";
+import { createWorkshopRegistration } from "@/utils/workshopStore";
 import { getWorkshopById } from "@/utils/workshops";
-import { sendWorkshopCashReservationEmail } from "@/utils/workshopEmail";
 
 export async function POST(
   req: Request,
@@ -42,38 +41,6 @@ export async function POST(
       currency: workshop.currency || 'EUR',
       amount: Number(workshop.amount || 0),
     });
-
-    if (paymentMethod === "cash") {
-      try {
-        const emailResult = await sendWorkshopCashReservationEmail({
-          participantName: registration.participantName,
-          email: registration.email,
-          phone: registration.phone,
-          workshopName: workshop.translations.en.name,
-          workshopDate: workshop.translations.en.date,
-          workshopLocation: workshop.translations.en.location,
-          registrationCode: registration.publicCode,
-          // A cash reservation does not collect money yet; don't report the
-          // workshop's full price as an amount already paid.
-          amount: undefined,
-          currency: registration.currency,
-          purchaseDate: registration.createdAt,
-        });
-
-        if (emailResult.customerSent || emailResult.adminSent) {
-          await updateWorkshopRegistration({
-            registrationId: registration.id,
-            workshopId: registration.workshopId,
-            patch: {
-              ...(emailResult.customerSent ? { reservationEmailSentAt: Date.now() } : {}),
-              ...(emailResult.adminSent ? { adminNotificationEmailSentAt: Date.now() } : {}),
-            },
-          });
-        }
-      } catch {
-        // The reservation remains valid if SMTP is temporarily unavailable.
-      }
-    }
 
     return NextResponse.json({
       ok: true,

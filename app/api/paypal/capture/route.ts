@@ -87,7 +87,7 @@ export async function POST(req: Request) {
         transactionId,
       });
 
-      if (!confirmedDeposit.depositEmailSentAt) {
+      if (!confirmedDeposit.depositEmailSentAt || !confirmedDeposit.adminNotificationEmailSentAt) {
         try {
           const emailResult = await sendWorkshopCashDepositConfirmationEmail({
             participantName: confirmedDeposit.participantName,
@@ -96,17 +96,23 @@ export async function POST(req: Request) {
             workshopName: workshop.translations.en.name,
             workshopDate: workshop.translations.en.date,
             workshopLocation: workshop.translations.en.location,
+            workshopImage: workshop.image,
             registrationCode: confirmedDeposit.publicCode,
             amount: confirmedDeposit.depositAmount,
             currency: confirmedDeposit.currency,
             purchaseDate: confirmedDeposit.paymentApprovedAt || Date.now(),
+            sendCustomer: !confirmedDeposit.depositEmailSentAt,
+            sendAdmin: !confirmedDeposit.adminNotificationEmailSentAt,
           });
 
-          if (!emailResult.skipped) {
+          if (emailResult.customerSent || emailResult.adminSent) {
             await updateWorkshopRegistration({
               registrationId: confirmedDeposit.id,
               workshopId: confirmedDeposit.workshopId,
-              patch: { depositEmailSentAt: Date.now() },
+              patch: {
+                ...(emailResult.customerSent ? { depositEmailSentAt: Date.now() } : {}),
+                ...(emailResult.adminSent ? { adminNotificationEmailSentAt: Date.now() } : {}),
+              },
             });
           }
         } catch {
@@ -144,6 +150,7 @@ export async function POST(req: Request) {
           workshopName: workshop.translations.en.name,
           workshopDate: workshop.translations.en.date,
           workshopLocation: workshop.translations.en.location,
+          workshopImage: workshop.image,
           registrationCode: confirmedRegistration.publicCode,
           amount: confirmedRegistration.amount,
           currency: confirmedRegistration.currency,

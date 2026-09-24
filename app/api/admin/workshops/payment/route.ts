@@ -36,6 +36,7 @@ export async function POST(req: Request) {
             workshopName: workshop.translations.en.name,
             workshopDate: workshop.translations.en.date,
             workshopLocation: workshop.translations.en.location,
+            workshopImage: workshop.image,
             registrationCode: registration.publicCode,
           });
           if (!emailResult.skipped) {
