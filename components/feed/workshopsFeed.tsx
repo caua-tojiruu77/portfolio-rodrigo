@@ -69,6 +69,17 @@ export default function WorkshopsFeed() {
     paypalAvailableSlots: number;
     cashAvailableSlots: number;
   }>>({});
+
+  useEffect(() => {
+    if (!selectedWorkshop) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [selectedWorkshop]);
+
   const selectedSlotInfo = selectedWorkshop
     ? liveMetrics[selectedWorkshop.id] || { paypalAvailableSlots: 6, cashAvailableSlots: 6 }
     : { paypalAvailableSlots: 6, cashAvailableSlots: 6 };
@@ -543,8 +554,13 @@ export default function WorkshopsFeed() {
       </div>
 
       {selectedWorkshop && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#050123]/80 p-4 backdrop-blur-sm">
-          <div className="relative w-full max-w-xl rounded-3xl border border-white/10 bg-[#0d0a24] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.5)]">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-y-contain bg-[#050123]/80 p-3 backdrop-blur-sm touch-pan-y sm:items-center sm:p-4">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="workshop-checkout-title"
+            className="relative my-auto max-h-[calc(100dvh-1.5rem)] w-full max-w-xl overflow-y-auto overscroll-y-contain rounded-3xl border border-white/10 bg-[#0d0a24] p-6 shadow-[0_30px_80px_rgba(0,0,0,0.5)] [-webkit-overflow-scrolling:touch] sm:max-h-[calc(100dvh-2rem)]"
+          >
             <button
               type="button"
               aria-label="Close"
@@ -556,7 +572,7 @@ export default function WorkshopsFeed() {
 
             <div className="mb-5 pr-10">
               <p className="text-xs uppercase tracking-[0.18em] text-brand-200">Workshop</p>
-              <h3 className="mt-2 text-2xl font-semibold text-white">{getWorkshopContent(selectedWorkshop, "en").name}</h3>
+              <h3 id="workshop-checkout-title" className="mt-2 text-2xl font-semibold text-white">{getWorkshopContent(selectedWorkshop, "en").name}</h3>
               <p className="mt-2 text-sm text-gray-300">{selectedWorkshop.price}</p>
             </div>
 

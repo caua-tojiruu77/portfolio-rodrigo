@@ -62,12 +62,12 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/img/logo-header.webp",
-    shortcut: "/img/logo-header.webp",
-    apple: "/img/logo-header.webp",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
     other: {
       rel: "apple-touch-icon-precomposed",
-      url: "/img/logo-header.webp",
+      url: "/favicon.png",
     },
   },
 };
@@ -116,7 +116,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link rel="stylesheet" href="https://use.typekit.net/scq2zya.css" />
-        <link rel="icon" href="/img/logo-header.png" type="image/x-icon" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
