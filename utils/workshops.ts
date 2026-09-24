@@ -201,46 +201,6 @@ const october28Advanced: WorkshopSchedule = {
 };
 
 export const workshops: Workshop[] = [
-  {
-    id: "live-payment-test-1-eur",
-    image: "/img/workshopo-d.png",
-    visible: true,
-    price: "€1",
-    amount: 1,
-    currency: "EUR",
-    translations: {
-      en: {
-        name: "LIVE PAYMENT TEST WORKSHOP",
-        description: "Test workshop for verifying the live booking and PayPal payment flow. This listing is for testing only.",
-        date: "Live payment test · date to be confirmed",
-        location: "Online payment test",
-        level: "All levels",
-        duration: "Test booking",
-        price: "€1",
-        button: "Enroll now",
-      },
-      it: {
-        name: "WORKSHOP DI TEST PAGAMENTO LIVE",
-        description: "Workshop di test per verificare la prenotazione e il pagamento PayPal sul sito live. Questo annuncio è solo per test.",
-        date: "Test pagamento live · data da confermare",
-        location: "Test di pagamento online",
-        level: "Tutti i livelli",
-        duration: "Prenotazione di test",
-        price: "€1",
-        button: "Iscriviti",
-      },
-      de: {
-        name: "LIVE-ZAHLUNGSTEST-WORKSHOP",
-        description: "Test-Workshop zur Überprüfung der Live-Buchung und PayPal-Zahlung. Dieser Eintrag ist nur für Tests gedacht.",
-        date: "Live-Zahlungstest · Termin noch offen",
-        location: "Online-Zahlungstest",
-        level: "Alle Levels",
-        duration: "Testbuchung",
-        price: "€1",
-        button: "Jetzt anmelden",
-      },
-    },
-  },
   createScheduledWorkshop(
     workshopTemplates[0],
     "handstand-beginners",

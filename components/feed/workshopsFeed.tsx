@@ -122,6 +122,15 @@ export default function WorkshopsFeed() {
     return () => window.clearInterval(refreshInterval);
   }, [refreshLiveMetrics]);
 
+  // Temporary visual preview: open /workshops?preview-confirmation=1.
+  // This only displays the popup and does not create a reservation or send email.
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("preview-confirmation") === "1") {
+      setPaymentMessage("Payment confirmed. Your workshop place is reserved.");
+    }
+  }, []);
+
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const paymentResult = params.get("payment");
@@ -464,6 +473,7 @@ export default function WorkshopsFeed() {
             <p className="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Payment successful</p>
             <h2 id="payment-confirmation-title" className="mt-3 text-2xl font-semibold text-white">Your place is confirmed</h2>
             <p className="mt-4 text-sm leading-6 text-gray-200">{paymentMessage}</p>
+            <p className="mt-3 text-sm leading-6 text-gray-300">Please check your inbox and spam/junk folder for the confirmation email and your registration code.</p>
             <button
               type="button"
               onClick={() => setPaymentMessage("")}

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("admin");
+  const [username, setUsername] = useState("RodrigoAdm");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -15,22 +15,26 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError("");
 
-    const response = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    const data = await response.json();
-    setLoading(false);
+      const data = await response.json();
+      if (!response.ok || !data.ok) {
+        setError(data.error || "Credenciais inválidas.");
+        return;
+      }
 
-    if (!response.ok || !data.ok) {
-      setError(data.error || "Credenciais inválidas.");
-      return;
+      router.push("/admin/workshops");
+      router.refresh();
+    } catch {
+      setError("Não foi possível conectar. Tente novamente.");
+    } finally {
+      setLoading(false);
     }
-
-    router.push("/admin/workshops");
-    router.refresh();
   };
 
   return (
@@ -61,8 +65,14 @@ export default function AdminLoginPage() {
 
           {error && <p className="rounded-xl border border-red-500/60 bg-red-500/10 px-3 py-2 text-sm text-red-200">{error}</p>}
 
-          <button type="submit" disabled={loading} className="inline-flex w-full items-center justify-center rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] disabled:opacity-60">
-            {loading ? "Entrando..." : "Entrar"}
+          <button type="submit" disabled={loading} aria-busy={loading} className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand-200 px-5 py-3 text-sm font-semibold text-[#050123] disabled:cursor-wait disabled:opacity-70">
+            {loading && (
+              <svg aria-hidden="true" className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            )}
+            <span>{loading ? "Entrando..." : "Entrar"}</span>
           </button>
         </div>
       </form>

@@ -10,6 +10,7 @@ type Registration = {
   participantName: string;
   email: string;
   phone: string;
+  createdAt?: number;
   status: string;
   paymentMethod?: "paypal" | "cash" | null;
   cashPaymentStatus?: string | null;
@@ -41,6 +42,8 @@ type ApiResponse = {
   registration?: Registration;
   error?: string;
 };
+
+const TEST_WORKSHOP_ID = "live-payment-test-1-eur";
 
 function formatOptionalDate(value: number | null | undefined) {
   return value ? new Date(value).toLocaleString("en-GB") : "—";
@@ -80,10 +83,11 @@ export default function AdminWorkshopsPanel({
   const [search, setSearch] = useState("");
   const [selectedWorkshopId, setSelectedWorkshopId] = useState<string | null>(null);
   const [previewEmail, setPreviewEmail] = useState("");
-  const [previewWorkshopId, setPreviewWorkshopId] = useState(initialMetrics[0]?.id || "");
+  const [previewWorkshopId, setPreviewWorkshopId] = useState(initialMetrics.find((workshop) => workshop.id !== TEST_WORKSHOP_ID)?.id || "");
   const [isPreviewSending, setIsPreviewSending] = useState(false);
   const [previewMessage, setPreviewMessage] = useState("");
   const [previewError, setPreviewError] = useState("");
+  const selectableMetrics = metrics.filter((workshop) => workshop.id !== TEST_WORKSHOP_ID);
 
   const sendEmailPreview = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -218,7 +222,7 @@ export default function AdminWorkshopsPanel({
       {message && <p className="mb-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">{message}</p>}
       {error && <p className="mb-4 rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</p>}
 
-      <form onSubmit={sendEmailPreview} className="mb-8 rounded-2xl border border-brand-200/30 bg-white/5 p-5">
+      <form onSubmit={sendEmailPreview} className="hidden mb-8 rounded-2xl border border-brand-200/30 bg-white/5 p-5">
         <h2 className="text-lg font-semibold text-white">Preview the workshop ticket email</h2>
         <p className="mt-1 text-sm text-gray-300">Sends a clearly marked preview to your address. It does not create a reservation, charge a payment, or notify the administrator.</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
@@ -241,7 +245,7 @@ export default function AdminWorkshopsPanel({
               required
               className="w-full rounded-xl border border-white/10 bg-[#0d0a24] px-4 py-3 text-white outline-none focus:border-brand-200"
             >
-              {metrics.map((workshop) => <option key={workshop.id} value={workshop.id}>{workshop.name}</option>)}
+              {selectableMetrics.map((workshop) => <option key={workshop.id} value={workshop.id}>{workshop.name}</option>)}
             </select>
           </label>
           <button
@@ -278,7 +282,7 @@ export default function AdminWorkshopsPanel({
       </div>
 
       <div className="mb-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {metrics.map((workshop) => (
+        {selectableMetrics.map((workshop) => (
           <button
             type="button"
             key={workshop.id}
@@ -314,6 +318,8 @@ export default function AdminWorkshopsPanel({
               <div className="mt-4 grid gap-3 border-t border-white/10 pt-4 text-sm">
                 <p><span className="text-gray-400">Workshop:</span> <span className="break-words text-gray-100">{registration.workshopId}</span></p>
                 <p><span className="text-gray-400">Payment:</span> {formatStatus(registration.status)}</p>
+                <p><span className="text-gray-400">Booked on:</span> {formatOptionalDate(registration.createdAt)}</p>
+                {registration.reservationExpiresAt && <p><span className="text-gray-400">Payment deadline:</span> {formatOptionalDate(registration.reservationExpiresAt)}</p>}
                 {registration.paymentMethod === "cash" && <p className="text-xs text-gray-400">PayPal deposit: €{registration.depositAmount || 10} ({registration.depositStatus || "pending"}) · €15 due in cash</p>}
                 <div>
                   <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-400">Attendance</p>
@@ -360,7 +366,8 @@ export default function AdminWorkshopsPanel({
                     <td className="px-4 py-3">
                       <span>{formatStatus(registration.status)}</span>
                       {registration.paymentMethod === "cash" && <span className="block text-xs text-gray-400">PayPal deposit: €{registration.depositAmount || 10} ({registration.depositStatus || "pending"}) · €15 due in cash</span>}
-                      <span className="block text-xs text-gray-400">Reservation: {formatOptionalDate(registration.reservationExpiresAt)}</span>
+                      <span className="block text-xs text-gray-400">Booked on: {formatOptionalDate(registration.createdAt)}</span>
+                      {registration.reservationExpiresAt && <span className="block text-xs text-gray-400">Payment deadline: {formatOptionalDate(registration.reservationExpiresAt)}</span>}
                     </td>
                     <td className="px-4 py-3">{paymentReference}</td>
                     <td className="px-4 py-3">
