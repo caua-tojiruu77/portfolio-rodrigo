@@ -203,20 +203,6 @@ const october28Advanced: WorkshopSchedule = {
 export const workshops: Workshop[] = [
   createScheduledWorkshop(
     workshopTemplates[0],
-    "handstand-beginners",
-    "/contact?subject=Handstand%20Workshop%20Beginners%20October%2021",
-    october21,
-    beginners,
-  ),
-  createScheduledWorkshop(
-    workshopTemplates[1],
-    "handstand-intermediate-advanced",
-    "/contact?subject=Handstand%20Workshop%20Advanced%20October%2021",
-    october21Advanced,
-    advanced,
-  ),
-  createScheduledWorkshop(
-    workshopTemplates[0],
     "handstand-beginners-28",
     "/contact?subject=Handstand%20Workshop%20Beginners%20October%2028",
     october28,
