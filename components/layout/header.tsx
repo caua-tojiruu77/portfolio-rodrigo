@@ -6,7 +6,6 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { createPolyglot } from "@/utils/polyglot";
 import { useLanguage } from "@/context/languageContext";
-import { workshopsEnabled } from "@/utils/workshops";
 
 export default function Header() {
   const [navbar, setNavbar] = useState(false);
@@ -34,9 +33,7 @@ export default function Header() {
       href: "/academicFormation",
     },
     { name: polyglot.t("header.gallery"), href: "/gallery" },
-    ...(workshopsEnabled
-      ? [{ name: polyglot.t("header.workshops"), href: "/workshops" }]
-      : []),
+    { name: polyglot.t("header.workshops"), href: "/workshops" },
   ];
 
   return (

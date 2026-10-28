@@ -366,10 +366,6 @@ export default function WorkshopsFeed() {
     };
   }, [reservation, selectedWorkshop, refreshLiveMetrics]);
 
-  if (!enabledWorkshops.length) {
-    return null;
-  }
-
   const openRegister = (workshop: Workshop) => {
     setSelectedWorkshop(workshop);
     setFormData({ participantName: "", email: "", phone: "", paymentMethod: "paypal" });
@@ -494,6 +490,13 @@ export default function WorkshopsFeed() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2">
+          {!enabledWorkshops.length && (
+            <div className="col-span-full rounded-3xl border border-white/10 bg-white/5 px-6 py-16 text-center shadow-[0_20px_50px_rgba(0,0,0,0.2)] backdrop-blur-sm">
+              <p className="text-sm font-semibold uppercase tracking-[0.25em] text-brand-200">
+                Coming soon
+              </p>
+            </div>
+          )}
           {enabledWorkshops.map((workshop) => {
             const content = getWorkshopContent(workshop, "en");
             const slotInfo = liveMetrics[workshop.id] || { availableSlots: 12, isFull: false, paypalAvailableSlots: 6, cashAvailableSlots: 6 };

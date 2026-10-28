@@ -176,46 +176,7 @@ const advanced: WorkshopLevel = {
   level: { en: "Advanced", it: "Avanzato", de: "Fortgeschritten" },
 };
 
-const october21: WorkshopSchedule = {
-  en: "October 21 · 18:00–19:30",
-  it: "21 ottobre · 18:00–19:30",
-  de: "21. Oktober · 18:00–19:30",
-};
-
-const october21Advanced: WorkshopSchedule = {
-  en: "October 21 · 19:30–21:00",
-  it: "21 ottobre · 19:30–21:00",
-  de: "21. Oktober · 19:30–21:00",
-};
-
-const october28: WorkshopSchedule = {
-  en: "October 28 · 18:00–19:30",
-  it: "28 ottobre · 18:00–19:30",
-  de: "28. Oktober · 18:00–19:30",
-};
-
-const october28Advanced: WorkshopSchedule = {
-  en: "October 28 · 19:30–21:00",
-  it: "28 ottobre · 19:30–21:00",
-  de: "28. Oktober · 19:30–21:00",
-};
-
-export const workshops: Workshop[] = [
-  createScheduledWorkshop(
-    workshopTemplates[0],
-    "handstand-beginners-28",
-    "/contact?subject=Handstand%20Workshop%20Beginners%20October%2028",
-    october28,
-    beginners,
-  ),
-  createScheduledWorkshop(
-    workshopTemplates[1],
-    "handstand-advanced-28",
-    "/contact?subject=Handstand%20Workshop%20Advanced%20October%2028",
-    october28Advanced,
-    advanced,
-  ),
-];
+export const workshops: Workshop[] = [];
 
 export const getWorkshopContent = (
   workshop: Workshop,
