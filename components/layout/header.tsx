@@ -47,7 +47,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="shrink-0">
             <Image
-              src="/img/logo-header-1.png"
+              src="/img/logo-header-1.webp"
               width={170}
               height={170}
               alt="Logo"

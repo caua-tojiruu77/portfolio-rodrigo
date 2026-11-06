@@ -18,7 +18,7 @@ export default function GalleryLibraries() {
 
         const cover = lib.type === "image" && lib.items.length > 0
           ? `${lib.path}/${typeof lib.items[0] === "string" ? lib.items[0] : lib.items[0].src}`
-          : "/img/logo-header.png";
+          : "/img/logo-header-1.webp";
 
         return (
           <motion.div

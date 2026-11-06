@@ -155,7 +155,7 @@ export default function ExperienceSection() {
               className="w-full h-auto rounded-2xl overflow-hidden"
             >
               <Image
-                src="/img/exp-image.png"
+                src="/img/exp-image.webp"
                 alt="Experience for Rodrigo Tavella"
                 title="My experience in dance and acrobatics"
                 width={500}

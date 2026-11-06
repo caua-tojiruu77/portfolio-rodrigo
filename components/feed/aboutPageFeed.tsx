@@ -207,7 +207,7 @@ export default function AboutSection() {
               className="w-full h-auto rounded-2xl overflow-hidden"
             >
               <Image
-                src="/img/about-images.png"
+                src="/img/about-images.webp"
                 alt="About Rodrigo Tavella"
                 title="About for Rodrigo Tavella"
                 width={500}
@@ -266,7 +266,7 @@ export default function AboutSection() {
               className="w-full h-auto rounded-2xl overflow-hidden shadow-2xl"
             >
               <Image
-                src="/img/about-image-2.png"
+                src="/img/about-image-2.webp"
                 alt="Tech Sheet Rodrigo Tavella"
                 title="Dance and Performance Artist"
                 width={500}

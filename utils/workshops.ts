@@ -27,7 +27,7 @@ export type Workshop = {
 const workshopTemplates: Workshop[] = [
   {
     id: "handstand-beginners",
-    image: "/img/workshopo-d.png",
+    image: "/img/workshopo-d.webp",
     registrationUrl: "/contact?subject=Handstand%20Workshop%20Beginners",
     visible: true,
     price: "€25",
@@ -71,7 +71,7 @@ const workshopTemplates: Workshop[] = [
   },
   {
     id: "handstand-intermediate-advanced",
-    image: "/img/workshopo-d.png",
+    image: "/img/workshopo-d.webp",
     registrationUrl: "/contact?subject=Handstand%20Workshop%20Intermediate%20Advanced",
     visible: true,
     price: "€25",

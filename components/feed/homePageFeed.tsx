@@ -95,7 +95,7 @@ export default function HomePageSection() {
               className="w-[28rem] h-[28rem] md:w-[36rem] md:h-[36rem] lg:w-full lg:h-auto rounded-2xl overflow-hidden"
             >
               <Image
-                src="/img/home-photo.png"
+                src="/img/home-photo-main.webp"
                 alt="Rodrigo Tavella, Professional Dancer and Teacher"
                 title="Professional Dancer and Teacher"
                 width={900}

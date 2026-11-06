@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     siteName: 'Portfólio Rodrigo Tavella',
     images: [
       {
-        url: '/img/logo-header.png',
+        url: '/img/logo-header-1.webp',
         width: 845,
         height: 471,
       },

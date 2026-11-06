@@ -183,7 +183,7 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className={`rounded-lg overflow-hidden shadow-lg relative transition-transform duration-200 ${hoveredIndex === idx ? 'scale-105' : 'scale-100'}`}
+            className={`rounded-lg overflow-hidden shadow-lg relative bg-black/40 transition-transform duration-200 ${hoveredIndex === idx ? 'scale-105' : 'scale-100'}`}
             onClick={() => {
               if (item.type === "video") {
                 const iframe = slideIframes.current[idx];
@@ -221,7 +221,7 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
                   alt={item.title ? item.title[language] : `${lib.title[language]} image ${idx + 1}`}
                   width={400}
                   height={400}
-                  className="object-cover w-full h-48"
+                  className="object-contain w-full h-48"
                 />
                 {/* thumbnails: no titles or descriptions (kept clean as requested) */}
               </>
@@ -269,7 +269,7 @@ export default function GalleryFeed({ category }: GalleryFeedProps) {
                     alt={selectedItem?.title ? selectedItem.title[language] : `${lib.title[language]} image`}
                     width={900}
                     height={900}
-                    className="max-h-[50vh] max-w-[60vw] object-contain"
+                    className="max-h-[80vh] max-w-[90vw] object-contain"
                   />
 
                   {/* Nav buttons */}
