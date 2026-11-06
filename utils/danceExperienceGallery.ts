@@ -4,7 +4,7 @@ export type DanceExperienceGallery = {
 };
 
 export const danceExperienceGalleries: Record<string, DanceExperienceGallery> = {
-  "/img/danceExperience/endstation-sehnsucht/4.webp": {
+  "/img/danceExperience/endstation-sehnsucht/12.webp": {
     path: "/img/danceExperience/endstation-sehnsucht",
     items: [
       "1.webp",
@@ -45,7 +45,7 @@ export const danceExperienceGalleries: Record<string, DanceExperienceGallery> = 
       "17.webp",
     ],
   },
-  "/img/danceExperience/movie-park-26/12.webp": {
+  "/img/danceExperience/movie-park-26/15.webp": {
     path: "/img/danceExperience/movie-park-26",
     items: [
       "1.webp",
@@ -59,12 +59,7 @@ export const danceExperienceGalleries: Record<string, DanceExperienceGallery> = 
       "9.webp",
       "10.webp",
       "11.webp",
-      "12.webp",
-      "13.webp",
-      "14.webp",
       "15.webp",
-      "16.webp",
-      "17.webp",
       "18.webp",
       "19.webp",
     ],
@@ -113,6 +108,11 @@ export const danceExperienceGalleries: Record<string, DanceExperienceGallery> = 
       "16.webp",
       "17.webp",
       "18.webp",
+      "19.webp",
+      "20.webp",
+      "21.webp",
+      "22.webp",
+      "23.webp",
     ],
   },
   "4.webp": {

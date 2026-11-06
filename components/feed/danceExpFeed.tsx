@@ -62,7 +62,7 @@ export default function DanceExperienceFeed() {
           subtitle:
             "Part of John Neumeier’s ballet production Endstation Sehnsucht, performing as a dancer in a theatrical work that combines expressive movement, dramatic interpretation and contemporary ballet.",
           date: "From April to July 2026",
-          img: "/img/danceExperience/endstation-sehnsucht/4.webp",
+          img: "/img/danceExperience/endstation-sehnsucht/12.webp",
         },
         {
           title: "Dancer in the Musical Paul die Laterne",
@@ -78,10 +78,10 @@ export default function DanceExperienceFeed() {
           subtitle:
             "Performing across three seasonal entertainment productions: Dancer and Acrobatic in Summer Season, Dancer in Halloween Horror Festival and Dancer in Hollywood Christmas. Bringing different characters, choreography and theatrical performances to life through dance, physical expression and stage presence.",
           date: "From February 2026 to January 2027",
-          img: "/img/danceExperience/movie-park-26/12.webp",
+          img: "/img/danceExperience/movie-park-26/15.webp",
         },
         {
-          title: "Exploria Party",
+          title: "Exploria Party - Burlesque Show",
           company: "It's an event for the 20th year party, with my choreographies Elegante Emotion and ChairDance / Bottrop-Germany",
           subtitle: "Dancer",
           date: "From 2024 to 2025",
@@ -173,7 +173,7 @@ export default function DanceExperienceFeed() {
           subtitle:
             "Parte della produzione di balletto Endstation Sehnsucht di John Neumeier, interpretando un ruolo da ballerino in un'opera teatrale che unisce movimento espressivo, interpretazione drammatica e balletto contemporaneo.",
           date: "Da aprile a luglio 2026",
-          img: "/img/danceExperience/endstation-sehnsucht/4.webp",
+          img: "/img/danceExperience/endstation-sehnsucht/12.webp",
         },
         {
           title: "Ballerino nel musical Paul die Laterne",
@@ -189,10 +189,10 @@ export default function DanceExperienceFeed() {
           subtitle:
             "Si esibisce in tre produzioni stagionali: ballerino e acrobata nella stagione estiva, ballerino all'Halloween Horror Festival e ballerino a Hollywood Christmas. Dà vita a personaggi, coreografie e performance teatrali diversi attraverso la danza, l'espressione fisica e la presenza scenica.",
           date: "Da febbraio 2026 a gennaio 2027",
-          img: "/img/danceExperience/movie-park-26/12.webp",
+          img: "/img/danceExperience/movie-park-26/15.webp",
         },
         {
-          title: "Exploria Party",
+          title: "Exploria Party - Burlesque Show",
           company:
             "È un evento per la festa del 20º anniversario, con le mie coreografie Elegante Emotion e ChairDance / Bottrop-Germania",
           subtitle: "Ballerino",
@@ -286,7 +286,7 @@ export default function DanceExperienceFeed() {
           subtitle:
             "Teil von John Neumeiers Ballettproduktion Endstation Sehnsucht, als Tänzer in einem Bühnenwerk mit ausdrucksstarker Bewegung, dramatischer Interpretation und zeitgenössischem Ballett.",
           date: "Von April bis Juli 2026",
-          img: "/img/danceExperience/endstation-sehnsucht/4.webp",
+          img: "/img/danceExperience/endstation-sehnsucht/12.webp",
         },
         {
           title: "Tänzer im Musical Paul die Laterne",
@@ -302,10 +302,10 @@ export default function DanceExperienceFeed() {
           subtitle:
             "Auftritte in drei saisonalen Unterhaltungsproduktionen: Tänzer und Akrobat in der Sommersaison, Tänzer beim Halloween Horror Festival und Tänzer bei Hollywood Christmas. Verschiedene Figuren, Choreografien und theatralische Darbietungen werden durch Tanz, körperlichen Ausdruck und Bühnenpräsenz zum Leben erweckt.",
           date: "Von Februar 2026 bis Januar 2027",
-          img: "/img/danceExperience/movie-park-26/12.webp",
+          img: "/img/danceExperience/movie-park-26/15.webp",
         },
         {
-          title: "Exploria Party",
+          title: "Exploria Party - Burlesque Show",
           company:
             "Eine Veranstaltung zur Feier des 20-jährigen Jubiläums, mit meinen Choreografien Elegante Emotion und ChairDance / Bottrop-Deutschland",
           subtitle: "Tänzer",
